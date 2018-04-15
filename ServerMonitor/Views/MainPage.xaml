@@ -1,0 +1,278 @@
+﻿<Page x:Class="ServerMonitor.Views.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:Behaviors="using:Template10.Behaviors"
+      xmlns:Core="using:Microsoft.Xaml.Interactions.Core"
+      xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
+      xmlns:controls="using:Template10.Controls"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="using:ServerMonitor.Views"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:vm="using:ServerMonitor.Views" 
+      xmlns:vm1="using:ServerMonitor.ViewModels"
+      mc:Ignorable="d">
+    <Page.DataContext>
+        <vm1:MainPageViewModel x:Name="ViewModel" />
+    </Page.DataContext>
+    <RelativePanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="AdaptiveVisualStateGroup">
+                <VisualState x:Name="VisualStateNarrow">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="720" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="RightUp.Visibility" Value="Visible" />
+                        <Setter Target="RightLow.Visibility" Value="Visible" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <controls:PageHeader x:Name="pageHeader" RelativePanel.AlignLeftWithPanel="True"
+                             RelativePanel.AlignRightWithPanel="True"
+                             RelativePanel.AlignTopWithPanel="True" Text="Server Monitor">
+
+            <controls:PageHeader.PrimaryCommands>
+                <AppBarButton Icon="Refresh" Foreground="White" Click = "{x:Bind ViewModel.Refresh_Click}"/>
+
+                <AppBarButton Icon="Filter" Foreground="White" Name="filter">
+                    <AppBarButton.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyout.MenuFlyoutPresenterStyle>
+                                <Style TargetType="MenuFlyoutPresenter">
+                                    <Setter Property="Margin" Value="0 -16 0 0"/>
+                                </Style>
+                            </MenuFlyout.MenuFlyoutPresenterStyle>
+                            <MenuFlyoutItem Text="All Servers" Name="AllServers" Tag="2" Click = "{x:Bind ViewModel.Filter_Click}"/>
+                            <MenuFlyoutItem Text="Error" Name="Error" Tag="0" Click = "{x:Bind ViewModel.Filter_Click}"/>
+                            <MenuFlyoutItem Text="Normal" Name="Normal" Tag="1" Click = "{x:Bind ViewModel.Filter_Click}"/>
+                        </MenuFlyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+
+                <AppBarButton Icon="AlignLeft" Foreground="White">
+                    <AppBarButton.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyout.MenuFlyoutPresenterStyle>
+                                <Style TargetType="MenuFlyoutPresenter">
+                                    <Setter Property="Margin" Value="0 -16 0 0"/>
+                                </Style>
+                            </MenuFlyout.MenuFlyoutPresenterStyle>
+                            <MenuFlyoutItem Text="Server Id Ascend" Name="serverIdAscend" Tag="1" Click = "{x:Bind ViewModel.Order_Click}"/>
+                            <MenuFlyoutItem Text="Server Id Descend" Name="serverIdDescend" Tag="2" Click = "{x:Bind ViewModel.Order_Click}"/>
+                            <MenuFlyoutItem Text="Alphabetical Ascend" Name="alphabeticalAscend" Tag="3" Click = "{x:Bind ViewModel.Order_Click}"/>
+                            <MenuFlyoutItem Text="Alphabetical Descend" Name="alphabeticalDescend" Tag="4" Click = "{x:Bind ViewModel.Order_Click}"/>
+                        </MenuFlyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+                <AppBarButton x:Name="AddServers" Label="ADD" Icon="Add" Foreground="White" Background="Transparent">
+                    <AppBarButton.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyout.MenuFlyoutPresenterStyle>
+                                <Style TargetType="MenuFlyoutPresenter">
+                                    <Setter Property="Margin" Value="0 -16 0 0"/>
+                                </Style>
+                            </MenuFlyout.MenuFlyoutPresenterStyle>
+                            <MenuFlyoutItem Text="ADD Server " Name="addserver" Tag="1" Click="{x:Bind ViewModel.Add_Server}" />
+                            <MenuFlyoutItem Text="ADD Website" Name="addwebsite" Tag="2" Click="{x:Bind ViewModel.Add_Website}"/>
+                        </MenuFlyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+            </controls:PageHeader.PrimaryCommands>
+
+            <!--  secondary commands  -->
+            <controls:PageHeader.SecondaryCommands>
+                <AppBarButton Click = "{x:Bind ViewModel.RequestAll_Click}" Label="Request All" Name="requestAll"/>
+            </controls:PageHeader.SecondaryCommands>
+        </controls:PageHeader>
+
+        <Grid RelativePanel.Below="pageHeader" HorizontalAlignment="Stretch" 
+              RelativePanel.AlignBottomWithPanel="True"
+              RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignRightWithPanel="True">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <RelativePanel Grid.Column="0" Grid.RowSpan="2">
+                <Grid x:Name="precheck_btn" Height="52"
+                      Margin="4,24,4,0"
+                      RelativePanel.AlignRightWith="sitelist_scroll"
+                      RelativePanel.AlignLeftWith="sitelist_scroll"
+                      RelativePanel.AlignHorizontalCenterWithPanel="True"
+                      HorizontalAlignment="Stretch" Background="{Binding PreCheckColor}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Image x:Name="precheck_image" Grid.Column="0" Margin="8,4,0,0"
+                           Source="/Images/ic_precheck.png" Width="32" Height="32"
+                           VerticalAlignment="Top" HorizontalAlignment="Left" />
+                    <RelativePanel Grid.Column="1">
+                        <TextBlock x:Name="precheck_site_name" Text="{Binding PreCheckName}" 
+                                   Margin="12,4,0,0" Foreground="White"/>
+
+                        <StackPanel Orientation="Horizontal" RelativePanel.AlignTopWithPanel="True"
+                                    RelativePanel.AlignRightWithPanel="True">
+                            <TextBlock x:Name="request_time" Text="Next Refresh : " Margin="0,10,8,0"
+                                       Foreground="White"  />
+                            <TextBlock x:Name="cdtxt" FontSize="24" HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" Foreground="White" Margin="0,4,8,0"></TextBlock>
+                        </StackPanel>
+
+
+                        <TextBlock x:Name="precheck_status" Text="{Binding PreCheckResult}" Margin="12,0,0,4"
+                                   Foreground="LightGray" RelativePanel.AlignBottomWithPanel="True"
+                                   RelativePanel.AlignLeftWithPanel="True"/>
+                    </RelativePanel>
+                </Grid>
+                <ScrollViewer x:Name="sitelist_scroll"
+                              RelativePanel.AlignHorizontalCenterWithPanel="True"
+                              VerticalScrollBarVisibility="Auto" Margin="0,116,0,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <GridView x:Name="sitelist"
+                                  ItemsSource="{Binding SiteItems}"
+                                  AllowDrop="True" HorizontalAlignment="Center"
+                                  CanReorderItems="True" SelectionMode="Single"
+                                  Tapped="{x:Bind ViewModel.SiteList_Tapped}"
+                                  Padding="4,0,0,0" RightTapped="SiteList_RightTapped">
+                            <GridView.Resources>
+                                <MenuFlyout x:Name="site_flyout">
+                                    <MenuFlyout.Items>
+                                        <MenuFlyoutItem Text="Copy" Click = "{x:Bind ViewModel.CopyFlyoutItem_Click}"/>
+                                        <MenuFlyoutItem Text="Close" Click = "{x:Bind ViewModel.CloseFlyoutItem_Click}"/>
+                                        <MenuFlyoutItem Text="Delete" Click = "{x:Bind ViewModel.DeleteFlyoutItem_Click}"/>
+                                    </MenuFlyout.Items>
+                                </MenuFlyout>
+                            </GridView.Resources>
+                            <GridView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Background="{Binding ResultColor}" Width="220" Height="100">
+                                        <Image Source="{Binding Image_path}" Width="32" Height="32"
+                                               Margin="4,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                        <TextBlock Text="{Binding Id}" Margin="0,4,4,0" Foreground="White"
+                                                   HorizontalAlignment="Right" VerticalAlignment="Top">
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Site_name}" Foreground="White" FontSize="32"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Last_result}" Margin="0,0,4,4" Foreground="LightGray"
+                                                   HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </GridView.ItemTemplate>
+                        </GridView>
+                        <!--site detail-->
+                        <Grid Grid.Row="1" Margin="4,16,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Site Detail" FontSize="24"/>
+                            <GridView Margin="0,12,0,0"  Grid.Row="1" ItemsSource="{Binding SiteResults}"
+                                      AllowDrop="True" CanReorderItems="True" SelectionMode="None">
+                                <GridView.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Vertical" Width="220">
+                                            <Grid BorderThickness="1" BorderBrush="{Binding Color}" Margin="0,0,4,0"/>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Margin="0,8,0,0" Text="{Binding Name}" Foreground="{Binding Color}"/>
+                                                <TextBlock Margin="4,8,0,0" Text="{Binding Number}" Foreground="{Binding Color}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </GridView.ItemTemplate>
+                            </GridView>
+                        </Grid>
+                    </Grid>
+                </ScrollViewer>
+            </RelativePanel>
+
+            <Grid x:Name="RightUp" Grid.Row="0" Grid.Column="1" Width="200" BorderThickness="2"
+                          BorderBrush="#E5E5E5" Background="#F0F0F0"
+                          Margin="0,24,8,4" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid BorderThickness="0,0,0,2" BorderBrush="#E5E5E5">
+                    <TextBlock Text="Recent Outage Site" FontSize="18" FontWeight="Bold" Margin="8,4,0,8" Foreground="#4682B4"/>
+                </Grid>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
+                    <ListView SelectionMode="None"  ItemsSource="{Binding OutageSites}"
+                              Foreground="White" IsItemClickEnabled="True" Grid.Row="1">
+                        <ListView.Resources>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="BorderThickness" Value="0,0,0,2"/>
+                                <Setter Property="BorderBrush" Value="#E5E5E5" />
+                            </Style>
+                        </ListView.Resources>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="-4,0,0,0" HorizontalAlignment="Stretch" Height="44" Width="180">
+                                    <TextBlock Text="{Binding Site_name}" FontWeight="Bold" Foreground="{Binding Color}"
+                                           HorizontalAlignment="Left" VerticalAlignment="Center" Width="80"/>
+                                    <TextBlock Text="{Binding LastTime}" Foreground="{Binding Color}" Grid.Column="1"
+                                           HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="12"
+                                           Margin="0,0,4,0"/>
+                                    <!--<Grid BorderThickness="1" BorderBrush="Gray" Margin="0,0,0,0" Height="1"
+                                      VerticalAlignment="Bottom"/>-->
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </ScrollViewer>
+            </Grid>
+
+            <Grid  x:Name="RightLow" Grid.Row="1" Grid.Column="1" Width="200"
+                   BorderThickness="2" BorderBrush="#E5E5E5" Background="#F0F0F0"
+                   Margin="0,20,8,8" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid BorderThickness="0,0,0,2" BorderBrush="#E5E5E5">
+                    <TextBlock Text="Site Performance" FontSize="18" FontWeight="Bold" Margin="8,4,0,8" Foreground="#4682B4"/>
+                </Grid>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
+                    <ListView SelectionMode="None"  ItemsSource="{Binding SitePerformanceList}"
+                              Foreground="White" IsItemClickEnabled="True" Grid.Row="1">
+                        <ListView.Resources>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="BorderThickness" Value="0,0,0,2"/>
+                                <Setter Property="BorderBrush" Value="#E5E5E5" />
+                            </Style>
+                        </ListView.Resources>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="-4,0,0,0" HorizontalAlignment="Stretch" Width="180" Height="50">
+                                    <TextBlock Text="{Binding Ranking}" FontWeight="Bold" Foreground="Black" FontSize="20"
+                                               HorizontalAlignment="Left" VerticalAlignment="Center" Width="48"/>
+                                    <TextBlock Text="{Binding Site_name}" Foreground="Black" Grid.Column="1" FontWeight="Bold"
+                                               HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="12"
+                                               Margin="68,8,4,0"/>
+                                    <TextBlock Text="Apdex :" Foreground="Black" Grid.Column="1"
+                                               HorizontalAlignment="Left" VerticalAlignment="Bottom" FontSize="12"
+                                               Margin="68,0,4,8"/>
+                                    <TextBlock Text="{Binding Apdex}" Foreground="Black" Grid.Column="1"
+                                               HorizontalAlignment="Left" VerticalAlignment="Bottom" FontSize="12"
+                                               Margin="112,0,4,8"/>
+                                    <!--<Grid BorderThickness="1" BorderBrush="Gray" Margin="0,0,0,0" Height="1"
+                                          VerticalAlignment="Bottom"/>-->
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </ScrollViewer>
+            </Grid>
+            
+        </Grid>
+    </RelativePanel>
+</Page>

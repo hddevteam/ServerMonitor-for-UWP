@@ -1,0 +1,185 @@
+﻿<Page
+    x:Class="ServerMonitor.Views.Contact"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ServerMonitor.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Template10.Controls"
+    xmlns:vm="using:ServerMonitor.ViewModels"
+    mc:Ignorable="d">
+    <Page.DataContext>
+        <vm:ContactViewModel x:Name="ViewModel"/>
+    </Page.DataContext>
+    <Grid Background="White">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="AdaptiveVisualStateGroup">
+                <VisualState x:Name="VisualStateNarrow">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="600" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="RightFrame1.Width" Value="360" />
+                        <Setter Target="RightFrame2.Width" Value="360" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <controls:PageHeader RelativePanel.AlignLeftWithPanel="True"
+                             RelativePanel.AlignRightWithPanel="True"
+                             RelativePanel.AlignTopWithPanel="True"
+                             Text="Controls" >
+            <AppBarButton Icon="Add" Foreground="White" Name="AddPage" 
+                          Click = "{x:Bind ViewModel.AddContact}"/>
+        </controls:PageHeader>
+        <!--联系人列表-->
+        <Grid Grid.Row="1" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal" Margin="12,24,24,16">
+                <TextBlock Text="Name" Width="260" FontSize="16" Foreground="Black" FontWeight="Black"/>
+                <TextBlock Text="E-mail" Width="240" FontSize="16" Foreground="Black" FontWeight="Bold"/>
+                <TextBlock Text="Telephone Number" Width="240" FontSize="16" Foreground="Black" FontWeight="Bold"/>
+            </StackPanel>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" 
+                      VerticalAlignment="Top">
+                <ListBox x:Name="contactList" ItemsSource="{Binding Contacts}"
+                         Tapped="{x:Bind ViewModel.Contactlist_Tapped}" RightTapped="ContactList_RightTapped">
+                    <ListBox.Resources>
+                        <MenuFlyout x:Name="contactListFlyout">
+                            <MenuFlyout.Items>
+                                <MenuFlyoutItem Text="Edit" Click = "{x:Bind ViewModel.EditFlyoutItem_Click}"/>
+                                <MenuFlyoutItem Text="Delete" Click = "{x:Bind ViewModel.DeleteFlyoutItem_Click}"/>
+                            </MenuFlyout.Items>
+                        </MenuFlyout>
+                    </ListBox.Resources>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="/Images/head.png"
+                                       Width="36" Height="36" Margin="0,4,0,4"/>
+                                <TextBlock Text="{Binding Contact_name}" FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" Width="208" Margin="8,0,8,0"/>
+                                <TextBlock Text="{Binding Contact_email}" FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" Width="232" Margin="0,0,8,0"/>
+                                <TextBlock Text="{Binding Telephone}" FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" Width="232" Margin="0,0,8,0"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+        </Grid>
+        <!--联系人详细信息-->
+        <Grid Grid.Row="1" Background="White" Name="RightFrame1"
+              BorderThickness="0.5" BorderBrush="LightGray"
+              HorizontalAlignment="Right" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Height="160"
+                  BorderThickness="0,0,0,0.5" BorderBrush="LightGray"
+                  Background="WhiteSmoke">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Width="80" Margin="28,48,0,32">
+                    <Image Source="/Images/head.png"/>
+                </Grid>
+                <TextBlock Text="{Binding ElementName=contactList,Path=SelectedItem.Contact_name}"
+                           FontWeight="Bold" Foreground="Black"
+                           VerticalAlignment="Center" Grid.Column="1"
+                           FontSize="20" MaxLines="2" TextWrapping="Wrap"
+                           Margin="8,0,8,0"/>
+            </Grid>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <RelativePanel Margin="12,20,12,12">
+                        <TextBlock Text="Contact" FontWeight="SemiBold"
+                                   Foreground="Black" FontSize="20"
+                                   RelativePanel.AlignVerticalCenterWithPanel="True"/>
+                        <Button Content="Edit" HorizontalAlignment="Right" Background="{x:Null}"
+                                RelativePanel.AlignRightWithPanel="True" FontSize="20"
+                                RelativePanel.AlignVerticalCenterWithPanel="True"
+                                Foreground="#0063B1" Click = "{x:Bind ViewModel.EditFlyoutItem_Click}"/>
+                    </RelativePanel>
+
+                    <ListBox SelectionMode="Single" SelectedValue="0" Margin="0,0,12,12" Grid.Row="1">
+                        <ListBoxItem Background="White">
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Telephone Number"
+                                   Foreground="Gray" FontSize="16"/>
+                                <TextBlock Text="{Binding ElementName=contactList,Path=SelectedItem.Telephone}" 
+                                           FontWeight="SemiBold" Foreground="Black" FontSize="16"/>
+                            </StackPanel>
+                        </ListBoxItem>
+                        <ListBoxItem Background="White">
+                            <StackPanel Orientation="Vertical" DataContext="{Binding ElementName=contactList, Path=SelectedItem}">
+                                <TextBlock Text="E-mail"
+                                   Foreground="Gray" FontSize="16"/>
+                                <TextBlock Text="{Binding ElementName=contactList,Path=SelectedItem.Contact_email}"
+                                           FontWeight="SemiBold" Foreground="Black" FontSize="16"/>
+                            </StackPanel>
+                        </ListBoxItem>
+                    </ListBox>
+                    <MenuFlyoutSeparator Grid.Row="2"></MenuFlyoutSeparator>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+
+        <!--编辑联系人，新建联系人-->
+        <Grid Grid.Row="1" Background="White" Name="RightFrame2"
+              BorderThickness="0.5" BorderBrush="LightGray"
+              HorizontalAlignment="Right" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="{Binding RightFrame2Title}" FontWeight="SemiBold"
+                       Foreground="Black"
+                       FontSize="20" Margin="24,24,0,16"/>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
+                <StackPanel  Margin="0,0,0,32" Orientation="Vertical"
+                             DataContext="{Binding RightContact}">
+                    <Grid Width="120" Height="120" Margin="24,8,24,32"
+                          HorizontalAlignment="Left"
+                          CornerRadius="60">
+                        <Image Source="/Images/head.png"/>
+                    </Grid>
+                    <ListBox SelectionMode="Single" SelectedValue="0" Margin="0,0,12,12" Grid.Row="1"/>
+                    <TextBlock Text="Name" Margin="24,0,24,16"  Foreground="Black"/>
+                    <TextBox Text="{Binding Contact_name, Mode=TwoWay}" Margin="24,0,24,0"  Foreground="Black"/>
+                    <MenuFlyoutSeparator Margin="12,16,12,16"/>
+                    <TextBlock Text="Telephone Number" Margin="24,0,24,16"  Foreground="Black"/>
+                    <TextBox Text="{Binding Telephone, Mode=TwoWay}" Margin="24,0,24,0"  Foreground="Black"/>
+                    <MenuFlyoutSeparator Margin="12,16,12,16"/>
+                    <TextBlock Text="E-mail" Margin="24,0,24,16"  Foreground="Black"/>
+                    <TextBox Text="{Binding Contact_email, Mode=TwoWay}" Margin="24,0,24,0"  Foreground="Black"/>
+                    <MenuFlyoutSeparator Margin="12,16,12,16"/>
+                </StackPanel>
+            </ScrollViewer>
+            <Grid Grid.Row="2" Margin="24,4,24,48">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Content="Save" Grid.Column="0" HorizontalAlignment="Stretch"
+                        Background="#0063B1" Margin="0,0,8,0" Foreground="White"
+                        Click="{x:Bind ViewModel.ConfirmContact}"/>
+                <Button Content="Cancel" Grid.Column="1" HorizontalAlignment="Stretch" Margin="8,0,0,0"
+                        Click="{x:Bind ViewModel.CancelContact}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

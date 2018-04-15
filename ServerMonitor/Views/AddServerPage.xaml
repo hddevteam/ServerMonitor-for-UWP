@@ -1,0 +1,104 @@
+﻿<UserControl
+    x:Class="ServerMonitor.Views.AddServerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ServerMonitor.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm1="using:ServerMonitor.ViewModels"   
+    mc:Ignorable="d"
+    d:DesignHeight="500"
+    d:DesignWidth="450" Loaded="{x:Bind ViewModel.Updatedata}">
+    <UserControl.DataContext>
+        <vm1:AddServerPageViewModel x:Name="ViewModel" />
+    </UserControl.DataContext>
+    <UserControl.Resources>
+        <vm1:RadioBoolToIntConverter  x:Key="radioBoolToIntConverter"/>
+    </UserControl.Resources>
+    <ScrollViewer>
+        <Grid>
+            <Border x:Name="OutBorder" Background="#55000000" 
+                VerticalAlignment="Stretch" 
+                HorizontalAlignment="Stretch"/>
+            <StackPanel x:Name="ContentGrid" Background="White"
+              Orientation="Vertical"
+              VerticalAlignment="Center" Height="500" Width="450">
+                <TextBlock Name="textid" Text="{Binding ID,Mode=TwoWay}"  Visibility="Collapsed" ></TextBlock>
+                <Grid Padding="15,50,15,15">
+                    <StackPanel Orientation="Vertical" >
+                        <TextBlock  Text="Server" FontSize="20"/>
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal"  >
+                                <RadioButton GroupName="protocol" Name="Socket" 
+                                             IsChecked="{Binding Path=Protocol,Mode=TwoWay, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=1}" Content="Socket"/>
+                                <RadioButton GroupName="protocol" Name="SSH" 
+                                             IsChecked="{Binding Path=Protocol,Mode=TwoWay, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=2}" Content="SSH"/>
+                                <RadioButton GroupName="protocol" Name="FTP" 
+                                             IsChecked="{Binding Path=Protocol,Mode=TwoWay, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=3}" Content="FTP"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton GroupName="protocol" Name="DNS"
+                                             IsChecked="{Binding Path=Protocol,Mode=TwoWay, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=4}" Content="DNS"/>
+                                <RadioButton GroupName="protocol" Name="ICMP"
+                                             IsChecked="{Binding Path=Protocol,Mode=TwoWay, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=5}" Content="ICMP"/>
+
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+                <Grid Padding="15">
+                    <Image Name="error" MaxHeight="25" Margin="0" HorizontalAlignment="Right" Visibility="Collapsed" MaxWidth="25" Source="ms-appx:///Images/error.png" />
+                    <TextBox Name="domain" PlaceholderText="Domain name/IP   This Field Is Required" LostFocus="Domain_LostFocus"  Height="30" Text="{Binding Domain,Mode=TwoWay}"></TextBox>
+                </Grid>
+                <Grid Padding="15">
+                    <TextBox PlaceholderText="Port(optional)" Text="{Binding Port,Mode=TwoWay}" Height="30" Width="150" HorizontalAlignment="Left"></TextBox>
+                </Grid>
+                <Grid Padding="15">
+                    <StackPanel>
+                        <TextBlock  Text="Name" Padding="0,0,0,10"></TextBlock>
+                        <TextBox PlaceholderText="If empty,domain name will be used." Text="{Binding Name,Mode=TwoWay}" Height="30"></TextBox>
+                    </StackPanel>
+                </Grid>
+                <Grid Padding="15">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock  Text="Contact"></TextBlock>
+                        <Image Name="add_contact" MaxHeight="25" Margin="30,0,0,0" MaxWidth="25" Source="ms-appx:///Images/adduser.png" />
+                    </StackPanel>
+                </Grid>
+                <Grid Padding="15">
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="btnLeft" 
+                            Content="OK" 
+                            Margin="10"
+                            Padding="15,5,15,5"
+                            HorizontalAlignment="Left"
+                            HorizontalContentAlignment="Center"
+                            VerticalAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            BorderThickness="0" 
+                            Click="{x:Bind ViewModel.AddServer}"
+                            Background="#f90"
+                            IsEnabled="False"
+                            Foreground="White"
+                            MaxWidth="150"/>
+                        <Button                  
+                            x:Name="btnRight" 
+                            Content="Cancel" 
+                            Margin="10"
+                            Click="RightButton_Click"
+                            Padding="15,5,15,5"
+                            HorizontalAlignment="Left"
+                            HorizontalContentAlignment="Center"
+                            VerticalAlignment="Center"  
+                            VerticalContentAlignment="Center"
+                            BorderThickness="0"
+                            Background="Gray"
+                            Foreground="BlanchedAlmond"
+                            MaxWidth="150"/>
+                    </StackPanel>
+
+                </Grid>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl>
