@@ -1266,7 +1266,7 @@ namespace ServerMonitor.ViewModels
         {
             string typeOfValue = parameter as string;
             double _value = double.Parse(value.ToString());
-            return string.Format("{0}Value：{1} ms", typeOfValue, (int)Math.Pow(10, _value));
+            return string.Format("{0}：{1} ms", typeOfValue, (int)Math.Pow(10, _value));
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
