@@ -42,16 +42,7 @@
                     <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="Contacts"/>
                 </StackPanel>
             </Controls:HamburgerButtonInfo>
-            <!--远程控制页面-->
-            <Controls:HamburgerButtonInfo ClearHistory="True" PageType="views:Remote">
-                <StackPanel Orientation="Horizontal">
-                    <SymbolIcon Width="48" Height="48" Symbol="Remote" />
-                    <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="Remoting"/>
-                </StackPanel>
-            </Controls:HamburgerButtonInfo>
-        </Controls:HamburgerMenu.PrimaryButtons>
-
-        <Controls:HamburgerMenu.SecondaryButtons>
+            <Controls:HamburgerMenu.SecondaryButtons>
             <!--  profile button  自带的测试button  可以删除  -->
             <Controls:HamburgerButtonInfo ButtonType="Command">
                 <Interactivity:Interaction.Behaviors>
