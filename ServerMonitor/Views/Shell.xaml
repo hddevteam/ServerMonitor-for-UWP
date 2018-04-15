@@ -42,7 +42,8 @@
                     <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="Contacts"/>
                 </StackPanel>
             </Controls:HamburgerButtonInfo>
-            <Controls:HamburgerMenu.SecondaryButtons>
+        </Controls:HamburgerMenu.PrimaryButtons>
+        <Controls:HamburgerMenu.SecondaryButtons>
             <!--  profile button  自带的测试button  可以删除  -->
             <Controls:HamburgerButtonInfo ButtonType="Command">
                 <Interactivity:Interaction.Behaviors>
