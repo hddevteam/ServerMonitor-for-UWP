@@ -26,10 +26,11 @@ namespace ServerMonitor.ViewModels
         int order = 1;  //1:id As 2:id De 3:Al As 4:Al De
         int filter = 2; //0:Error  1:Normal  2:All Servers,
 
+        ContentDialog termsOfUseContentDialog = null;
         private Site preCheck;
         public MainPageViewModel()
         {
-            
+            T = 200;
         }
         #region 绑定数据
         private string preCheckName;
@@ -77,12 +78,23 @@ namespace ServerMonitor.ViewModels
             new SiteResult{Color="#5D5A58", Name="Unknown:"}
         };
         public List<SiteResult> SiteResults { get => siteResults; set => siteResults = value; }
-        
+
         private ObservableCollection<OutageSite> outageSites = new ObservableCollection<OutageSite>();
         public ObservableCollection<OutageSite> OutageSites { get => outageSites; set => outageSites = value; }
 
         private ObservableCollection<SitePerformance> sitePerformanceList = new ObservableCollection<SitePerformance>();
         public ObservableCollection<SitePerformance> SitePerformanceList { get => sitePerformanceList; set => sitePerformanceList = value; }
+
+        private int t;
+        public int T
+        {
+            get => t;
+            set
+            {
+                t = value;
+                RaisePropertyChanged(() => T);
+            }
+        }
         #endregion 绑定数据
 
         #region 系统函数
@@ -104,6 +116,10 @@ namespace ServerMonitor.ViewModels
             await Task.CompletedTask;
         }
 
+        public void Loaded(ContentDialog contentDialog)
+        {
+            termsOfUseContentDialog = contentDialog;
+        }
         #endregion 系统函数
 
         #region 响应事件
@@ -136,7 +152,7 @@ namespace ServerMonitor.ViewModels
         public static void Pre_Check()
         {
             //对google dns进行pre check (8.8.8.8)
-            var _googleDnsBack =  Request.IcmpRequest(IPAddress.Parse("8.8.8.8"));
+            var _googleDnsBack = Request.IcmpRequest(IPAddress.Parse("8.8.8.8"));
             string _resultcolor = DataHelper.GetColor(_googleDnsBack);//得到返回值
             Site _preCheckSite = DBHelper.GetSiteById(4);//初始化precheck记录，目前是ID 4 
             _preCheckSite.Last_request_result = int.Parse(_resultcolor);//更新color
@@ -145,7 +161,7 @@ namespace ServerMonitor.ViewModels
             MainPageViewModel _getlist = new MainPageViewModel();
             _getlist.GetListSite();//更新ui
 
-        }       
+        }
         /// <summary>
         /// 进行刷新的按钮事件
         /// </summary>
@@ -201,14 +217,14 @@ namespace ServerMonitor.ViewModels
                     var color = DataHelper.GetColor(backData);
                     var dictionary = backData;
                     var time = DataHelper.GetTime(backData);
-                    
+
                     try
                     {
                         upSite.Last_request_result = int.Parse(color);
                         upSite.Request_interval = int.Parse(time);
                         DBHelper.UpdateSite(upSite);
                     }
-                    catch { }                        
+                    catch { }
                     GetListSite();//更新站点列表              
                 }
                 else
@@ -263,7 +279,7 @@ namespace ServerMonitor.ViewModels
         public void SiteList_Tapped(object sender, TappedRoutedEventArgs e)
         {
             int x = (sender as GridView).SelectedIndex;
-            if(x>=0)
+            if (x >= 0)
             {
                 string siteId = ((SiteItem)((sender as GridView).Items[x])).Id + "";
                 NavigationService.Navigate(typeof(Views.SiteDetail), siteId);
@@ -282,12 +298,12 @@ namespace ServerMonitor.ViewModels
             if (e.OriginalSource is Grid)
             {
                 grid = (Grid)(e.OriginalSource);
-                if(!(grid.Children[1] is TextBlock))
+                if (!(grid.Children[1] is TextBlock))
                 {
                     return false;
                 }
             }
-            else if(e.OriginalSource is TextBlock)
+            else if (e.OriginalSource is TextBlock)
             {
                 grid = (Grid)((TextBlock)e.OriginalSource).Parent;
             }
@@ -311,7 +327,7 @@ namespace ServerMonitor.ViewModels
             Site site = CloneSite(q1.First());
             site.Site_name = site.Site_name + " Copy";
             site.Last_request_result = 2;
-            if (DBHelper.InsertOneSite(site)==1)
+            if (DBHelper.InsertOneSite(site) == 1)
             {
                 GetListSite();
             }
@@ -380,7 +396,19 @@ namespace ServerMonitor.ViewModels
         //    }
         //}
 
-
+        public async Task TextBlock_TappedAsync(object sender, TappedRoutedEventArgs e)
+        {
+            ContentDialogResult result = await termsOfUseContentDialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                GetSitePerformance(sites);
+            }
+            else
+            {
+                // User pressed Cancel, ESC, or the back arrow.
+                // Terms of use were not accepted.
+            }
+        }
         #endregion 响应事件
 
         #region 辅助函数
@@ -445,7 +473,7 @@ namespace ServerMonitor.ViewModels
 
             //排除不监听和precheck，再只留错误和超时的
             List<Site> q = (from t in list
-                            where t.Is_Monitor == true && t.Is_pre_check == false && (t.Last_request_result==0|| t.Last_request_result == -1)
+                            where t.Is_Monitor == true && t.Is_pre_check == false && (t.Last_request_result == 0 || t.Last_request_result == -1)
                             orderby t.Update_time descending
                             select t).ToList();
             // 循环判断站点超时还是错误
@@ -453,13 +481,13 @@ namespace ServerMonitor.ViewModels
             {
                 //Red：0错误，Orange：-1超时，Gray：2未知，Blue：1成功
                 //#D13438 #4682B4 #5D5A58 #f7630c，红蓝灰橙
-                if (q[i].Last_request_result==0)
+                if (q[i].Last_request_result == 0)
                 {
                     OutageSites.Add(new OutageSite()
                     {
                         LastTime = string.Format("{0:MM-dd HH:mm:ss}", q[i].Update_time),
-                        Site_name =q[i].Site_name,
-                        Color= "#D13438",
+                        Site_name = q[i].Site_name,
+                        Color = "#D13438",
                     });
                 }
                 else
@@ -477,7 +505,6 @@ namespace ServerMonitor.ViewModels
         //得到站点性能信息，从log表中取数据分析
         private void GetSitePerformance(List<Site> list)
         {
-            int T = 200;
             SitePerformanceList.Clear();
 
             //得到监听的站点信息（除pre_check）
@@ -489,7 +516,7 @@ namespace ServerMonitor.ViewModels
             for (int i = 0; i < q.Count; i++)
             {
                 List<Log> logList = DBHelper.GetLogsBySiteId(q[i].Id);
-                if (logList.Count==0)
+                if (logList.Count == 0)
                 {
                     container.Add(new SitePerformance()
                     {
@@ -498,11 +525,11 @@ namespace ServerMonitor.ViewModels
                     });
                     continue;
                 }
-                var w = from t in logList   //总的采样
+                var w = from t in logList   //总的采样 距现在3天内
                         where DateTime.Now.Subtract(t.Create_time).Days < 3
                         select t;
                 int total = w.Count(); //总的采样个数
-                if (total==0)
+                if (total == 0)
                 {
                     container.Add(new SitePerformance()
                     {
@@ -671,7 +698,7 @@ namespace ServerMonitor.ViewModels
         private string GetSiteItemLastResult(Site site)
         {
             string result = "";
-            if(site.Is_server)
+            if (site.Is_server)
             {
                 switch (site.Last_request_result)
                 {
@@ -679,7 +706,7 @@ namespace ServerMonitor.ViewModels
                         result = "Error in " + site.Request_interval + "ms";
                         break;
                     case 1:
-                        result = "Port"+site.Server_port + " (open) in " + site.Request_interval + "ms";
+                        result = "Port" + site.Server_port + " (open) in " + site.Request_interval + "ms";
                         break;
                     case 2:
                         result = "Unknown";
@@ -699,7 +726,7 @@ namespace ServerMonitor.ViewModels
                         result = "Error in " + site.Request_interval + "ms";
                         break;
                     case 1:
-                        result = site.Status_code+" (OK) in " + site.Request_interval + "ms";
+                        result = site.Status_code + " (OK) in " + site.Request_interval + "ms";
                         break;
                     case 2:
                         result = "Unknown";
@@ -711,7 +738,7 @@ namespace ServerMonitor.ViewModels
                         break;
                 }
             }
-            
+
             return result;
         }
         #endregion 辅助函数
@@ -857,7 +884,7 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        
+
         public string Protocol_type
         {
             get => protocol_type;

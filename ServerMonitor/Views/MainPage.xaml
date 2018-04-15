@@ -34,7 +34,7 @@
                              RelativePanel.AlignTopWithPanel="True" Text="Server Monitor">
 
             <controls:PageHeader.PrimaryCommands>
-                <AppBarButton Icon="Refresh" Foreground="White" Click = "{x:Bind ViewModel.Refresh_Click}"/>
+                <AppBarButton Icon="Refresh" Foreground="White" Click = "{x:Bind ViewModel.RequestAll_Click}"/>
 
                 <AppBarButton Icon="Filter" Foreground="White" Name="filter">
                     <AppBarButton.Flyout>
@@ -51,7 +51,7 @@
                     </AppBarButton.Flyout>
                 </AppBarButton>
 
-                <AppBarButton Icon="AlignLeft" Foreground="White">
+                <AppBarButton Icon="Sort" Foreground="White">
                     <AppBarButton.Flyout>
                         <MenuFlyout>
                             <MenuFlyout.MenuFlyoutPresenterStyle>
@@ -82,9 +82,9 @@
             </controls:PageHeader.PrimaryCommands>
 
             <!--  secondary commands  -->
-            <controls:PageHeader.SecondaryCommands>
+            <!--<controls:PageHeader.SecondaryCommands>
                 <AppBarButton Click = "{x:Bind ViewModel.RequestAll_Click}" Label="Request All" Name="requestAll"/>
-            </controls:PageHeader.SecondaryCommands>
+            </controls:PageHeader.SecondaryCommands>-->
         </controls:PageHeader>
 
         <Grid RelativePanel.Below="pageHeader" HorizontalAlignment="Stretch" 
@@ -203,7 +203,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid BorderThickness="0,0,0,2" BorderBrush="#E5E5E5">
-                    <TextBlock Text="Recent Outage Site" FontSize="18" FontWeight="Bold" Margin="8,4,0,8" Foreground="#4682B4"/>
+                    <TextBlock Text="Recent Outage" FontSize="18" FontWeight="Bold" Margin="8,4,0,8" Foreground="#4682B4"/>
                 </Grid>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
                     <ListView SelectionMode="None"  ItemsSource="{Binding OutageSites}"
@@ -231,6 +231,29 @@
                 </ScrollViewer>
             </Grid>
 
+            <ContentDialog x:Name="termsOfUseContentDialog" Grid.RowSpan="2"
+                           Grid.ColumnSpan="2" PrimaryButtonText="Accept"
+                           SecondaryButtonText="Cancel">
+                <ContentDialog.TitleTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Set Apdex T" FontSize="24" FontWeight="Bold"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ContentDialog.TitleTemplate>
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="T :" Width="20"/>
+                        <TextBlock Text="{Binding ElementName=slide1,Path=Value}"/>
+                        <TextBlock Text=" ( ms )"/>
+                    </StackPanel>
+
+                    <Slider x:Name="slide1" Maximum="2000" Minimum="100" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" 
+                            TickFrequency="100" TickPlacement="TopLeft" SmallChange="1"
+                            Value="{Binding T, Mode=TwoWay}"/>
+                </StackPanel>
+            </ContentDialog>
+
             <Grid  x:Name="RightLow" Grid.Row="1" Grid.Column="1" Width="200"
                    BorderThickness="2" BorderBrush="#E5E5E5" Background="#F0F0F0"
                    Margin="0,20,8,8" Visibility="Collapsed">
@@ -239,7 +262,8 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid BorderThickness="0,0,0,2" BorderBrush="#E5E5E5">
-                    <TextBlock Text="Site Performance" FontSize="18" FontWeight="Bold" Margin="8,4,0,8" Foreground="#4682B4"/>
+                    <TextBlock Text="Apdex Benchmark" FontSize="18" FontWeight="Bold" Margin="8,4,0,8" Foreground="#4682B4"
+                               VerticalAlignment="Top" Tapped="{x:Bind ViewModel.TextBlock_TappedAsync}"/>
                 </Grid>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
                     <ListView SelectionMode="None"  ItemsSource="{Binding SitePerformanceList}"
@@ -272,7 +296,7 @@
                     </ListView>
                 </ScrollViewer>
             </Grid>
-            
+
         </Grid>
     </RelativePanel>
 </Page>
