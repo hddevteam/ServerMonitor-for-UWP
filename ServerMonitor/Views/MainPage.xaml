@@ -82,9 +82,9 @@
             </controls:PageHeader.PrimaryCommands>
 
             <!--  secondary commands  -->
-            <!--<controls:PageHeader.SecondaryCommands>
-                <AppBarButton Click = "{x:Bind ViewModel.RequestAll_Click}" Label="Request All" Name="requestAll"/>
-            </controls:PageHeader.SecondaryCommands>-->
+            <controls:PageHeader.SecondaryCommands>
+                <AppBarButton Click = "{x:Bind ViewModel.TextBlock_TappedAsync}" Label="Set Apdex T"/>
+            </controls:PageHeader.SecondaryCommands>
         </controls:PageHeader>
 
         <Grid RelativePanel.Below="pageHeader" HorizontalAlignment="Stretch" 
@@ -263,7 +263,7 @@
                 </Grid.RowDefinitions>
                 <Grid BorderThickness="0,0,0,2" BorderBrush="#E5E5E5">
                     <TextBlock Text="Apdex Benchmark" FontSize="18" FontWeight="Bold" Margin="8,4,0,8" Foreground="#4682B4"
-                               VerticalAlignment="Top" Tapped="{x:Bind ViewModel.TextBlock_TappedAsync}"/>
+                               VerticalAlignment="Top"/>
                 </Grid>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
                     <ListView SelectionMode="None"  ItemsSource="{Binding SitePerformanceList}"

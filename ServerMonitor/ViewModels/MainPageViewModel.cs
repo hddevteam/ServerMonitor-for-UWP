@@ -26,6 +26,7 @@ namespace ServerMonitor.ViewModels
         int order = 1;  //1:id As 2:id De 3:Al As 4:Al De
         int filter = 2; //0:Error  1:Normal  2:All Servers,
 
+        //MainPage 界面的弹出框
         ContentDialog termsOfUseContentDialog = null;
         private Site preCheck;
         public MainPageViewModel()
@@ -85,6 +86,7 @@ namespace ServerMonitor.ViewModels
         private ObservableCollection<SitePerformance> sitePerformanceList = new ObservableCollection<SitePerformance>();
         public ObservableCollection<SitePerformance> SitePerformanceList { get => sitePerformanceList; set => sitePerformanceList = value; }
 
+        //Set Apdex T，<=T是顾客满意的请求时间单位ms
         private int t;
         public int T
         {
@@ -116,6 +118,7 @@ namespace ServerMonitor.ViewModels
             await Task.CompletedTask;
         }
 
+        //在界面加载完毕，可以交互时，被MainPage.xaml.cs的Loaded方法调用
         public void Loaded(ContentDialog contentDialog)
         {
             termsOfUseContentDialog = contentDialog;
@@ -295,6 +298,7 @@ namespace ServerMonitor.ViewModels
         {
             string siteId;
             Grid grid;
+            //右击时，点击的地点不同，触发的事件源的相关控件也不同。要进行判断
             if (e.OriginalSource is Grid)
             {
                 grid = (Grid)(e.OriginalSource);
@@ -396,17 +400,21 @@ namespace ServerMonitor.ViewModels
         //    }
         //}
 
-        public async Task TextBlock_TappedAsync(object sender, TappedRoutedEventArgs e)
+
+        //弹出对话框，设置应用响应时间的最优门槛 T
+        public async Task TextBlock_TappedAsync()
         {
+            int temp = T;
             ContentDialogResult result = await termsOfUseContentDialog.ShowAsync();
+            //点击Accept
             if (result == ContentDialogResult.Primary)
             {
+
                 GetSitePerformance(sites);
             }
-            else
+            else  //点击 Cancel执行
             {
-                // User pressed Cancel, ESC, or the back arrow.
-                // Terms of use were not accepted.
+                T = temp;
             }
         }
         #endregion 响应事件
