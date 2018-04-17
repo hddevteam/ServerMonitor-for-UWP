@@ -17,6 +17,7 @@
         <vm1:ChartPageViewModel x:Name="ViewModel"></vm1:ChartPageViewModel>
     </Page.DataContext>
 
+    <!--主体-->
     <RelativePanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="AdaptiveVisualStateGroup">
