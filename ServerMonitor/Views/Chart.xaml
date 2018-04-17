@@ -12,6 +12,7 @@
     xmlns:telerikGrid="using:Telerik.UI.Xaml.Controls.Grid"
     xmlns:gridPrimitives="using:Telerik.UI.Xaml.Controls.Grid.Primitives"
     xmlns:telerikGrid1="using:Telerik.Data.Core"
+    xmlns:local1="using:ServerMonitor"
     mc:Ignorable="d">
     <Page.DataContext>
         <vm1:ChartPageViewModel x:Name="ViewModel"></vm1:ChartPageViewModel>
@@ -45,6 +46,7 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
+        
         <controls:PageHeader x:Name="pageHeader" RelativePanel.AlignLeftWithPanel="True"
                              RelativePanel.AlignRightWithPanel="True"
                              RelativePanel.AlignTopWithPanel="True"
@@ -82,7 +84,8 @@
                     <ColumnDefinition Width="1*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <!--区间切换-->
-                <Pivot x:Name="period" Grid.Row="0" Grid.Column="0" SelectedIndex="0" Grid.ColumnSpan="2">
+                <Pivot x:Name="period" Grid.Row="0" Grid.Column="0" SelectedIndex="0" Grid.ColumnSpan="2"
+                       SelectionChanged="{x:Bind ViewModel.Pivot_SelectionChanged}">
                     <PivotItem Header="Today" >
                     </PivotItem>
                     <PivotItem Header="Three Days">
@@ -112,17 +115,53 @@
                         </telerik:RadCartesianChart.VerticalAxis>
                         <telerik:RadCartesianChart.HorizontalAxis>
                             <telerik:DateTimeContinuousAxis Title="Nearly a week of site request results"
-                                                             MajorStep="2"
-                                                             FontWeight="Medium" LabelFormat="{}{0,0:MM-dd HH:mm}">
+                                                            Maximum="{x:Bind ViewModel.Infos.MaxnumDateTime,Mode=OneWay}"
+                                                            Minimum="{x:Bind ViewModel.Infos.MinnumDateTime,Mode=OneWay}"
+                                                            MajorStep="{Binding Infos.DateTimeContinuousAxisProperties.MajorStep,Mode=TwoWay}"
+                                                            MajorStepUnit="{Binding Infos.DateTimeContinuousAxisProperties.MajorStepUnit,Mode=TwoWay}"
+                                                            LabelFormat="{}{0,0:MM-dd HH:mm}"
+                                                            FontWeight="Medium">
                             </telerik:DateTimeContinuousAxis>
                         </telerik:RadCartesianChart.HorizontalAxis>
                         <telerik:RadCartesianChart.Grid>
                             <telerik:CartesianChartGrid MajorLinesVisibility="Y"/>
                         </telerik:RadCartesianChart.Grid>
+
+                        <!--  引入一个类似自定义过滤器概念的资源(在数据绑定的传递数据过程中对数据进行pre-handle) -->
+                        <telerik:RadCartesianChart.Resources>
+                            <local1:CustomConverter x:Key="Converter"/>
+                           
+                        </telerik:RadCartesianChart.Resources>
+                        
+                        <!-- 字面上理解是设置图表的一些基本特性（行为）-->
+                        <telerik:RadCartesianChart.Behaviors>
+                            <!-- 哎这个是设置图表的帮助理解的提示框,就是鼠标悬停在图表上，会有提示信息 -->
+                            <telerik:ChartTooltipBehavior>
+                                <!-- 如果要用到数据绑定通常都要使用到xxx template->DataTemplate -->
+                                <telerik:ChartTooltipBehavior.ContentTemplate>
+                                    <!-- 数据绑定模块  -->
+                                    <DataTemplate>
+                                        <!-- 以下的是每个数据显示使用的模板 -->
+                                        <Border BorderBrush="#80D6F4" BorderThickness="1">
+                                            <StackPanel Background="white">
+                                                <TextBlock Text="{Binding DataPoint.Value,Converter={StaticResource Converter}, ConverterParameter=Value}" Foreground="#99441D"/>
+                                                <TextBlock Text="{Binding DataPoint.Category, Converter={StaticResource Converter}, ConverterParameter=Category}" Foreground="#506005"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <!-- end -->
+                                    </DataTemplate>
+                                    <!--end-->
+                                </telerik:ChartTooltipBehavior.ContentTemplate>
+                                <!--end-->
+                            </telerik:ChartTooltipBehavior>
+                            <!--end-->
+                        </telerik:RadCartesianChart.Behaviors>
+                        <!--end-->
+
                         <telerik:RadCartesianChart.SeriesProvider >
-                            <telerik:ChartSeriesProvider x:Name="provider" Source="{x:Bind ViewModel.Infos.Collection}">
+                            <telerik:ChartSeriesProvider x:Name="provider" Source="{x:Bind ViewModel.Infos.Chart1Collection}">
                                 <telerik:ChartSeriesProvider.SeriesDescriptors>
-                                    <telerik:CategoricalSeriesDescriptor ValuePath="Count" CategoryPath="MonitorTime">
+                                    <telerik:CategoricalSeriesDescriptor ValuePath="ResponseTime" CategoryPath="RequestTime">
                                         <telerik:CategoricalSeriesDescriptor.Style>
                                             <Style TargetType="telerik:LineSeries">
                                                 <Setter Property="CombineMode" Value="Cluster"/>

@@ -24,6 +24,7 @@ using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using GalaSoft.MvvmLight.Threading;
+using Telerik.Charting;
 
 namespace ServerMonitor.ViewModels
 {
@@ -108,7 +109,7 @@ namespace ServerMonitor.ViewModels
         {
 
             Lengend = new ObservableCollection<ChartLengend>();
-
+            Infos.Chart1Collection = new ObservableCollection<ObservableCollection<Chart1>>();
             Infos.Collection = new ObservableCollection<ObservableCollection<LineCount>>();
             Infos.SelectSites = new ObservableCollection<SelectSite>();
             Infos.Sites = new ObservableCollection<Site>();
@@ -215,6 +216,7 @@ namespace ServerMonitor.ViewModels
             {
                 //该站点的数据序列
                 ObservableCollection<LineCount> series = new ObservableCollection<LineCount>();
+                ObservableCollection<Chart1> chart1Series = new ObservableCollection<Chart1>();
                 if (site.Is_server) { site.Site_name = site.Site_name + "(SERVER)"; } //避免不同站点类型同名情况
 
                 //近一周
@@ -223,10 +225,10 @@ namespace ServerMonitor.ViewModels
                     //Debug.WriteLine(time.AddDays(-i));
                     series.Add(new LineCount() { MonitorTime = time.AddDays(-i), SiteName = site.Site_name });
                 }
-                Cacu(site, series);
+                Cacu(site, series, chart1Series);
                 //将统计好的结果加入到序列集合
                 Infos.Collection.Add(series);
-
+                Infos.Chart1Collection.Add(chart1Series);
             }
             await Task.CompletedTask;
         }
@@ -235,11 +237,12 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="site"></param>
         /// <param name="series"></param>
-        public void Cacu(Site site, ObservableCollection<LineCount> series)
+        public void Cacu(Site site, ObservableCollection<LineCount> series, ObservableCollection<Chart1> chart1Series)
         {
             //站点各项请求结果统计
             int successCount = 0;
             int errorCount = 0, overtimeCount = 0;
+            
             foreach (var log in Infos.Logs)
             {
                 #region 统计站点信息
@@ -248,24 +251,28 @@ namespace ServerMonitor.ViewModels
                     //该条记录结果统计
                     int success = 0;
                     int error = 0, overtime = 0;
+                    Double successTime=0, overTime=0, errorTime=0;
                     //判断并记录该条log是成功，失败，还是超时
                     if (!log.Is_error)
                     {
                         //成功
                         success++;
                         successCount++;
+                        successTime = log.Request_time;
                     }
                     else if (log.Status_code == "1002") //状态码为1002时表示请求超时
                     {
                         //超时
                         overtime++;
                         overtimeCount++;
+                        overTime = log.Request_time;
                     }
                     else
                     {
                         //失败
                         error++;
                         errorCount++;
+                        errorTime = log.Request_time;
                     }
 
                     TimeSpan timeSpan = DateTime.Now - log.Create_time;
@@ -282,7 +289,7 @@ namespace ServerMonitor.ViewModels
                         else { series[6 - timeSpan.Days].Count += overtime; }
                         //Debug.WriteLine("SiteName:{0}+Success:{1}+Error:{2}+OverTime:{3}+MonitorTime:{4}+6 - timeSpan.Days:{5}", site.Site_name, success, error, overtime, log.Create_time,(6 - timeSpan.Days));
                     }
-
+                    chart1Series.Add(new Chart1() { RequestTime = log.Create_time,SuccessTime=successTime,OverTime=overTime,ErrorTime=errorTime, ResponseTime = successTime});
                 }
 
                 #endregion
@@ -330,15 +337,27 @@ namespace ServerMonitor.ViewModels
             //Debug.WriteLine("TypeChanged:" + Type);
             if (Infos != null)
             {
-                foreach (var items in Infos.Collection)
+                //foreach (var items in Infos.Collection)
+                //{
+                //    foreach (var item in items)
+                //    {
+                //        if (type == "Success") { item.Count = item.Success; }
+                //        else if (type == "Error") { item.Count = item.Error; }
+                //        else
+                //        {
+                //            item.Count = item.Overtime;
+                //        }
+                //    }
+                //}
+                foreach (var items in Infos.Chart1Collection)
                 {
                     foreach (var item in items)
                     {
-                        if (type == "Success") { item.Count = item.Success; }
-                        else if (type == "Error") { item.Count = item.Error; }
+                        if (type == "Success") { item.ResponseTime = item.SuccessTime; }
+                        else if (type == "Error") { item.ResponseTime = item.ErrorTime; }
                         else
                         {
-                            item.Count = item.Overtime;
+                            item.ResponseTime = item.OverTime;
                         }
                     }
                 }
@@ -393,11 +412,108 @@ namespace ServerMonitor.ViewModels
             var msgDialog = new Windows.UI.Popups.MessageDialog("站点最多选择五个！！") { Title = "提示" };
             await msgDialog.ShowAsync();
         }
+
+        /// <summary>
+        /// Pivot 切换的时候触发的事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void Pivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+            Pivot _p = sender as Pivot;
+            int _selectedIndex = _p.SelectedIndex;
+            Debug.WriteLine("Pivot_SelectionChanged();");
+            switch (_selectedIndex)
+            {
+                case 0:
+                    Infos.MaxnumDateTime = DateTime.Now;
+                    Infos.MinnumDateTime = DateTime.Now.AddHours(-11);
+                    break;
+                case 1:
+                    Infos.MaxnumDateTime = DateTime.Now;
+                    Infos.MinnumDateTime = DateTime.Now.AddDays(-2);
+                    break;
+                case 2:
+                    Infos.MaxnumDateTime = DateTime.Now;
+                    Infos.MinnumDateTime = DateTime.Now.AddDays(-6);
+                    break;
+                default:
+                    break;
+            }
+            ChangeStepUnitStep(_selectedIndex);
+        }
+
+        /// <summary>
+        /// 响应式修改第一个图表的属性
+        /// </summary>
+        /// <param name="index"></param>
+        public void ChangeStepUnitStep(int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    Infos.DateTimeContinuousAxisProperties.MajorStep = 2;
+                    Infos.DateTimeContinuousAxisProperties.MajorStepUnit = TimeInterval.Hour;
+                    break;
+                case 1:
+                    Infos.DateTimeContinuousAxisProperties.MajorStep = 12;
+                    Infos.DateTimeContinuousAxisProperties.MajorStepUnit = TimeInterval.Hour;
+                    break;
+                case 2:
+                    Infos.DateTimeContinuousAxisProperties.MajorStep = 24;
+                    Infos.DateTimeContinuousAxisProperties.MajorStepUnit = TimeInterval.Hour;
+                    break;
+                default:
+                    break;
+            }
+        }
         #endregion
 
     }
     #region 图表页面各项数据类
-    //图表图例
+
+    /// <summary>
+    /// 封装DateTimeContinuousAxis坐标轴使用的属性
+    /// </summary>
+    public class Chart1DateTimeContinuousAxisProperties : ObservableObject
+    {
+        private TimeInterval majorStepUnit;
+        private double majorStep;
+
+        /// <summary>
+        /// 第一个图表的横轴单位
+        /// </summary>
+        public TimeInterval MajorStepUnit
+        {
+            get => majorStepUnit;
+            set
+            {
+                majorStepUnit = value;
+                RaisePropertyChanged(() => MajorStepUnit);
+            }
+        }
+        /// <summary>
+        /// 第一个图表的横轴坐标之间的间隔
+        /// </summary>
+        public double MajorStep
+        {
+            get => majorStep;
+            set
+            {
+                majorStep = value;
+                RaisePropertyChanged(() => MajorStep);
+            }
+        }
+
+        public Chart1DateTimeContinuousAxisProperties()
+        {
+            MajorStep = 1;
+            MajorStepUnit = TimeInterval.Hour;
+        }
+    }
+
+    //第一个图表的图例
     public class ChartLengend : ObservableObject
     {
         private string title;
@@ -545,6 +661,48 @@ namespace ServerMonitor.ViewModels
             }
         }
     }
+    //第一个图表
+    public class Chart1:ObservableObject
+    {
+        private DateTime requestTime;
+
+        public DateTime RequestTime
+        {
+            get { return requestTime; }
+            set { requestTime = value; RaisePropertyChanged(() => RequestTime); }
+        }
+        private Double responseTime;
+
+        public Double ResponseTime
+        {
+            get { return responseTime; }
+            set { responseTime = value; RaisePropertyChanged(() => ResponseTime); }
+        }
+
+        private Double successTime;
+
+        public Double SuccessTime
+        {
+            get { return successTime; }
+            set { successTime = value; RaisePropertyChanged(() => SuccessTime); }
+        }
+        private Double overTime;
+
+        public Double OverTime
+        {
+            get { return overTime; }
+            set { overTime = value; RaisePropertyChanged(() => OverTime); }
+        }
+        private Double errorTime;
+
+        public Double ErrorTime
+        {
+            get { return errorTime; }
+            set { errorTime = value; RaisePropertyChanged(() => ErrorTime); }
+        }
+
+
+    }
     //柱形图（列表）数据类
     public class BarChartData : ObservableObject
     {
@@ -633,6 +791,13 @@ namespace ServerMonitor.ViewModels
         private Visibility state1 = Visibility.Collapsed;
         private Visibility state2 = Visibility.Collapsed;
         private Visibility state3 = Visibility.Visible;
+        //图表1 坐标轴时间线结束值
+        private DateTime maxnumDateTime=DateTime.Now;
+        //图表1 坐标轴时间线起始值
+        private DateTime minnumDateTime=DateTime.Now.AddHours(-23);
+        //图表1 时间坐标轴 时隙(两个相邻时间差)及单位(Hour,Day)等属性
+        private Chart1DateTimeContinuousAxisProperties dateTimeContinuousAxisProperties
+            =new Chart1DateTimeContinuousAxisProperties();
 
         //数据库日志
         private ObservableCollection<Log> logs;
@@ -646,6 +811,8 @@ namespace ServerMonitor.ViewModels
         private ObservableCollection<LineCount> lineChart;
         //线形图所有系列集合
         ObservableCollection<ObservableCollection<LineCount>> collection;
+        //图表1所有系列集合
+        ObservableCollection<ObservableCollection<Chart1>> chart1Collection;
         //页面1表格数据
         private ObservableCollection<BarChartData> gridChart;
         #endregion
@@ -726,6 +893,34 @@ namespace ServerMonitor.ViewModels
                 collection = value;
                 RaisePropertyChanged(() => Collection);
             }
+        }
+
+        public ObservableCollection<ObservableCollection<Chart1>> Chart1Collection
+        {
+            get { return chart1Collection; }
+            set
+            {
+                chart1Collection = value;
+                RaisePropertyChanged(() => Chart1Collection);
+            }
+        }
+
+        public DateTime MaxnumDateTime
+        {
+            get { return maxnumDateTime; }
+            set { maxnumDateTime = value; RaisePropertyChanged(() => MaxnumDateTime); }
+        }
+
+        public DateTime MinnumDateTime
+        {
+            get { return minnumDateTime; }
+            set { minnumDateTime = value; RaisePropertyChanged(() => MinnumDateTime); }
+        }
+
+        public Chart1DateTimeContinuousAxisProperties DateTimeContinuousAxisProperties
+        {
+            get { return dateTimeContinuousAxisProperties; }
+            set { dateTimeContinuousAxisProperties = value; RaisePropertyChanged(() => DateTimeContinuousAxisProperties); }
         }
         #endregion
     }
