@@ -19,7 +19,7 @@ namespace ServerMonitor.Views
     {
         public MainPage()
         {
-            InitializeComponent();           
+            InitializeComponent();
             NavigationCacheMode = NavigationCacheMode.Enabled;
             int i = 0;
             int TimeCount = 300;//倒计时秒数
@@ -28,6 +28,7 @@ namespace ServerMonitor.Views
             {
                 await Dispatcher.TryRunAsync(CoreDispatcherPriority.Normal, new DispatchedHandler(() =>
                 {
+                    //https://github.com/hddevteam/ServerMonitor-for-UWP.git
                     i += 1;
                     //double temp = (90 * Math.PI) * i / TimeCount / 10;                   
                     cdtxt.Text = ((TimeCount - i) / 60).ToString("00") + ":" + ((TimeCount - i) % 60).ToString("00");
@@ -39,6 +40,13 @@ namespace ServerMonitor.Views
                 }));
             });
             timer.Start();
+
+            this.Loaded += MainPage_Loaded;
+        }
+
+        private void MainPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            (this.ViewModel as MainPageViewModel).Loaded(this.termsOfUseContentDialog);
         }
 
         /// <summary>
@@ -50,7 +58,7 @@ namespace ServerMonitor.Views
         {
             MainPageViewModel model = this.ViewModel as MainPageViewModel;
             if (model.SiteList_RightTapped(sender, e))
-            {               
+            {
                 site_flyout.ShowAt(sitelist, e.GetPosition(this.sitelist));
             }
         }
