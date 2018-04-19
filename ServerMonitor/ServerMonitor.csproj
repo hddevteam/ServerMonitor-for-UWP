@@ -95,8 +95,10 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\BasicRequest.cs" />
     <Compile Include="Controls\DataHelper.cs" />
     <Compile Include="Controls\DBHelper.cs" />
+    <Compile Include="Controls\DnsRequest.cs" />
     <Compile Include="Controls\IcmpPacket.cs" />
     <Compile Include="Controls\Request.cs" />
     <Compile Include="Controls\UnitTest.cs" />
@@ -335,6 +337,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Heijden.Dns.Portable">
+      <Version>2.0.19</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>5.2.3</Version>
     </PackageReference>
