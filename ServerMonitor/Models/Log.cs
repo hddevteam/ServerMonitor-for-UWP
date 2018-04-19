@@ -78,6 +78,7 @@ namespace ServerMonitor.Models
             }
         }
 
+
         public override string ToString()
         {
             return string.Format("站点:{0}\t时间:{1}\t请求状态码:{2}",Site_id,request_time,status_code);
