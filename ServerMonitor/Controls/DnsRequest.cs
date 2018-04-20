@@ -77,7 +77,7 @@ namespace ServerMonitor.Controls
                 await t;
                 stopwatch.Stop();
 
-                if (response.Answers.Count != 0) // 请求成功，获取到了解析结果
+                if (response.Answers.Count != 0&&t.IsCompleted) // 请求成功，获取到了解析结果
                 {
                     // Dns服务器状态良好
                     Status = "1000";
