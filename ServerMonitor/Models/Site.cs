@@ -11,7 +11,7 @@ namespace ServerMonitor.Models
 {
     // 对应的Site表
     [Table("Site")]
-    public class Site : ObservableObject,INotifyPropertyChanged
+    public class Site : ObservableObject, INotifyPropertyChanged
     {
         int id;
         string site_name;
@@ -31,12 +31,16 @@ namespace ServerMonitor.Models
         string protocol_content;
         // 上次请求结果(Red：0,错误)  (Orange：-1 超时) (Gray：2,未知)   (Blue：1成功)
         int last_request_result;
+        // 补充信息
+        string others;
+        // 协议请求验证信息
+        string protocolIdentification;
 
         [PrimaryKey, AutoIncrement]
         public int Id
         {
             get => id;
-            set => id=value;
+            set => id = value;
         }
         public string Site_name
         {
@@ -74,7 +78,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Server_port);
             }
         }
-        [Default(value: 1)]
+        [DefaultValue(value: "1", type: typeof(int))]
         public int Monitor_interval
         {
             get => monitor_interval;
@@ -84,7 +88,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Monitor_interval);
             }
         }
-        [Default(value: true)]
+        [DefaultValue(value: "true", type: typeof(bool))]
         public bool Is_Monitor
         {
             get => is_Monitor;
@@ -94,7 +98,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Is_Monitor);
             }
         }
-        [Default(value: 5)]
+        [DefaultValue(value: "5", type: typeof(int))]
         public int Request_interval
         {
             get => request_interval;
@@ -104,7 +108,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Request_interval);
             }
         }
-        [Default(value: 0)]
+        [DefaultValue(value: "0", type: typeof(int))]
         public int Request_count
         {
             get => request_count;
@@ -133,9 +137,10 @@ namespace ServerMonitor.Models
                     create_time = value;
                     RaisePropertyChanged(() => Create_time);
                 }
-                else {
+                else
+                {
                     create_time = DateTime.Now;
-                    RaisePropertyChanged(()=>Create_time);
+                    RaisePropertyChanged(() => Create_time);
                 }
             }
         }
@@ -156,7 +161,7 @@ namespace ServerMonitor.Models
                 }
             }
         }
-        [Default(value: 0)]
+        [DefaultValue(value: "false", type: typeof(bool))]
         public bool Is_pre_check
         {
             get => is_pre_check;
@@ -166,7 +171,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Is_pre_check);
             }
         }
-        [Default(value: "200")]
+        [DefaultValue(value: "200", type: typeof(string))]
         public string Request_succeed_code
         {
             get => request_succeed_code;
@@ -195,7 +200,7 @@ namespace ServerMonitor.Models
             }
         }
 
-        [Default(value: '2')]
+        [DefaultValue(value: "2", type: typeof(int))]
         public int Last_request_result
         {
             get => last_request_result;
@@ -206,5 +211,7 @@ namespace ServerMonitor.Models
             }
         }
 
+        public string Others { get => others; set => others = value; }
+        public string ProtocolIdentification { get => protocolIdentification; set => protocolIdentification = value; }
     }
 }
