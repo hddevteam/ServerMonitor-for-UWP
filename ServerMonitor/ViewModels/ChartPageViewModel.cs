@@ -394,17 +394,17 @@ namespace ServerMonitor.ViewModels
             {
                 case 0:
                     Infos.DateTimeContinuousAxisProperties.MaxnumDateTime = DateTime.Now;
-                    Infos.DateTimeContinuousAxisProperties.MinnumDateTime = DateTime.Now.AddHours(-23);
+                    Infos.DateTimeContinuousAxisProperties.MinnumDateTime = DateTime.Now.AddDays(-1);
                     Infos.DateTimeContinuousAxisProperties.ChartTitle = "Results within the last 24 hours";
                     break;
                 case 1:
                     Infos.DateTimeContinuousAxisProperties.MaxnumDateTime = DateTime.Now;
-                    Infos.DateTimeContinuousAxisProperties.MinnumDateTime = DateTime.Now.AddDays(-2).Date;
+                    Infos.DateTimeContinuousAxisProperties.MinnumDateTime = DateTime.Now.AddDays(-2);
                     Infos.DateTimeContinuousAxisProperties.ChartTitle = "Nearly three days of request results";
                     break;
                 case 2:
                     Infos.DateTimeContinuousAxisProperties.MaxnumDateTime = DateTime.Now;
-                    Infos.DateTimeContinuousAxisProperties.MinnumDateTime = DateTime.Now.AddDays(-6).Date;
+                    Infos.DateTimeContinuousAxisProperties.MinnumDateTime = DateTime.Now.AddDays(-6);
                     Infos.DateTimeContinuousAxisProperties.ChartTitle = "Nearly a week of request results";
                     break;
                 default:
@@ -424,12 +424,13 @@ namespace ServerMonitor.ViewModels
             switch (index)
             {
                 case 0:
-                    Infos.DateTimeContinuousAxisProperties.MajorStep = 4;
+                    
+                    Infos.DateTimeContinuousAxisProperties.MajorStep = 6;
                     Infos.DateTimeContinuousAxisProperties.MajorStepUnit = TimeInterval.Hour;
                     break;
                 case 1:
-                    Infos.DateTimeContinuousAxisProperties.MajorStep = 12;
-                    Infos.DateTimeContinuousAxisProperties.MajorStepUnit = TimeInterval.Hour;
+                    Infos.DateTimeContinuousAxisProperties.MajorStep = 1;
+                    Infos.DateTimeContinuousAxisProperties.MajorStepUnit = TimeInterval.Day;
                     break;
                 case 2:
                     Infos.DateTimeContinuousAxisProperties.MajorStep = 1;
@@ -462,6 +463,7 @@ namespace ServerMonitor.ViewModels
             get { return chartTitle; }
             set { chartTitle = value; RaisePropertyChanged(() => ChartTitle); }
         }
+        
         /// <summary>
         /// 第一个图表的横轴单位
         /// </summary>

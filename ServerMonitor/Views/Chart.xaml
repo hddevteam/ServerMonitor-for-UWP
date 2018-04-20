@@ -22,6 +22,7 @@
     <RelativePanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="AdaptiveVisualStateGroup">
+                
                 <VisualState x:Name="VisualStateNarrow">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="521" />
@@ -113,9 +114,6 @@
                         <telerik:RadCartesianChart.VerticalAxis>
                             <telerik:LinearAxis Title="RequestTime" FontWeight="Medium"/>
                         </telerik:RadCartesianChart.VerticalAxis>
-                        <!--<telerik:RadCartesianChart.VerticalAxis>
-                            <telerik:LogarithmicAxis LogarithmBase="10" Title="RequestTime" FontWeight="Medium"/>
-                        </telerik:RadCartesianChart.VerticalAxis>-->
                         <telerik:RadCartesianChart.HorizontalAxis>
                             <telerik:DateTimeContinuousAxis Title="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.ChartTitle,Mode=OneWay}"
                                                             Maximum="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.MaxnumDateTime,Mode=OneWay}"
@@ -124,6 +122,7 @@
                                                             MajorStepUnit="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.MajorStepUnit,Mode=OneWay}"
                                                             LabelFormat="{}{0,0:MM-dd HH:mm}"
                                                             FontWeight="Medium">
+                                
                             </telerik:DateTimeContinuousAxis>
                         </telerik:RadCartesianChart.HorizontalAxis>
                         <telerik:RadCartesianChart.Grid>
