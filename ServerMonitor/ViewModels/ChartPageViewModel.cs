@@ -254,16 +254,19 @@ namespace ServerMonitor.ViewModels
                             result = "Error";
                             responseTime = Math.Log10(log.Request_time);
                         }
+                        Debug.WriteLine(result + "," + site.Site_name + "," + log.Create_time+","+log.Request_time);
                         chart1Series.Add(new Chart1() { RequestTime = log.Create_time, Result = result, ResponseTime = responseTime });
                     }
                     #endregion
-                }
-                CacuBarChart(site, successCount, errorCount, overtimeCount);
+                } 
                 //将统计好的结果加入到序列集合
                 Chart1Collection.Add(chart1Series);
+
+                CacuBarChart(site, successCount, errorCount, overtimeCount);
             }
             //统计完成后触发此方法，计算前台需要显示的数据
             TypeChanged_Data(Type);
+
             await Task.CompletedTask;
         }
         
@@ -282,10 +285,8 @@ namespace ServerMonitor.ViewModels
             if (site.Is_server)
             {
                 type = "SERVER";
-                site.Site_name = site.Site_name + "(SERVER)";//区分不同站点类型同名情况
-                Infos.BarChart.Add(new BarChartData() { SiteName = site.Site_name, Success = success, Error = error, Overtime = overtime });
-                //此处去掉之前的添加的显示类别
-                site.Site_name = site.Site_name.Substring(0, site.Site_name.Length - 8);
+                //+(SERVER)区分不同站点类型同名情况
+                Infos.BarChart.Add(new BarChartData() { SiteName = site.Site_name + "(SERVER)", Success = success, Error = error, Overtime = overtime });
             }
             else
             {
@@ -310,7 +311,6 @@ namespace ServerMonitor.ViewModels
             {
                 //重新计算需清空（前台所绑定属性）
                 Infos.Chart1CollectionCopy.Clear();
-                Debug.WriteLine("Infos.Chart1CollectionCopy.Count_begin:" + Infos.Chart1CollectionCopy.Count);
                 
                 //根据所选类型从图表1序列集合中选择符合的数据
                 foreach (var items in Chart1Collection)
@@ -324,9 +324,8 @@ namespace ServerMonitor.ViewModels
                     }
                     //序列集合
                     Infos.Chart1CollectionCopy.Add(dataItem);
-                    //Debug.WriteLine("Infos.Chart1CollectionCopy.dataItem.Count:" + dataItem);
+                    Debug.WriteLine("Infos.Chart1CollectionCopy.dataItem.Count:" + dataItem.Count);
                 }
-                Debug.WriteLine("Infos.Chart1CollectionCopy.Count_end:" + Infos.Chart1CollectionCopy.Count);
             }
         }
 
@@ -348,6 +347,7 @@ namespace ServerMonitor.ViewModels
         {
             //清空数据，重新统计
             Infos.Sites.Clear();
+            Lengend.Clear();
             Chart1Collection.Clear();
             Infos.GridChart.Clear();
             Infos.BarChart.Clear();
@@ -367,7 +367,7 @@ namespace ServerMonitor.ViewModels
                 Infos.State2 = Visibility.Collapsed;
                 //重新统计数据
                 await CacuChartAsync();
-                Lengend.Clear();
+                
                 await ChartLengendAsync();
             }
         }
@@ -394,8 +394,8 @@ namespace ServerMonitor.ViewModels
             {
                 case 0:
                     Infos.DateTimeContinuousAxisProperties.MaxnumDateTime = DateTime.Now;
-                    Infos.DateTimeContinuousAxisProperties.MinnumDateTime = DateTime.Now.Date;
-                    Infos.DateTimeContinuousAxisProperties.ChartTitle = "Today's request results";
+                    Infos.DateTimeContinuousAxisProperties.MinnumDateTime = DateTime.Now.AddHours(-23);
+                    Infos.DateTimeContinuousAxisProperties.ChartTitle = "Results within the last 24 hours";
                     break;
                 case 1:
                     Infos.DateTimeContinuousAxisProperties.MaxnumDateTime = DateTime.Now;
@@ -456,13 +456,6 @@ namespace ServerMonitor.ViewModels
         //图表1 坐标轴时间线起始值
         private DateTime minnumDateTime = DateTime.Now.Date;
         private string chartTitle = "Today's request results";
-        private string labelFormat;
-
-        public string LabelFormat
-        {
-            get { return labelFormat; }
-            set { labelFormat = value; RaisePropertyChanged(() => LabelFormat); }
-        }
 
         public string ChartTitle
         {

@@ -27,10 +27,9 @@
                         <AdaptiveTrigger MinWindowWidth="521" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="LineChart.Padding" Value="24" />
+                        <Setter Target="LineChart.Padding" Value="24,24,0,24" />
                         <Setter Target="BarChart.Padding" Value="24" />
                         <Setter Target="grid2.Margin" Value="48" />
-                        <Setter Target="HorizontalAxis.MajorStep" Value="6"></Setter>
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="VisualStateCommon">
@@ -43,7 +42,6 @@
                         <Setter Target="selectionTypeCombo.HorizontalAlignment" Value="Right"></Setter>
                         <Setter Target="selectionTypeCombo.(Grid.Column)" Value="1"></Setter>
                         <Setter Target="selectionTypeCombo.(Grid.Row)" Value="0"></Setter>
-                        <Setter Target="HorizontalAxis.MajorStep" Value="3"></Setter>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -81,7 +79,7 @@
                     <RowDefinition Height="4*"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="6*"></ColumnDefinition>
+                    <ColumnDefinition Width="7*"></ColumnDefinition>
                     <ColumnDefinition Width="6*"></ColumnDefinition>
                     <ColumnDefinition Width="1*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
@@ -109,7 +107,7 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
                 
-                <StackPanel x:Name="LineChart" Padding="0,0,24,0" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+                <StackPanel x:Name="LineChart" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
                     <!--线形图-->
                     <telerik:RadCartesianChart PaletteName="DefaultLight" Height="300" x:Name="RequestTimeLineChar" >
                         <telerik:RadCartesianChart.VerticalAxis>
@@ -239,7 +237,7 @@
                                 <telerik:PropertyNameDataPointBinding PropertyName="Success"/>
                             </telerik:BarSeries.ValueBinding>
                             <telerik:BarSeries.CategoryBinding>
-                                <telerik:PropertyNameDataPointBinding PropertyName="Site"/>
+                                <telerik:PropertyNameDataPointBinding PropertyName="SiteName"/>
                             </telerik:BarSeries.CategoryBinding>
                         </telerik:BarSeries>
                         <telerik:BarSeries ItemsSource="{Binding Infos.BarChart}" CombineMode="Stack100">
@@ -247,7 +245,7 @@
                                 <telerik:PropertyNameDataPointBinding PropertyName="Overtime"/>
                             </telerik:BarSeries.ValueBinding>
                             <telerik:BarSeries.CategoryBinding>
-                                <telerik:PropertyNameDataPointBinding PropertyName="Site"/>
+                                <telerik:PropertyNameDataPointBinding PropertyName="SiteName"/>
                             </telerik:BarSeries.CategoryBinding>
                         </telerik:BarSeries>
                         <telerik:BarSeries ItemsSource="{Binding Infos.BarChart}" CombineMode="Stack100">
@@ -255,7 +253,7 @@
                                 <telerik:PropertyNameDataPointBinding PropertyName="Error"/>
                             </telerik:BarSeries.ValueBinding>
                             <telerik:BarSeries.CategoryBinding>
-                                <telerik:PropertyNameDataPointBinding PropertyName="Site"/>
+                                <telerik:PropertyNameDataPointBinding PropertyName="SiteName"/>
                             </telerik:BarSeries.CategoryBinding>
                         </telerik:BarSeries>
                     </telerik:RadCartesianChart>
@@ -266,7 +264,7 @@
                                          AutoGenerateColumns="False" VerticalAlignment="Center" HorizontalAlignment="Center" 
                                          IsTabStop="True" IsHitTestVisible="True" UserGroupMode="Disabled">
                         <telerikGrid:RadDataGrid.Columns>
-                            <telerikGrid:DataGridTextColumn PropertyName="Site" Header="Site" CanUserFilter="False">
+                            <telerikGrid:DataGridTextColumn PropertyName="SiteName" Header="Site" CanUserFilter="False">
                                 <telerikGrid:DataGridTextColumn.HeaderStyle>
                                     <Style TargetType="gridPrimitives:DataGridColumnHeader">
                                         <Setter Property="Background" Value="AliceBlue"/>
