@@ -1,6 +1,7 @@
 ﻿using Heijden.Dns.Portable;
 using Heijden.DNS;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.Controls
 {
-    class DnsRequest : BasicRequest
+    public class DnsRequest : BasicRequest
     {
         // 继承的属性：CreateTime TimeCost OverTime Status Others ErrorException
         /// <summary>
@@ -25,7 +26,7 @@ namespace ServerMonitor.Controls
         /// <summary>
         /// 测试期待值
         /// </summary>
-        string actualResult;
+        HashSet<string> actualResult = null;
         /// <summary>
         /// Dns服务器IP地址
         /// </summary>
@@ -34,7 +35,7 @@ namespace ServerMonitor.Controls
         public QType RecordType { get => recordType; set => recordType = value; }
         public string DomainName { get => domainName; set => domainName = value; }
         public IPAddress DnsServer { get => dnsServer; set => dnsServer = value; }
-        public string ActualResult { get => actualResult; set => actualResult = value; }
+        public HashSet<string> ActualResult { get => actualResult; set => actualResult = value; }
 
         /// <summary>
         /// 生成一个Dns请求对象
@@ -83,8 +84,11 @@ namespace ServerMonitor.Controls
                     // 请求耗时应该在2^15-1(ms)内完成
                     TimeCost = (short)stopwatch.ElapsedMilliseconds;
                     // 记录解析记录
-                    ActualResult = response.Answers.First().RECORD.ToString();
-
+                    actualResult = new HashSet<string>();
+                    foreach (var item in response.Answers)
+                    {
+                        actualResult.Add(item.RECORD.ToString());
+                    }
                     return true;
                 }
                 else // 请求失败，无解析结果
@@ -93,7 +97,7 @@ namespace ServerMonitor.Controls
                     Status = "1002";
                     // 请求耗时应该在2^15-1(ms)内完成
                     TimeCost = (short)stopwatch.ElapsedMilliseconds;
-                    ActualResult = "No Record";
+                    ActualResult.Add("No Data!");
                     return false;
                 }
             }
@@ -149,7 +153,18 @@ namespace ServerMonitor.Controls
                 // 判断域名是否合法 ...
                 return Uri.IsWellFormedUriString(Domainname, UriKind.Absolute);
             }
-            
+
+        }
+
+        /// <summary>
+        /// 检查expectResult是否命中解析结果resultSet
+        /// </summary>
+        /// <param name="expectResult"></param>
+        /// <param name="resultSet"></param>
+        /// <returns></returns>
+        public bool IsMatchResult(string expectResult,HashSet<string> resultSet)
+        {
+            return resultSet.Contains(expectResult);
         }
         /**
          * int i = 0;

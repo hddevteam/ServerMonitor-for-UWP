@@ -354,6 +354,7 @@ namespace ServerMonitor.ViewModels
             rightFrame1.Visibility = Visibility.Collapsed;
             rightFrame2.Visibility = Visibility.Collapsed;
             GetListServer();
+            await Task.CompletedTask;
         }
         //取消
         public void CancelServer()
