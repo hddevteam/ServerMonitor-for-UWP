@@ -101,6 +101,7 @@
     <Compile Include="Controls\DnsRequest.cs" />
     <Compile Include="Controls\IcmpPacket.cs" />
     <Compile Include="Controls\Request.cs" />
+    <Compile Include="Controls\SMTPRequest.cs" />
     <Compile Include="Controls\UnitTest.cs" />
     <Compile Include="CustomConverter.cs" />
     <Compile Include="MainPage.xaml.cs">
