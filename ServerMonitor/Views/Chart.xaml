@@ -30,6 +30,7 @@
                         <Setter Target="LineChart.Padding" Value="24" />
                         <Setter Target="BarChart.Padding" Value="24" />
                         <Setter Target="grid2.Margin" Value="48" />
+                        <Setter Target="HorizontalAxis.MajorStep" Value="6"></Setter>
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="VisualStateCommon">
@@ -42,6 +43,7 @@
                         <Setter Target="selectionTypeCombo.HorizontalAlignment" Value="Right"></Setter>
                         <Setter Target="selectionTypeCombo.(Grid.Column)" Value="1"></Setter>
                         <Setter Target="selectionTypeCombo.(Grid.Row)" Value="0"></Setter>
+                        <Setter Target="HorizontalAxis.MajorStep" Value="3"></Setter>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -113,12 +115,15 @@
                         <telerik:RadCartesianChart.VerticalAxis>
                             <telerik:LinearAxis Title="RequestTime" FontWeight="Medium"/>
                         </telerik:RadCartesianChart.VerticalAxis>
+                        <!--<telerik:RadCartesianChart.VerticalAxis>
+                            <telerik:LogarithmicAxis LogarithmBase="10" Title="RequestTime" FontWeight="Medium"/>
+                        </telerik:RadCartesianChart.VerticalAxis>-->
                         <telerik:RadCartesianChart.HorizontalAxis>
-                            <telerik:DateTimeContinuousAxis Title="Nearly a week of site request results"
-                                                            Maximum="{x:Bind ViewModel.Infos.MaxnumDateTime,Mode=OneWay}"
-                                                            Minimum="{x:Bind ViewModel.Infos.MinnumDateTime,Mode=OneWay}"
-                                                            MajorStep="{Binding Infos.DateTimeContinuousAxisProperties.MajorStep,Mode=TwoWay}"
-                                                            MajorStepUnit="{Binding Infos.DateTimeContinuousAxisProperties.MajorStepUnit,Mode=TwoWay}"
+                            <telerik:DateTimeContinuousAxis Title="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.ChartTitle,Mode=OneWay}"
+                                                            Maximum="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.MaxnumDateTime,Mode=OneWay}"
+                                                            Minimum="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.MinnumDateTime,Mode=OneWay}"
+                                                            MajorStep="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.MajorStep,Mode=OneWay}"
+                                                            MajorStepUnit="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.MajorStepUnit,Mode=OneWay}"
                                                             LabelFormat="{}{0,0:MM-dd HH:mm}"
                                                             FontWeight="Medium">
                             </telerik:DateTimeContinuousAxis>
@@ -159,7 +164,7 @@
                         <!--end-->
 
                         <telerik:RadCartesianChart.SeriesProvider >
-                            <telerik:ChartSeriesProvider x:Name="provider" Source="{x:Bind ViewModel.Infos.Chart1Collection}">
+                            <telerik:ChartSeriesProvider x:Name="provider" Source="{x:Bind ViewModel.Infos.Chart1CollectionCopy,Mode=TwoWay}">
                                 <telerik:ChartSeriesProvider.SeriesDescriptors>
                                     <telerik:CategoricalSeriesDescriptor ValuePath="ResponseTime" CategoryPath="RequestTime">
                                         <telerik:CategoricalSeriesDescriptor.Style>
