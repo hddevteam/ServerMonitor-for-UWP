@@ -68,8 +68,7 @@ namespace ServerMonitor.Controls
         public static string GetTime(Dictionary<string,string> dictionary)
         {
             int  _totalTime=0;
-            int _singleTime = 0;
-            var d = "";
+            int _singleTime = 0;            
             //根据数据包获取颜色值
             if (dictionary.Count == 1)
             {
