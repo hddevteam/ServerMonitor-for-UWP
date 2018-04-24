@@ -91,7 +91,7 @@ namespace ServerMonitor.ViewModels
         public ChartPageViewModel()
         {
             RequestResult = new List<string> {"显示全部", "Success", "Error", "OverTime" };
-            Type = "Error";
+            Type = "显示全部";
             Infos = new SiteRequestCountInfo();
             Chart1Collection = new ObservableCollection<ObservableCollection<Chart1>>();
         }
@@ -115,14 +115,16 @@ namespace ServerMonitor.ViewModels
             {
                 //计算图表数据
                 var getResult= await Task.Run(()=>CacuChartAsync(Infos.Sites,Infos.Logs));
-                Chart1Collection = getResult.Item1;
+                foreach (var item in getResult.Item1)
+                {
+                    Chart1Collection.Add(item);
+                }
+                //此处不能直接赋值，图表绑定会有问题??
+                //Chart1Collection = getResult.Item1;
                 CacuBarChart(Infos.Sites, getResult.Item2);
             }
-            
-            //统计完成后触发此方法，计算前台需要显示的数据
-            //TypeChanged_Data(Type);
 
-            Lengend = await ChartLengendAsync(Infos.Sites);
+            await ChartLengendAsync(Infos.Sites);
             Infos.SelectSites = await SelectSiteInfoAsync(Infos.SelectSites);
 
             //图表加载完毕后切换加载状态
@@ -159,7 +161,11 @@ namespace ServerMonitor.ViewModels
             return DBHelper.GetAllLog();
         }
 
-        //对从数据库获取的site做处理
+        /// <summary>
+        /// 对从数据库获取的site做初始处理，初始化统计站点，初始化站点选中状态
+        /// </summary>
+        /// <param name="sites"></param>
+        /// <returns></returns>
         public async Task<Tuple<ObservableCollection<SelectSite>,List<Site>>> SelectSitesAsync(List<Site> sites)
         {
             var selectSites = new ObservableCollection<SelectSite>();
@@ -184,7 +190,11 @@ namespace ServerMonitor.ViewModels
             return new Tuple<ObservableCollection<SelectSite>, List<Site>>(selectSites, Sites);
         }
 
-        //站点信息补全，添加图片及类型说明
+        /// <summary>
+        /// 站点信息补全，添加图片及类型说明
+        /// </summary>
+        /// <param name="selectSites"></param>
+        /// <returns></returns>
         public async Task<ObservableCollection<SelectSite>> SelectSiteInfoAsync(ObservableCollection<SelectSite> selectSites)
         {
             foreach (var item in selectSites)
@@ -204,24 +214,26 @@ namespace ServerMonitor.ViewModels
             return selectSites;
         }
 
-        //线性图图例
+        /// <summary>
+        /// 线性图图例
+        /// </summary>
+        /// <param name="sites"></param>
+        /// <returns></returns>
         public async Task<ObservableCollection<ChartLengend>> ChartLengendAsync(List<Site> sites)
         {
             int i = 0;
-            ObservableCollection<ChartLengend> lengend = new ObservableCollection<ChartLengend>();
             foreach (var item in sites)
             {
 
-                lengend.Add(new ChartLengend() { Title = item.Site_name, Fill = DefaultPalette.FillEntries.Brushes[i] });
+                Lengend.Add(new ChartLengend() { Title = item.Site_name, Fill = DefaultPalette.FillEntries.Brushes[i] });
                 i++;
             }
             await Task.CompletedTask;
-            return lengend;
+            return Lengend;
         }
         #endregion
 
         #region 数据统计
-
         /// <summary>
         /// 计算线性图结果
         /// </summary>
@@ -235,46 +247,40 @@ namespace ServerMonitor.ViewModels
             DateTime time = DateTime.Now;
             var count = Infos.Sites.Count;
             int[,] siteResultCount = new int[count, 3];
-            int index = 0;
+            int index = 0;//二维数组的行序
             foreach (var site in Infos.Sites)
             {
                 //该站点的数据序列,若站点序列只有一条数据，线性表表现为不显示
                 ObservableCollection<Chart1> chart1Series = new ObservableCollection<Chart1>();
-
                 //站点各项请求结果统计
-                int successCount = 0;
-                int errorCount = 0, overtimeCount = 0;
+                int successCount = 0, errorCount = 0, overtimeCount = 0;
                 foreach (var log in Infos.Logs)
                 {
                     #region 统计站点信息
                     if (log.Site_id == site.Id)
                     {
                         //该条记录结果统计
-                        string result = "";
-                        Double responseTime = 0;
+                        string result = ""; Double responseTime = 0;
                         //判断并记录该条log是成功，失败，还是超时
                         if (!log.Is_error)
                         {
                             //成功
-                            successCount++;
-                            result = "Success";
+                            successCount++; result = "Success";
                             responseTime = Math.Log10(log.Request_time);
                         }
                         else if (log.Status_code == "1002") //状态码为1002时表示请求超时
                         {
                             //超时
-                            overtimeCount++;
-                            result = "OverTime";
+                            overtimeCount++; result = "OverTime";
                             responseTime = Math.Log10(log.Request_time);
                         }
                         else
                         {
                             //失败
-                            errorCount++;
-                            result = "Error";
+                            errorCount++; result = "Error";
                             responseTime = 0;
                         }
-                        Debug.WriteLine(result + "," + site.Site_name + "," + log.Create_time+","+log.Request_time);
+                        //Debug.WriteLine(result + "," + site.Site_name + "," + log.Create_time+","+log.Request_time);
                         chart1Series.Add(new Chart1() { RequestTime = log.Create_time, Result = result, ResponseTime = responseTime });
                     }
                     #endregion
@@ -285,11 +291,11 @@ namespace ServerMonitor.ViewModels
                 siteResultCount[index,0] = successCount;
                 siteResultCount[index, 1] = errorCount;
                 siteResultCount[index, 2] = overtimeCount;
-                for (int i = 0; i < 3; i++)
-                {
-                    Debug.WriteLine("siteResultCount[index,0]:{0},siteResultCount[index,1]:{1},siteResultCount[index,3]:{2}",
-                        siteResultCount[index, 0], siteResultCount[index, 1], siteResultCount[index, 2]);
-                }
+                //for (int i = 0; i < 3; i++)
+                //{
+                //    Debug.WriteLine("siteResultCount[index,0]:{0},siteResultCount[index,1]:{1},siteResultCount[index,3]:{2}",
+                //        siteResultCount[index, 0], siteResultCount[index, 1], siteResultCount[index, 2]);
+                //}
                 index++;
             }
             await Task.CompletedTask;
@@ -311,8 +317,7 @@ namespace ServerMonitor.ViewModels
                 string type;
                 if (item.Is_server)
                 {
-                    type = "SERVER";
-                    //+(SERVER)区分不同站点类型同名情况
+                    type = "SERVER"; //+(SERVER)区分不同站点类型同名情况
                     Infos.BarChart.Add(new BarChartData() { SiteName = item.Site_name + "(SERVER)", Success = requestResults[index,0],
                         Error = requestResults[index, 1], Overtime = requestResults[index, 2]
                     });
@@ -334,7 +339,6 @@ namespace ServerMonitor.ViewModels
         #endregion
 
         #region 响应事件
-
         /// <summary>
         /// 切换类型
         /// </summary>
@@ -357,7 +361,6 @@ namespace ServerMonitor.ViewModels
                     {
                         //每个站点序列
                         ObservableCollection<Chart1> dataItem = new ObservableCollection<Chart1>();
-
                         //请求结果符合当前所选类别时，添加到序列(Linq 查询表达式)
                         foreach (var item in items.Where(i => i.Result.Equals(Type)).Select(i => i))
                         {
@@ -365,7 +368,6 @@ namespace ServerMonitor.ViewModels
                         }
                         //序列集合
                         Infos.Chart1CollectionCopy.Add(dataItem);
-                        Debug.WriteLine("Infos.Chart1CollectionCopy.dataItem.Count:" + dataItem.Count);
                     }  
                 }
             }
@@ -409,12 +411,15 @@ namespace ServerMonitor.ViewModels
                 Infos.State2 = Visibility.Collapsed;
                 //重新统计数据
                 var getResult = await Task.Run(() => CacuChartAsync(Infos.Sites, Infos.Logs));
-                Chart1Collection = getResult.Item1;
+                foreach (var item in getResult.Item1)
+                {
+                    Chart1Collection.Add(item);
+                }
+                //Chart1Collection = getResult.Item1;
                 CacuBarChart(Infos.Sites, getResult.Item2);
                 //统计完成后触发此方法，计算前台需要显示的数据
                 TypeChanged_Data(Type);
-                Lengend = await ChartLengendAsync(Infos.Sites);
-                Debug.WriteLine(Lengend.Count);
+                await ChartLengendAsync(Infos.Sites);
             }
         }
 
