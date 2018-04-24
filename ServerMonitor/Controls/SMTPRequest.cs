@@ -70,7 +70,7 @@ namespace ServerMonitor.Controls
                     {
                         if (!s.Connected) // //Connection timed out...
                         {
-                            Status = "1003";
+                            Status = "1002"; //超时1002  错误1001
                             TimeCost = OverTime;    //设为规定值
                             ErrorException = new Exception("请求超时");  //记录错误信息
                             s.Dispose();     //让连接暂停
@@ -89,15 +89,15 @@ namespace ServerMonitor.Controls
                     {
                         if (outTime == false)  //false为不超时 ,对此情况下的报错处理
                         {
-                            Status = "1003";
+                            Status = "1001";
                             ErrorException = e;
                             TimeCost = OverTime;
                         }
                         continue;
                     }
-                    if (!s.Connected) // Connection failed, try next IPaddress. 当作超时处理
+                    if (!s.Connected) // Connection failed
                     {
-                        Status = "1003";
+                        Status = "1001";
                         TimeCost = OverTime;
                         ErrorException = new Exception("未建立连接");
                     }
@@ -121,8 +121,8 @@ namespace ServerMonitor.Controls
             }
             catch (Exception e)
             {
-                // 服务器超时
-                Status = "1003";
+                // 其他错误，例如域名解析错误
+                Status = "1001";
                 // 收集捕获到的异常
                 ErrorException = e;
                 // 请求耗时设置为超时上限
