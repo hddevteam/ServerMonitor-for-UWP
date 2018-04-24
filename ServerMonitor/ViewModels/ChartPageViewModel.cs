@@ -280,7 +280,6 @@ namespace ServerMonitor.ViewModels
                             errorCount++; result = "Error";
                             responseTime = 0;
                         }
-                        //Debug.WriteLine(result + "," + site.Site_name + "," + log.Create_time+","+log.Request_time);
                         chart1Series.Add(new Chart1() { RequestTime = log.Create_time, Result = result, ResponseTime = responseTime });
                     }
                     #endregion
@@ -291,11 +290,6 @@ namespace ServerMonitor.ViewModels
                 siteResultCount[index,0] = successCount;
                 siteResultCount[index, 1] = errorCount;
                 siteResultCount[index, 2] = overtimeCount;
-                //for (int i = 0; i < 3; i++)
-                //{
-                //    Debug.WriteLine("siteResultCount[index,0]:{0},siteResultCount[index,1]:{1},siteResultCount[index,3]:{2}",
-                //        siteResultCount[index, 0], siteResultCount[index, 1], siteResultCount[index, 2]);
-                //}
                 index++;
             }
             await Task.CompletedTask;
