@@ -27,6 +27,10 @@ namespace ServerMonitor.Controls
         string actualResult;
         public string ActualResult { get => actualResult; set => actualResult = value; }
 
+        /// <summary>
+        /// 生成一个SMTP请求对象
+        /// </summary>
+        /// <param name="DomainName">待请求的SMTP域名</param>
         public SMTPRequest(string DomainName)
         {
             this.DomainName = DomainName;
@@ -35,22 +39,24 @@ namespace ServerMonitor.Controls
         /// <summary>
         /// SMTP请求
         /// </summary>
-        /// <returns></returns>
+        /// <returns>是否请求成功</returns>
         public override async Task<bool> MakeRequest()
         {
-            CreateTime = DateTime.Now;
+            CreateTime = DateTime.Now;// 赋值生成请求的时间
+            bool outTime = false; //true 为超时
             try
             {
                 Socket s = null;  //用他来建立连接，发送信息
                 IPAddress hostAddress = null;  // 主机IP地址
                 IPEndPoint hostEndPoint;     //主机端点 IP地址+端口
-                // get all the ip with the domain
+                // get all the ip with the domain  一般只有一个
                 IPHostEntry hostInfo = await Dns.GetHostEntryAsync(DomainName);
                 IPAddress[] IPaddresses = hostInfo.AddressList;
 
-                // go through each ip and attempt a connection
+                // go through each ip and attempt a connection，成功请求就停止（返回true），失败就继续下一个（有的话）
                 for (int index = 0; index < IPaddresses.Length; index++)
                 {
+                    outTime = false; //true 为超时  ，false为不超时
                     hostAddress = IPaddresses[index];
                     hostEndPoint = new IPEndPoint(hostAddress, 587);// get our end point
                     // prepare the socket
@@ -58,28 +64,30 @@ namespace ServerMonitor.Controls
 
                     Stopwatch stopwatch = new Stopwatch(); // 记录请求耗时
 
+                    //捕捉连接超时，异步执行timer.Tick事件的方法，该方法只在OverTime（ms）后执行一次
                     DispatcherTimer timer = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 0, 0, OverTime) };
                     timer.Tick += new EventHandler<object>((sender, e) =>
                     {
                         if (!s.Connected) // //Connection timed out...
                         {
                             Status = "1003";
-                            TimeCost = OverTime;
-                            ErrorException = new Exception("请求超时");
-                            s.Dispose();
-                            s = null;
+                            TimeCost = OverTime;    //设为规定值
+                            ErrorException = new Exception("请求超时");  //记录错误信息
+                            s.Dispose();     //让连接暂停
+                            outTime = true;      // 标记为超时，且此情况已处理
                         }
-                        timer.Stop();
+                        timer.Stop();  //关闭计算器，让该方法只执行一次，
                     });
-                    
+
                     try
                     {
-                        timer.Start();
-                        await s.ConnectAsync(hostEndPoint);
+                        timer.Start();  //开始执行timer.Tick事件的方法
+                        //建立TCP连接，不能用s.Connect(hostEndPoint); 会使timer.Tick无法正常执行
+                        await s.ConnectAsync(hostEndPoint);  
                     }
-                    catch (Exception e) //Connection timed out...
+                    catch (Exception e) //Connection error
                     {
-                        if (s != null)
+                        if (outTime == false)  //false为不超时 ,对此情况下的报错处理
                         {
                             Status = "1003";
                             ErrorException = e;
@@ -95,21 +103,20 @@ namespace ServerMonitor.Controls
                     }
                     else
                     {
-                        s.Receive(RecvFullMessage);//接受建立连接时的返回信息
+                        s.Receive(RecvFullMessage);//接收建立连接时的返回信息
                         //交代自己认证SMTP服务器的域名 然后发送 接收信息存在RecvFullMessage
 
-                        stopwatch.Start();
-                        ByteCommand = ASCII.GetBytes("HELO " + DomainName + "\r\n");
+                        stopwatch.Start();  //开始计时
+                        ByteCommand = ASCII.GetBytes("HELO " + DomainName + "\r\n"); //规定的HELO请求格式
                         s.Send(ByteCommand, ByteCommand.Length, 0);
-                        s.Receive(RecvFullMessage);
-                        stopwatch.Stop();
+                        s.Receive(RecvFullMessage);  //接收HELO请求的返回信息
+                        stopwatch.Stop();   //结束计时
 
-                        Status = ASCII.GetString(RecvFullMessage).Substring(0, 3);
-                        TimeCost = (short)stopwatch.ElapsedMilliseconds;
-                        ActualResult = ASCII.GetString(RecvFullMessage);
-                        return true;
+                        Status = ASCII.GetString(RecvFullMessage).Substring(0, 3); //去状态码
+                        TimeCost = (short)stopwatch.ElapsedMilliseconds;         //计算请求时间
+                        ActualResult = ASCII.GetString(RecvFullMessage);         //记录请求结果
+                        return true;                                            //停止循环，返回true
                     }
-
                 }
             }
             catch (Exception e)
