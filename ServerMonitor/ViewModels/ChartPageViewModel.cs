@@ -78,7 +78,7 @@ namespace ServerMonitor.ViewModels
             }
         }
         //图表1数据序列集合（前台绑定的非此属性，而是可变副本）
-        private static ObservableCollection<ObservableCollection<Chart1>> chart1Collection;
+        private ObservableCollection<ObservableCollection<Chart1>> chart1Collection;
 
         public ObservableCollection<ObservableCollection<Chart1>> Chart1Collection
         {
