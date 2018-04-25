@@ -16,21 +16,23 @@ namespace ServerMonitor.ViewModels
 {
     public class ContactViewModel : Template10.Mvvm.ViewModelBase
     {
-        private Contact selectedContact;
-        Grid rightFrame2, rightFrame1;
+        private Contact selectedContact; //点击或右击对应的联系人
+        Grid rightFrame2, rightFrame1;  //右方隐藏控件 RightFrame1:联系人详细信息;  RightFrame2:编辑联系人，新建联系人
         int isAddContact = 0; //1:添加联系人 2：编辑联系人 0：什么都不做
         public ContactViewModel()
         {
 
         }
         #region 绑定数据
+        //联系人列表
         private ObservableCollection<Contact> contacts = new ObservableCollection<Contact>();
         public ObservableCollection<Contact> Contacts { get => contacts; set => contacts = value; }
 
-        //编辑联系人，新建联系人绑定联系人
+        //用于编辑联系人，新建联系人的绑定联系人
         public Contact RightContact { get => rightContact; set => rightContact = value; }
         private Contact rightContact = new Contact();
-        
+
+        //RightFrame2的标题
         private string rightFrame2Title = "New Contact";
         public string RightFrame2Title
         {
@@ -64,13 +66,14 @@ namespace ServerMonitor.ViewModels
 
         #region 响应事件
         /// <summary>
-        /// 联系人列表右击列表 得到右击的站点id
+        /// 联系人列表右击 取得点击对应的联系人信息
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public bool ContactList_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
             var x = e.OriginalSource;
+            //根据点击的事件源 取对应的联系人信息
             if (x is Rectangle)
             {
                 selectedContact = (Contact)(((Rectangle)(e.OriginalSource)).DataContext);
@@ -85,6 +88,11 @@ namespace ServerMonitor.ViewModels
             }
             return true;
         }
+        /// <summary>
+        /// 联系人列表点击 取得点击的联系人
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void Contactlist_Tapped(object sender, TappedRoutedEventArgs e)
         {
             rightFrame1.Visibility = Visibility.Collapsed;
@@ -92,11 +100,14 @@ namespace ServerMonitor.ViewModels
             if (x >= 0)
             {
                 selectedContact = (Contact)((sender as ListBox).Items[x]);
-                rightFrame1.Visibility = Visibility.Visible;
+                rightFrame1.Visibility = Visibility.Visible; //让联系人详情rightFrame1显示
                 rightFrame2.Visibility = Visibility.Collapsed;
             }
         }
-        //新建联系人
+
+        /// <summary>
+        /// 联系人列表右击 显示弹出框中新建联系人
+        /// </summary>
         public void AddContact()
         {
             isAddContact = 1;
@@ -108,7 +119,10 @@ namespace ServerMonitor.ViewModels
             rightFrame1.Visibility = Visibility.Collapsed;
             rightFrame2.Visibility = Visibility.Visible;
         }
-        //编辑联系人
+
+        /// <summary>
+        /// 联系人列表右击 显示弹出框中编辑联系人 联系人详情中编辑联系人
+        /// </summary>
         public void EditFlyoutItem_Click()
         {
             isAddContact = 2;
@@ -120,18 +134,21 @@ namespace ServerMonitor.ViewModels
             rightFrame1.Visibility = Visibility.Collapsed;
             rightFrame2.Visibility = Visibility.Visible;
         }
-        //1新建/ 2编辑联系人 确认
+
+        /// <summary>
+        /// 新建或编辑联系人中的确认
+        /// </summary>
         public async void ConfirmContact()
         {
-            string str = JudgeInput(RightContact);
-            if (!str.Equals(""))
+            string str = JudgeInput(RightContact); //判断输入的联系人信息是否合法
+            if (!str.Equals(""))  //true：表示不合法 弹出框提醒
             {
                 var messageBox = new Windows.UI.Popups.MessageDialog(str) { Title = "Error" };
                 messageBox.Commands.Add(new Windows.UI.Popups.UICommand("OK"));
                 await messageBox.ShowAsync();
                 return;
             }
-            if(isAddContact==1)
+            if(isAddContact==1)  //新建联系人
             {
                 RightContact.Create_time = DateTime.Now;
                 RightContact.Update_time = DateTime.Now;
@@ -141,7 +158,7 @@ namespace ServerMonitor.ViewModels
                     rightFrame2.Visibility = Visibility.Collapsed;
                 }
             }
-            else if(isAddContact==2)
+            else if(isAddContact==2)  //更新联系人
             {
                 RightContact.Update_time = DateTime.Now;
                 if (DBHelper.UpdateContact(RightContact) == 1)
@@ -150,21 +167,26 @@ namespace ServerMonitor.ViewModels
                     rightFrame2.Visibility = Visibility.Collapsed;
                 }
             }
-            GetListContact();
+            GetListContact();  //刷新联系人列表
         }
-        //新建/编辑联系人 取消
+        /// <summary>
+        /// 新建或编辑联系人中的取消
+        /// </summary>
         public void CancelContact()
         {
             rightFrame1.Visibility = Visibility.Collapsed;
             rightFrame2.Visibility = Visibility.Collapsed;
         }
-        //删除联系人
+
+        /// <summary>
+        /// 联系人列表右击 显示弹出框中删除联系人
+        /// </summary>
         public async void DeleteFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            string str = selectedContact.Contact_name + " will be deleted.";
+            string str = selectedContact.Contact_name + " will be deleted.";  //弹出框文本
             var messageBox = new Windows.UI.Popups.MessageDialog(str) { Title = "Delete this contact?" };
             messageBox.Commands.Add(new Windows.UI.Popups.UICommand("Delete", uicommand =>
-            {
+            {    //点击Delete，删除联系人
                 if (DBHelper.DeleteOneContact(selectedContact.Id) == 1)
                 {
                     rightFrame1.Visibility = Visibility.Collapsed;
@@ -173,16 +195,18 @@ namespace ServerMonitor.ViewModels
                 }
             }));
             messageBox.Commands.Add(new Windows.UI.Popups.UICommand("Cancel", uicommand =>
-            {
-                
+            {     //点击Cancel  不作为
+
             }));
-            await messageBox.ShowAsync();
+            await messageBox.ShowAsync();  //弹出框显示
         }
         #endregion 响应事件
 
         #region 辅助函数
-        //获取联系人
-        private void GetListContact()
+        /// <summary>
+        /// 获取和刷新联系人
+        /// </summary>
+        private void GetListContact()  //不可测
         {
             List<Contact> list = DBHelper.GetAllContact();
             Contacts.Clear();
@@ -191,14 +215,20 @@ namespace ServerMonitor.ViewModels
                 Contacts.Add(list[i]);
             }
         }
-        //设置，获取界面右端隐藏元素
-        public void SetFrame(Grid grid1,Grid grid2)
+        
+        /// <summary>
+        /// 设置，获取界面右端隐藏控件
+        /// </summary>
+        public void SetFrame(Grid grid1,Grid grid2)  //不可测
         {
             rightFrame1 = grid1;
             rightFrame2 = grid2;
         }
-        //深度克隆联系人Contact 
-        private Contact CloneContact(Contact contact)
+
+        /// <summary>
+        /// 深度克隆联系人Contact 
+        /// </summary>
+        private Contact CloneContact(Contact contact)  //可测
         {
             Contact ct = new Contact()
             {
@@ -210,8 +240,10 @@ namespace ServerMonitor.ViewModels
             };
             return ct;
         }
-        //判断新建，编辑时输入是否合法
-        private string JudgeInput(Contact contact)
+        /// <summary>
+        /// 判断新建，编辑时输入是否合法
+        /// </summary>
+        private string JudgeInput(Contact contact) //可测
         {
             string str = "";
             //手机号码
@@ -223,6 +255,7 @@ namespace ServerMonitor.ViewModels
             //Email地址
             Regex regE = new Regex(@"^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$");
 
+            //如果两个都不不匹配执行
             if(!(regPho.IsMatch(contact.Telephone)|| regPho1.IsMatch(contact.Telephone)))
             {
                 if (!("".Equals(contact.Telephone) || contact.Telephone == null))
