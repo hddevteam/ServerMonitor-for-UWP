@@ -34,7 +34,7 @@ namespace ServerMonitor.ViewModels
             T = 200;
         }
         #region 绑定数据
-        private string preCheckName;
+        private string preCheckName;  //preCheck的名字
         public string PreCheckName
         {
             get => preCheckName;
@@ -166,15 +166,6 @@ namespace ServerMonitor.ViewModels
 
         }
         /// <summary>
-        /// 进行刷新的按钮事件
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void Refresh_Click()
-        {
-            GetListSite();
-        }
-        /// <summary>
         /// 请求所有服务的按钮事件
         /// </summary>
         /// <param name="sender"></param>
@@ -259,7 +250,12 @@ namespace ServerMonitor.ViewModels
             }
             var sitelist1 = SiteItems;
         }
-        //add server点击事件
+        
+        /// <summary>
+        /// add server点击事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void Add_Server(object sender, RoutedEventArgs e)
         {
             ShowAddServerPage();
@@ -269,7 +265,12 @@ namespace ServerMonitor.ViewModels
             var msgPopup = new AddServerPage();
             AddServerPage.ShowWindow();
         }
-        //add website点击事件
+
+        /// <summary>
+        /// add website点击事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void Add_Website(object sender, RoutedEventArgs e)
         {
             ShowAddWebsitePage();
@@ -279,6 +280,12 @@ namespace ServerMonitor.ViewModels
             var msgPopup = new AddWebsitePage();
             AddWebsitePage.ShowWindow();
         }
+
+        /// <summary>
+        /// 站点列表点击事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void SiteList_Tapped(object sender, TappedRoutedEventArgs e)
         {
             int x = (sender as GridView).SelectedIndex;
@@ -320,6 +327,11 @@ namespace ServerMonitor.ViewModels
             return true;
         }
 
+        /// <summary>
+        /// 站点列表右击后的点击复制事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void CopyFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
             var q = from t in SiteItems
@@ -336,6 +348,12 @@ namespace ServerMonitor.ViewModels
                 GetListSite();
             }
         }
+
+        /// <summary>
+        /// 站点列表右击后的关闭站点监听事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void CloseFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
             var q = from t in SiteItems
@@ -351,6 +369,12 @@ namespace ServerMonitor.ViewModels
                 GetListSite();
             }
         }
+
+        /// <summary>
+        /// 站点列表右击后的点击删除事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void DeleteFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
             var q = from t in SiteItems
@@ -365,43 +389,12 @@ namespace ServerMonitor.ViewModels
                 GetListSite();
             }
         }
-
-
-        //DispatcherTimer dispatcherTimer;
-        //int Timecount = 60000 * 5;//5分钟 定义一个计时器5分钟
-        //public void DispatcherTimeSetup()
-        //{
-        //    dispatcherTimer = new DispatcherTimer();
-        //    dispatcherTimer.Tick += DispatcherTimer_Tick;
-        //    dispatcherTimer.Interval = new TimeSpan(0, 0, 1);//设置方法间隔1s
-        //    dispatcherTimer.Start();
-        //}
-
-        //private void DispatcherTimer_Tick(object sender, object e)
-        //{
-        //    //倒计时
-        //    _countdown = "Next Refresh : "+((Timecount / 60000) % 60).ToString() + "分 " + ((Timecount / 1000) % 60).ToString() + "秒";
-        //    RaisePropertyChanged(() => CountDown);
-        //    Timecount -= 1000;
-        //    if (Timecount == 0)
-        //    {
-        //        Timecount = 5 * 60000;
-        //    }
-        //}
-        //private string _countdown = "Next Refresh : ";
-
-        //public string CountDown
-        //{
-        //    get => _countdown;
-        //    set
-        //    {
-        //        _countdown = value;
-        //        RaisePropertyChanged(() => CountDown);
-        //    }
-        //}
-
-
-        //弹出对话框，设置应用响应时间的最优门槛 T
+        
+        /// <summary>
+        /// 弹出对话框，设置应用响应时间的最优门槛T 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public async Task TextBlock_TappedAsync()
         {
             int temp = T;
@@ -409,8 +402,7 @@ namespace ServerMonitor.ViewModels
             //点击Accept
             if (result == ContentDialogResult.Primary)
             {
-
-                GetSitePerformance(sites);
+                GetSitePerformance(sites); //刷新站点性能列表
             }
             else  //点击 Cancel执行
             {
@@ -420,24 +412,27 @@ namespace ServerMonitor.ViewModels
         #endregion 响应事件
 
         #region 辅助函数
-        //获取数据
-        private void GetListSite()
+        /// <summary>
+        /// 获取数据 并统一刷新界面数据
+        /// </summary>
+        private void GetListSite()   //不可测
         {
-            SiteItems.Clear();
+            SiteItems.Clear();  //清空其数据
             for (int i = 0; i < 4; i++)
             {
                 SiteResults[i].Number = 0;
             }
             sites = DBHelper.GetAllSite();
-            List<Site> q = ProcessSite(sites);  //加工处理从数据库得到的站点信息  --筛选，排序
-            GetOutageSite(sites);    //加工处理从数据库得到的站点信息，显示在右上方
-
+            List<Site> q = ProcessSite(sites);
+            GetOutageSite(sites);
             GetSitePerformance(sites);
 
+            //PreCheck：针对其显示做处理
             PreCheckColor = GetSiteItemColor(preCheck.Last_request_result);
             PreCheckResult = GetSiteItemLastResult(preCheck);
             PreCheckName = preCheck.Site_name;
 
+            //循环把数据添加在SiteItems（列表）中
             for (int i = 0; i < q.Count; i++)
             {
                 string color = GetSiteItemColor(q[i].Last_request_result); //得到在UI上对应站点颜色
@@ -455,7 +450,7 @@ namespace ServerMonitor.ViewModels
                         Protocol_type = q[i].Protocol_type,
                         Site_address = q[i].Site_address,
                     });
-                    ChangeSiteResult(q[i].Last_request_result, 1);//在for循环内累加站点统计信息
+                    ChangeSiteResult(q[i].Last_request_result);//在for循环内累加站点统计信息
                 }
                 else
                 {
@@ -470,12 +465,83 @@ namespace ServerMonitor.ViewModels
                         Protocol_type = q[i].Protocol_type,
                         Site_address = q[i].Site_address,
                     });
-                    ChangeSiteResult(q[i].Last_request_result, 1);
+                    ChangeSiteResult(q[i].Last_request_result);
                 }
             }
         }
-        //加工处理从数据库得到的站点信息，显示在右上方
-        private void GetOutageSite(List<Site> list)
+
+        /// <summary>
+        /// 加工处理从数据库得到的站点信息并返回 --筛选，排序  得到并筛选掉 pre-Check
+        /// </summary>
+        /// <param name="list">站点列表</param>
+        /// <returns>有序的站点列表</returns>
+        private List<Site> ProcessSite(List<Site> list) //不可测
+        {
+            List<Site> q;
+            if (filter == 2)  //0:Error  1:Normal  2:All Servers, 筛选
+            {
+                q = (from t in list
+                     where t.Is_Monitor == true
+                     select t).ToList();
+            }
+            else if (filter == 1)//正常1
+            {
+                q = (from t in list
+                     where t.Is_Monitor == true
+                     where t.Last_request_result == 1
+                     select t).ToList();
+            }
+            else
+            {
+                q = (from t in list
+                     where t.Is_Monitor == true
+                     where t.Last_request_result != 1
+                     select t).ToList();
+            }
+            switch (order)  //1:id As 2:id De 3:字母 As 4:字母 De 排序
+            {
+                case 1:
+                    q = (from t in q
+                         orderby t.Id ascending
+                         select t).ToList();
+                    break;
+                case 2:
+                    q = (from t in q
+                         orderby t.Id descending
+                         select t).ToList();
+                    break;
+                case 3:
+                    q = (from t in q
+                         orderby t.Site_name ascending
+                         select t).ToList();
+                    break;
+                case 4:
+                    q = (from t in q
+                         orderby t.Site_name descending
+                         select t).ToList();
+                    break;
+                default:
+                    break;
+            }
+
+            // 从list（数据库） 得到 pre-Check
+            preCheck = (from t in list
+                        where t.Is_pre_check == true
+                        select t).ToList()[0];
+
+            // 筛选掉 pre-Check
+            q = (from t in q
+                 where t.Is_pre_check == false
+                 select t).ToList();
+
+            return q;
+        }
+
+        /// <summary>
+        /// 得到宕机的站点信息并按时间先后排序，显示在右上方 保存在OutageSites中
+        /// </summary>
+        /// <param name="list">站点列表</param>
+        private void GetOutageSite(List<Site> list) //不可测
         {
             OutageSites.Clear();
 
@@ -510,8 +576,11 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        //得到站点性能信息，从log表中取数据分析
-        private void GetSitePerformance(List<Site> list)
+        /// <summary>
+        /// 得到站点性能信息并按性能排序，从log表中取数据分析 显示在右下方 保存在SitePerformanceList中
+        /// </summary>
+        /// <param name="list">站点列表</param>
+        private void GetSitePerformance(List<Site> list) //不可测
         {
             SitePerformanceList.Clear();
 
@@ -571,72 +640,13 @@ namespace ServerMonitor.ViewModels
                 SitePerformanceList.Add(container[i]);
             }
         }
-
-        //加工处理从数据库得到的站点信息  --筛选，排序
-        private List<Site> ProcessSite(List<Site> list)
-        {
-            List<Site> q;
-            if (filter == 2)  //0:Error  1:Normal  2:All Servers, 筛选
-            {
-                q = (from t in list
-                     where t.Is_Monitor == true
-                     select t).ToList();
-            }
-            else if (filter == 1)//正常1
-            {
-                q = (from t in list
-                     where t.Is_Monitor == true
-                     where t.Last_request_result == 1
-                     select t).ToList();
-            }
-            else
-            {
-                q = (from t in list
-                     where t.Is_Monitor == true
-                     where t.Last_request_result != 1
-                     select t).ToList();
-            }
-            switch (order)  //1:id As 2:id De 3:Al As 4:Al De 排序
-            {
-                case 1:
-                    q = (from t in q
-                         orderby t.Id ascending
-                         select t).ToList();
-                    break;
-                case 2:
-                    q = (from t in q
-                         orderby t.Id descending
-                         select t).ToList();
-                    break;
-                case 3:
-                    q = (from t in q
-                         orderby t.Site_name ascending
-                         select t).ToList();
-                    break;
-                case 4:
-                    q = (from t in q
-                         orderby t.Site_name descending
-                         select t).ToList();
-                    break;
-                default:
-                    break;
-            }
-
-            // 从list（数据库） 得到 pre-Check
-            preCheck = (from t in list
-                        where t.Is_pre_check == true
-                        select t).ToList()[0];
-
-            // 筛选掉 pre-Check
-            q = (from t in q
-                 where t.Is_pre_check == false
-                 select t).ToList();
-
-            return q;
-        }
-
-        //深度克隆站点
-        private Site CloneSite(Site site)
+        
+        /// <summary>
+        /// 深度克隆站点 （大部分克隆）
+        /// </summary>
+        /// <param name="site">站点</param>
+        /// <returns>克隆站点</returns>
+        private Site CloneSite(Site site)   //可测
         {
             Site cs = new Site()
             {
@@ -647,8 +657,6 @@ namespace ServerMonitor.ViewModels
                 Server_port = site.Server_port,
                 Monitor_interval = site.Monitor_interval,
                 Is_Monitor = site.Is_Monitor,
-                //Status_code = site.Status_code,
-                //Request_interval = site.Request_interval,
                 Create_time = DateTime.Now,
                 Update_time = DateTime.Now,
                 Is_pre_check = false,
@@ -656,34 +664,40 @@ namespace ServerMonitor.ViewModels
             };
             return cs;
         }
-        //修改站点统计信息 一般是相应站点情况（如Success）数量 +1
-        private void ChangeSiteResult(int last_request_result, int ch)
+        /// <summary>
+        /// 修改站点情况统计信息 相应站点情况（如Success）数量 +1
+        /// </summary>
+        /// <param name="last_request_result">最近站点请求结果</param>
+        private void ChangeSiteResult(int last_request_result)   //不可测
         {
             switch (last_request_result)
             {
                 case 1:
-                    SiteResults[0].Number += ch;
+                    SiteResults[0].Number ++;
                     break;
                 case 0:
-                    SiteResults[1].Number += ch;
+                    SiteResults[1].Number ++;
                     break;
                 case -1:
-                    SiteResults[2].Number += ch;
+                    SiteResults[2].Number ++;
                     break;
                 case 2:
-                    SiteResults[3].Number += ch;
+                    SiteResults[3].Number ++;
                     break;
                 default:
                     break;
             }
         }
-        //处理站点信息last_request_result 
-        ////Red：0错误，Orange：-1超时，Gray：2未知，4682B4：1成功  
-        //#D13438 #4682B4 #5D5A58 #f7630c，红蓝灰橙
-        private string GetSiteItemColor(int last_request_result)
+
+        /// <summary>
+        /// 返回站点在UI上对应颜色
+        /// </summary>
+        /// <param name="last_request_result">最近站点请求结果</param>
+        /// <returns>颜色</returns>
+        private string GetSiteItemColor(int last_request_result)    //可测
         {
-            string color = "#5D5A58";
-            switch (last_request_result)
+            string color = "#5D5A58"; //#D13438 #4682B4 #5D5A58 #f7630c，红蓝灰橙
+            switch (last_request_result) //Red：0错误，Orange：-1超时，Gray：2未知，4682B4：1成功  
             {
                 case 0:
                     color = "#D13438";
@@ -697,18 +711,24 @@ namespace ServerMonitor.ViewModels
                 case -1:
                     color = "#f7630c";
                     break;
-                default:
+                default:       //取默认
                     break;
             }
             return color;
         }
-        //处理站点信息last_request_result
-        private string GetSiteItemLastResult(Site site)
+
+
+        /// <summary>
+        /// 返回最近站点访问信息
+        /// </summary>
+        /// <param name="site">站点</param>
+        /// <returns>站点信息</returns>
+        private string GetSiteItemLastResult(Site site) //  能测 但有点复杂
         {
             string result = "";
-            if (site.Is_server)
+            if (site.Is_server)  //判断是不是服务器
             {
-                switch (site.Last_request_result)
+                switch (site.Last_request_result) //0错误，-1超时，2未知，1成功
                 {
                     case 0:
                         result = "Error in " + site.Request_interval + "ms";
