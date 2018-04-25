@@ -21,14 +21,14 @@ namespace ServerMonitor.ViewModels
 {
     public class MainPageViewModel : Template10.Mvvm.ViewModelBase
     {
-        private int rightTapped_SiteId;
+        private int rightTapped_SiteId;  //右击站点id
         List<Site> sites; //只在GetListSite()增加和删除其元素个数
         int order = 1;  //1:id As 2:id De 3:Al As 4:Al De
         int filter = 2; //0:Error  1:Normal  2:All Servers,
 
         //MainPage 界面的弹出框
         ContentDialog termsOfUseContentDialog = null;
-        private Site preCheck;
+        private Site preCheck;  //preCheck站点
         public MainPageViewModel()
         {
             T = 200;
@@ -45,7 +45,7 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        private string preCheckColor = "Red";
+        private string preCheckColor;  //preCheck的颜色
         public string PreCheckColor
         {
             get => preCheckColor;
@@ -55,8 +55,8 @@ namespace ServerMonitor.ViewModels
                 RaisePropertyChanged(() => PreCheckColor);
             }
         }
-        private string preCheckResult;
-        public string PreCheckResult
+        private string preCheckResult;  //preCheck的最近一次请求信息
+        public string PreCheckResult  
         {
             get => preCheckResult;
             set
@@ -67,10 +67,12 @@ namespace ServerMonitor.ViewModels
         }
 
         //只在GetListSite()增加和删除其元素个数
+        //监听的站点列表
         private ObservableCollection<SiteItem> siteItems = new ObservableCollection<SiteItem>();
         public ObservableCollection<SiteItem> SiteItems { get => siteItems; set => siteItems = value; }
 
         //只在GetListSite()修改元素值 #D13438 #4682B4 #5D5A58 #f7630c，红蓝灰橙
+        //站点列表的最近一次请求信息的分类统计信息 显出在站点列表下方
         private List<SiteResult> siteResults = new List<SiteResult>()//Red：错误，Orange：警告，Gray：未知，Blue：成功
         {
             new SiteResult{Color="#4682B4", Name="Success:"},
@@ -80,9 +82,11 @@ namespace ServerMonitor.ViewModels
         };
         public List<SiteResult> SiteResults { get => siteResults; set => siteResults = value; }
 
+        //站点的宕机信息列表，显示在右上方
         private ObservableCollection<OutageSite> outageSites = new ObservableCollection<OutageSite>();
         public ObservableCollection<OutageSite> OutageSites { get => outageSites; set => outageSites = value; }
 
+        //站点性能信息列表 显示在右下方
         private ObservableCollection<SitePerformance> sitePerformanceList = new ObservableCollection<SitePerformance>();
         public ObservableCollection<SitePerformance> SitePerformanceList { get => sitePerformanceList; set => sitePerformanceList = value; }
 
