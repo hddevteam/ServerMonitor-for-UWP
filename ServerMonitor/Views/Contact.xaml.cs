@@ -38,9 +38,13 @@ namespace ServerMonitor.Views
 
         private void ContactList_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            if (model.ContactList_RightTapped(sender, e))
+            if(model==null)
             {
-                contactListFlyout.ShowAt(contactList, e.GetPosition(this.contactList));
+                model = this.ViewModel as ContactViewModel;
+            }
+            if (model.ContactList_RightTapped(sender, e))  //交由ViewModel中的对应的方法处理
+            {
+                contactListFlyout.ShowAt(contactList, e.GetPosition(this.contactList)); //弹出框显示
             }
         }
     }
