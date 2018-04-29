@@ -77,7 +77,7 @@ namespace ServerMonitor.Controls
                 await t;
                 stopwatch.Stop();
 
-                if (response.Answers.Count != 0) // 请求成功，获取到了解析结果
+                if (response.Answers.Count != 0&&t.IsCompleted) // 请求成功，获取到了解析结果
                 {
                     // Dns服务器状态良好
                     Status = "1000";
@@ -94,7 +94,7 @@ namespace ServerMonitor.Controls
                 else // 请求失败，无解析结果
                 {
                     // Dns服务器状态未知，但是该域名无法解析
-                    Status = "1002";
+                    Status = "1001";
                     // 请求耗时应该在2^15-1(ms)内完成
                     TimeCost = (short)stopwatch.ElapsedMilliseconds;
                     ActualResult.Add("No Data!");
@@ -105,7 +105,7 @@ namespace ServerMonitor.Controls
             catch (TaskCanceledException e)
             {
                 // Dns服务器超时
-                Status = "1003";
+                Status = "1002";
                 // 收集捕获到的异常
                 ErrorException = e;
                 // 请求耗时设置为超时上限
@@ -116,7 +116,7 @@ namespace ServerMonitor.Controls
             catch (OperationCanceledException e)
             {
                 // Dns服务器超时
-                Status = "1003";
+                Status = "1002";
                 // 收集捕获到的异常
                 ErrorException = e;
                 // 请求耗时设置为超时上限
@@ -127,7 +127,7 @@ namespace ServerMonitor.Controls
             catch (Exception e)
             {
                 // Dns服务器请求出现未捕获到的异常
-                Status = "1002";
+                Status = "1001";
                 // 收集捕获到的异常
                 ErrorException = e.InnerException;
                 // 请求耗时设置为超时上限

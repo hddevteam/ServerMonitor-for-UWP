@@ -46,6 +46,7 @@ namespace ServerMonitor.Views
 
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
+            //交由ViewModel中的对应的方法处理
             (this.ViewModel as MainPageViewModel).Loaded(this.termsOfUseContentDialog);
         }
 
@@ -57,7 +58,7 @@ namespace ServerMonitor.Views
         public void SiteList_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
             MainPageViewModel model = this.ViewModel as MainPageViewModel;
-            if (model.SiteList_RightTapped(sender, e))
+            if (model.SiteList_RightTapped(sender, e)) //交由ViewModel中的对应的方法处理
             {
                 site_flyout.ShowAt(sitelist, e.GetPosition(this.sitelist));
             }
