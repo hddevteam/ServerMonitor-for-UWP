@@ -27,7 +27,7 @@ namespace ServerMonitor.ViewModels
         private string _Value = "0";
         public string Value { get { return _Value; } set { Set(ref _Value, value); } }
 
-        
+
 
         #region 绑定数据
 
@@ -78,7 +78,7 @@ namespace ServerMonitor.ViewModels
         /// 在页面加载完成后，更新页面bind数据
         /// </summary>
         public void Updatedata()
-        {           
+        {
             if (ID != null)
             {
                 //id不为空,则从数据库查询相关数据进行binding
@@ -119,7 +119,7 @@ namespace ServerMonitor.ViewModels
         public void AddServer()
         {
             //添加服务器 //Value是0代表是新增，否则value代表修改项的id
-            if (ID==null)
+            if (ID == null)
             {
                 Site _site = new Site
                 {
@@ -127,55 +127,6 @@ namespace ServerMonitor.ViewModels
                     Monitor_interval = 5,
                     Is_Monitor = true
                 };
-                if (Protocol == 1)
-                {
-                    _site.Protocol_type = "Socket";
-                }
-                else if (Protocol == 2)
-                {
-                    _site.Protocol_type = "SSH";
-                }
-                else if (Protocol == 3)
-                {
-                    _site.Protocol_type = "FTP";
-                }
-                else if (Protocol == 4)
-                {
-                    _site.Protocol_type = "DNS";
-                }else if (Protocol == 5)
-                {
-                    _site.Protocol_type = "ICMP";
-                }
-                _site.Site_address = Domain;
-                try
-                {
-                    _site.Server_port = int.Parse(Port);
-                }
-                catch { }
-                if (Name==null)
-                {
-                    _site.Site_name = Domain;
-                }
-                else
-                {
-                    _site.Site_name = Name;
-                }
-                DBHelper.InsertOneSite(_site);
-                AddServerPage.DismissWindow();
-            }
-            else
-            {
-                Site _site = new Site
-                {
-                    Monitor_interval = 5,
-                    Is_Monitor = true,
-                    Is_server = true
-                };
-                try
-                {
-                    _site.Id = int.Parse(ID);
-                }
-                catch { }                
                 if (Protocol == 1)
                 {
                     _site.Protocol_type = "Socket";
@@ -202,7 +153,57 @@ namespace ServerMonitor.ViewModels
                     _site.Server_port = int.Parse(Port);
                 }
                 catch { }
-                if (Name==null)
+                if (Name == null)
+                {
+                    _site.Site_name = Domain;
+                }
+                else
+                {
+                    _site.Site_name = Name;
+                }
+                DBHelper.InsertOneSite(_site);
+                AddServerPage.DismissWindow();
+            }
+            else
+            {
+                Site _site = new Site
+                {
+                    Monitor_interval = 5,
+                    Is_Monitor = true,
+                    Is_server = true
+                };
+                try
+                {
+                    _site.Id = int.Parse(ID);
+                }
+                catch { }
+                if (Protocol == 1)
+                {
+                    _site.Protocol_type = "Socket";
+                }
+                else if (Protocol == 2)
+                {
+                    _site.Protocol_type = "SSH";
+                }
+                else if (Protocol == 3)
+                {
+                    _site.Protocol_type = "FTP";
+                }
+                else if (Protocol == 4)
+                {
+                    _site.Protocol_type = "DNS";
+                }
+                else if (Protocol == 5)
+                {
+                    _site.Protocol_type = "ICMP";
+                }
+                _site.Site_address = Domain;
+                try
+                {
+                    _site.Server_port = int.Parse(Port);
+                }
+                catch { }
+                if (Name == null)
                 {
                     _site.Site_name = Domain;
                 }
@@ -220,20 +221,20 @@ namespace ServerMonitor.ViewModels
     /// 转换器，用于转换协议类型
     /// </summary>
     public class RadioBoolToIntConverter : IValueConverter
+    {
+        //协议转换器
+        public object Convert(object value, Type targetType, object parameter, string language)
         {
-            //协议转换器
-            public object Convert(object value, Type targetType, object parameter, string language)
-            {
-                int integer = (int)value;
-                if (integer == int.Parse(parameter.ToString()))
-                    return true;
-                else
-                    return false;
-            }
-
-            public object ConvertBack(object value, Type targetType, object parameter, string language)
-            {
-                return parameter;
-            }
+            int integer = (int)value;
+            if (integer == int.Parse(parameter.ToString()))
+                return true;
+            else
+                return false;
         }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            return parameter;
+        }
+    }
 }

@@ -7,7 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vml="using:ServerMonitor.ViewModels"
-      mc:Ignorable="d">
+    mc:Ignorable="d">
     <Page.DataContext>
         <vml:AllServerViewModel x:Name="ViewModel"/>
     </Page.DataContext>
@@ -21,7 +21,6 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="RightFrame1.Width" Value="360" />
-                        <Setter Target="RightFrame2.Width" Value="360" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -34,11 +33,7 @@
         <!--  header  -->
         <controls:PageHeader x:Name="pageHeader"
                              Content="All Server"
-                             Frame="{x:Bind Frame}"
-                             RelativePanel.AlignLeftWithPanel="True"
-                             RelativePanel.AlignRightWithPanel="True"
-                             RelativePanel.AlignTopWithPanel="True" RequestedTheme="Light"
-                             OverflowButtonVisibility="Collapsed" PrimaryCommandsVisibility="Visible" >
+                             OverflowButtonVisibility="Collapsed">
             <AppBarButton Label="SELECT" Icon="Filter" Foreground="White" Name="filter">
                 <AppBarButton.Flyout>
                     <MenuFlyout>
@@ -53,7 +48,7 @@
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
-            <AppBarButton Icon="Priority" Foreground="White">
+            <AppBarButton Icon="Sort" Foreground="White">
                 <AppBarButton.Flyout>
                     <MenuFlyout>
                         <MenuFlyout.MenuFlyoutPresenterStyle>
@@ -76,8 +71,8 @@
                                 <Setter Property="Margin" Value="0 -16 0 0"/>
                             </Style>
                         </MenuFlyout.MenuFlyoutPresenterStyle>
-                        <MenuFlyoutItem Text="ADD Server " Name="addserver" Tag="1" Click="{x:Bind ViewModel.Add_Server}" />
-                        <MenuFlyoutItem Text="ADD Website" Name="addwebsite" Tag="2" Click="{x:Bind ViewModel.Add_Website}"/>
+                        <MenuFlyoutItem Text="ADD Server " Name="addserver" Click="{x:Bind ViewModel.Add_Server}" />
+                        <MenuFlyoutItem Text="ADD Website" Name="addwebsite" Click="{x:Bind ViewModel.Add_Website}"/>
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
@@ -97,8 +92,7 @@
                 <TextBlock Text="Monitor Status"  FontSize="16" Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
             </StackPanel>
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" Grid.Column="6"
-                      VerticalAlignment="Top">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" VerticalAlignment="Top">
                 <ListBox x:Name="ServerList" SelectionMode="Extended"
                       ItemsSource="{Binding ServerItems}"
                       Foreground="White"  Background="Gray"
@@ -109,7 +103,7 @@
                             <MenuFlyout.Items>
                                 <MenuFlyoutItem Text="Detail" Click = "{x:Bind ViewModel.DetailFlyoutItem_Click}"/>
                                 <MenuFlyoutItem Text="Edit" Click = "{x:Bind ViewModel.EditFlyoutItem_Click}"/>
-                                <MenuFlyoutItem Text="Open/Close" Click = "{x:Bind ViewModel.ClosedFlyoutItem_Click}"/>
+                                <MenuFlyoutItem Text="{Binding OpenOrClose}" Click = "{x:Bind ViewModel.ClosedFlyoutItem_Click}"/>
                                 <MenuFlyoutItem Text="Delete" Click = "{x:Bind ViewModel.Delete_Click}"/>
                             </MenuFlyout.Items>
                         </MenuFlyout>
@@ -117,9 +111,9 @@
 
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="6">
-                                <TextBlock Text="{Binding Site_id}" Foreground="White" Width="16" VerticalAlignment="Center"/>
-                                <Image Source="{Binding Image_path}" Margin="12 0 12 0"/>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Site_id}" Foreground="White" Width="16" Margin="4 0 0 0" VerticalAlignment="Center"/>
+                                <Image Source="{Binding Image_path}" Margin="16 0 12 0" Width="36" Height="36"/>
                                 <StackPanel Width="200"  VerticalAlignment="Center"  HorizontalAlignment="Center">
                                     <TextBlock Text="{Binding Site_name}" FontWeight="Bold" Foreground="White" />
                                     <TextBlock Text="{Binding Site_address}" Foreground="White"/>
@@ -142,21 +136,20 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Grid Height="160"
-                  BorderThickness="0,0,0,0.5" BorderBrush="LightGray"
-                  Background="WhiteSmoke">
+            <Grid Height="160" Background="#BAB6B6"
+                  BorderThickness="0,0,0,0.5" BorderBrush="LightGray">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Grid Width="80" Margin="28,48,0,32">
+                <Grid Width="80" Margin="28,40,0,32">
                     <Image Source="{Binding ElementName=ServerList,Path=SelectedItem.Image_path}"/>
                 </Grid>
                 <TextBlock Text="{Binding ElementName=ServerList,Path=SelectedItem.Site_name}"
                            FontWeight="Bold" Foreground="Black"
                            VerticalAlignment="Center" Grid.Column="1"
                            FontSize="20" MaxLines="2" TextWrapping="Wrap"
-                           Margin="8,0,8,0"/>
+                           Margin="8,4,8,0"/>
             </Grid>
             <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
                 <Grid>
@@ -185,7 +178,7 @@
                             </StackPanel>
                         </ListBoxItem>
                         <ListBoxItem Background="White">
-                            <StackPanel Orientation="Vertical" DataContext="{Binding ElementName=ServerList, Path=SelectedItem}">
+                            <StackPanel Orientation="Vertical">
                                 <TextBlock Text="Status code"
                                    Foreground="Gray" FontSize="16"/>
                                 <TextBlock Text="{Binding ElementName=ServerList,Path=SelectedItem.Site_status_codes}"
@@ -193,7 +186,7 @@
                             </StackPanel>
                         </ListBoxItem>
                         <ListBoxItem Background="White">
-                            <StackPanel Orientation="Vertical" DataContext="{Binding ElementName=ServerList, Path=SelectedItem}">
+                            <StackPanel Orientation="Vertical">
                                 <TextBlock Text="Contact"
                                    Foreground="Gray" FontSize="16"/>
                                 <TextBlock Text="{Binding ElementName=ServerList,Path=SelectedItem.Contact}"
@@ -210,57 +203,13 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Content="Open/Close" Grid.Column="0" HorizontalAlignment="Stretch"
+                <Button Content="{Binding OpenOrClose}" Grid.Column="0" HorizontalAlignment="Stretch"
                         Background="#0063B1" Foreground="White"
                         Click="{x:Bind ViewModel.ClosedFlyoutItem_Click}"/>
                 <Button Content="Delete" Grid.Column="1" HorizontalAlignment="Stretch" Margin="8,0,0,0"
                         Click="{x:Bind ViewModel.Delete_Click}"/>
                 <Button Content="Cancel" Grid.Column="2" HorizontalAlignment="Stretch" Margin="8,0,0,0"
                         Click="{x:Bind ViewModel.CancelServer}"/>
-            </Grid>
-        </Grid>
-
-        <!--编辑站点信息，新建站点-->
-        <Grid Grid.Row="1" Background="White" Name="RightFrame2"
-              BorderThickness="0.5" BorderBrush="LightGray"
-              HorizontalAlignment="Right" Visibility="Collapsed">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <TextBlock Text="{Binding RightFrame2Title}" FontWeight="SemiBold"
-                       Foreground="Black"
-                       FontSize="20" Margin="24,24,0,16"/>
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
-                <StackPanel  Margin="0,0,0,32" Orientation="Vertical"
-                             DataContext="{Binding RightServer}">
-                    <ListBox SelectionMode="Single" SelectedValue="0" Margin="0,0,12,12" Grid.Row="1"/>
-                    <TextBlock Text="Name" Margin="24,0,24,16"  Foreground="Black"/>
-                    <TextBox Text="{Binding Site_name, Mode=TwoWay}" Margin="24,0,24,0"  Foreground="Black"/>
-                    <MenuFlyoutSeparator Margin="12,16,12,16"/>
-                    <TextBlock Text="Address" Margin="24,0,24,16"  Foreground="Black"/>
-                    <TextBox Text="{Binding Site_address, Mode=TwoWay}" Margin="24,0,24,0"  Foreground="Black"/>
-                    <MenuFlyoutSeparator Margin="12,16,12,16"/>
-                    <TextBlock Text="Status Code" Margin="24,0,24,16"  Foreground="Black"/>
-                    <TextBox Text="{Binding Site_status_code, Mode=TwoWay}" Margin="24,0,24,0"  Foreground="Black"/>
-                    <MenuFlyoutSeparator Margin="12,16,12,16"/>
-                </StackPanel>
-            </ScrollViewer>
-            <Grid Grid.Row="3" Margin="24,0,24,48">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Button Content="Save" Grid.Column="0" HorizontalAlignment="Stretch"
-                        Background="#0063B1" Foreground="White"
-                        Click="{x:Bind ViewModel.ConfirmServer}"/>
-                <Button Content="Open/Close" Grid.Column="1" HorizontalAlignment="Stretch" Margin="8,0,0,0"
-                        Background="#0063B1" Foreground="White"
-                        Click="{x:Bind ViewModel.ClosedFlyoutItem_Click}"/>
-                <Button Content="Delete" Grid.Column="2" HorizontalAlignment="Stretch" Margin="8,0,0,0"
-                        Click="{x:Bind ViewModel.Delete_Click}"/>
             </Grid>
         </Grid>
     </Grid>

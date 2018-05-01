@@ -360,9 +360,6 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public void CloseFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var q = from t in SiteItems
-                    where t.Id == rightTapped_SiteId
-                    select t;
             var q1 = from t in sites
                      where t.Id == rightTapped_SiteId
                      select t;

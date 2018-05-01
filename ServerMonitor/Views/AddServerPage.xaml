@@ -17,18 +17,16 @@
     </UserControl.Resources>
     <ScrollViewer>
         <Grid>
-            <Border x:Name="OutBorder" Background="#55000000" 
-                VerticalAlignment="Stretch" 
-                HorizontalAlignment="Stretch"/>
-            <StackPanel x:Name="ContentGrid" Background="White"
-              Orientation="Vertical"
-              VerticalAlignment="Center" Height="500" Width="450">
+            <Border x:Name="OutBorder" Background="#55000000"
+                    VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+            <StackPanel x:Name="ContentGrid" Background="White" Orientation="Vertical"
+                        VerticalAlignment="Center" Height="500" Width="450">
                 <TextBlock Name="textid" Text="{Binding ID,Mode=TwoWay}"  Visibility="Collapsed" ></TextBlock>
                 <Grid Padding="15,50,15,15">
                     <StackPanel Orientation="Vertical" >
                         <TextBlock  Text="Server" FontSize="20"/>
                         <StackPanel Orientation="Vertical">
-                            <StackPanel Orientation="Horizontal"  >
+                            <StackPanel Orientation="Horizontal">
                                 <RadioButton GroupName="protocol" Name="Socket" 
                                              IsChecked="{Binding Path=Protocol,Mode=TwoWay, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=1}" Content="Socket"/>
                                 <RadioButton GroupName="protocol" Name="SSH" 
@@ -67,34 +65,18 @@
                 </Grid>
                 <Grid Padding="15">
                     <StackPanel Orientation="Horizontal">
-                        <Button x:Name="btnLeft" 
-                            Content="OK" 
-                            Margin="10"
-                            Padding="15,5,15,5"
-                            HorizontalAlignment="Left"
-                            HorizontalContentAlignment="Center"
-                            VerticalAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            BorderThickness="0" 
-                            Click="{x:Bind ViewModel.AddServer}"
-                            Background="#f90"
-                            IsEnabled="False"
-                            Foreground="White"
-                            MaxWidth="150"/>
-                        <Button                  
-                            x:Name="btnRight" 
-                            Content="Cancel" 
-                            Margin="10"
-                            Click="RightButton_Click"
-                            Padding="15,5,15,5"
-                            HorizontalAlignment="Left"
-                            HorizontalContentAlignment="Center"
-                            VerticalAlignment="Center"  
-                            VerticalContentAlignment="Center"
-                            BorderThickness="0"
-                            Background="Gray"
-                            Foreground="BlanchedAlmond"
-                            MaxWidth="150"/>
+                        <Button x:Name="btnLeft" Content="OK" Margin="10"
+                                Padding="15,5,15,5" HorizontalAlignment="Left"
+                                HorizontalContentAlignment="Center" VerticalAlignment="Center"
+                                VerticalContentAlignment="Center" BorderThickness="0" 
+                                Click="{x:Bind ViewModel.AddServer}" Background="#f90"
+                                IsEnabled="False" Foreground="White" MaxWidth="150"/>
+                        <Button x:Name="btnRight" Content="Cancel" Margin="10"
+                                Click="RightButton_Click" Padding="15,5,15,5"
+                                HorizontalAlignment="Left" HorizontalContentAlignment="Center"
+                                VerticalAlignment="Center" VerticalContentAlignment="Center"
+                                BorderThickness="0" Background="Gray" Foreground="BlanchedAlmond"
+                                MaxWidth="150"/>
                     </StackPanel>
 
                 </Grid>

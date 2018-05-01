@@ -22,12 +22,11 @@ namespace ServerMonitor.ViewModels
 {
     class AllServerViewModel : Template10.Mvvm.ViewModelBase
     {
-        private static List<Site> sites;
-        private static ServerItem ServerContext;
-        int isAddServer = 0;//1:添加 2：编辑
-        Grid rightFrame2, rightFrame1;
-        private static int order = 1;  //1:id As 2:id De 3:Al As 4:Al De
-        private static int filter = 2; //0:Error  1:Normal  2:All Servers
+        private List<Site> sites;
+        private ServerItem ServerContext;
+        Grid rightFrame1;
+        private int order = 1;  //1:id As 2:id De 3:Al As 4:Al De
+        private int filter = 2; //0:Error  1:Normal  2:All Servers
         public AllServerViewModel() { }
         #region 系统函数
         public override async Task OnNavigatedToAsync(object parameter, NavigationMode mode, IDictionary<string, object> suspensionState)
@@ -47,26 +46,26 @@ namespace ServerMonitor.ViewModels
         #endregion 系统函数
 
         #region 绑定数据
-        private static ObservableCollection<ServerItem> serverItems = new ObservableCollection<ServerItem>();
-        public static ObservableCollection<ServerItem> ServerItems { get => serverItems; set => serverItems = value; }
+        private ObservableCollection<ServerItem> serverItems = new ObservableCollection<ServerItem>();
+        public ObservableCollection<ServerItem> ServerItems { get => serverItems; set => serverItems = value; }
         //编辑，新建绑定站点
         public ServerItem RightServer { get => rightServer; set => rightServer = value; }
         private ServerItem rightServer = new ServerItem();
 
-        private string rightFrame2Title = "New Server";//新建/编辑
-        public string RightFrame2Title
+        private string openOrClose;//新建/编辑
+        public string OpenOrClose
         {
-            get => rightFrame2Title;
+            get => openOrClose;
             set
             {
-                rightFrame2Title = value;
-                RaisePropertyChanged(() => RightFrame2Title);
+                openOrClose = value;
+                RaisePropertyChanged(() => OpenOrClose);
             }
         }
         #endregion 绑定数据
 
         #region 辅助函数
-        private static void GetListServer()
+        private void GetListServer()
         {
             ServerItems.Clear();
             sites = DBHelper.GetAllSite();
@@ -83,38 +82,41 @@ namespace ServerMonitor.ViewModels
                 {
                     site_status = "Close";
                 }
-                if (q[i].Id != 4)
+
+                if (q[i].Is_server)
                 {
-                    if (q[i].Is_server)
+                    ServerItems.Add(new ServerItem()
                     {
-                        ServerItems.Add(new ServerItem()
-                        {
-                            Site_id = q[i].Id,
-                            Site_name = q[i].Site_name,
-                            Site_address = q[i].Site_address,
-                            Site_status_codes = q[i].Status_code,
-                            Is_Monitor = q[i].Is_Monitor,
-                            Site_type = "Server",
-                            Site_status = site_status,
-                            Image_path = "/Images/ic_server.png",
-                        });
-                    }
-                    else
+                        Site_id = q[i].Id,
+                        Site_name = q[i].Site_name,
+                        Site_address = q[i].Site_address,
+                        Site_status_codes = q[i].Status_code,
+                        Is_Monitor = q[i].Is_Monitor,
+                        Site_type = "Server",
+                        Site_status = site_status,
+                        Image_path = "/Images/ic_server.png",
+                    });
+                }
+                else
+                {
+                    ServerItems.Add(new ServerItem()
                     {
-                        ServerItems.Add(new ServerItem()
-                        {
-                            Site_id = q[i].Id,
-                            Site_name = q[i].Site_name,
-                            Site_address = q[i].Site_address,
-                            Site_status_codes = q[i].Status_code,
-                            Is_Monitor = q[i].Is_Monitor,
-                            Site_type = "WebSite",
-                            Site_status = site_status,
-                            Image_path = "/Images/ic_website.png",
-                        });
-                    }
+                        Site_id = q[i].Id,
+                        Site_name = q[i].Site_name,
+                        Site_address = q[i].Site_address,
+                        Site_status_codes = q[i].Status_code,
+                        Is_Monitor = q[i].Is_Monitor,
+                        Site_type = "WebSite",
+                        Site_status = site_status,
+                        Image_path = "/Images/ic_website.png",
+                    });
                 }
             }
+        }
+        //设置，获取界面右端隐藏元素
+        public void SetFrame(Grid grid1)
+        {
+            rightFrame1 = grid1;
         }
         #endregion 辅助函数
 
@@ -164,7 +166,19 @@ namespace ServerMonitor.ViewModels
             {
                 ServerContext = (ServerItem)((Rectangle)e.OriginalSource).DataContext;
             }
-            return true;
+            if (null != ServerContext)
+            {
+                if(ServerContext.Site_status.Equals("Open"))
+                {
+                    OpenOrClose = "Close";
+                }
+                else
+                {
+                    OpenOrClose = "Open";
+                }
+                return true;
+            }
+            return false;
         }
         /// <summary>
         /// ListBox点击事件
@@ -180,10 +194,21 @@ namespace ServerMonitor.ViewModels
             {
                 ServerContext = ((ServerItem)((sender as ListBox).Items[x]));
                 rightFrame1.Visibility = Visibility.Visible;
-                rightFrame2.Visibility = Visibility.Collapsed;
+            }
+
+            if (null != ServerContext)
+            {
+                if (ServerContext.Site_status.Equals("Open"))
+                {
+                    OpenOrClose = "Close";
+                }
+                else
+                {
+                    OpenOrClose = "Open";
+                }
             }
         }
-        private static List<Site> ProcessSite(List<Site> list)
+        private List<Site> ProcessSite(List<Site> list)
         {
             List<Site> q;
             if (filter == 2)  //0:Error  1:Normal  2:All Servers,
@@ -230,6 +255,12 @@ namespace ServerMonitor.ViewModels
                 default:
                     break;
             }
+
+            // 筛选掉 pre-Check
+            q = (from t in q
+                 where t.Is_pre_check == false
+                 select t).ToList();
+
             return q;
         }
 
@@ -260,24 +291,11 @@ namespace ServerMonitor.ViewModels
         //进入详细页面
         public void DetailFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            //    var q = from t in ServerItems
-            //            where t.Site_id == ServerContext.Site_id
-            //            select t;
-            //    var q1 = from t in sites
-            //             where t.Id == ServerContext.Site_id
-            //             select t;
             NavigationService.Navigate(typeof(Views.SiteDetail), ServerContext.Site_id);
         }
         //进入编辑页面
         public void EditFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            //var q = from t in ServerItems
-            //        where t.Site_id == ServerContext.Site_id
-            //        select t;
-
-            //var q1 = from t in sites
-            //         where t.Id == ServerContext.Site_id
-            //         select t;
             var site = DBHelper.GetSiteById(ServerContext.Site_id);
             if (site.Is_server)
             {
@@ -292,7 +310,6 @@ namespace ServerMonitor.ViewModels
                 AddWebsitePage.ShowWindow();
             }
             rightFrame1.Visibility = Visibility.Collapsed;
-            rightFrame2.Visibility = Visibility.Collapsed;
         }
         //关闭Server
         public void ClosedFlyoutItem_Click(object sender, RoutedEventArgs e)
@@ -303,65 +320,14 @@ namespace ServerMonitor.ViewModels
             q1.First().Is_Monitor = !ServerContext.Is_Monitor; ;
             if (DBHelper.UpdateSite(q1.First()) == 1)
             {
-                sites = DBHelper.GetAllSite();  //更新数据库site表对应的sites
-            }
-            GetListServer();
-            rightFrame1.Visibility = Visibility.Collapsed;
-            rightFrame2.Visibility = Visibility.Collapsed;
-        }
-        //设置，获取界面右端隐藏元素
-        public void SetFrame(Grid grid1, Grid grid2)
-        {
-            rightFrame1 = grid1;
-            rightFrame2 = grid2;
-        }
-        //新建站点
-        public void AddServer()
-        {
-            isAddServer = 1;
-            RightFrame2Title = "New Server";
-            RightServer.Site_id = 0;
-            RightServer.Site_name = "";
-            RightServer.Site_address = "";
-            RightServer.Site_status_codes = "";
-            rightFrame1.Visibility = Visibility.Collapsed;
-            rightFrame2.Visibility = Visibility.Visible;
-        }
-        //编辑站点信息
-        public void Edit_Click()
-        {
-            isAddServer = 2;
-            RightFrame2Title = "Edit Server";
-            RightServer.Site_id = ServerContext.Site_id;
-            RightServer.Site_name = ServerContext.Site_name;
-            RightServer.Site_address = ServerContext.Site_address;
-            RightServer.Site_status_codes = ServerContext.Site_status_codes;
-            rightFrame1.Visibility = Visibility.Collapsed;
-            rightFrame2.Visibility = Visibility.Visible;
-        }
-        //1新建/ 2编辑 确认
-        public async void ConfirmServer()
-        {
-            Site upSite = new Site();
-            upSite = DBHelper.GetSiteById(ServerContext.Site_id);
-            if (isAddServer == 1)
-            {
-                DBHelper.InsertOneSite(upSite);
-            }
-            else if (isAddServer == 2)
-            {
-                DBHelper.UpdateSite(upSite);
+                GetListServer();  //更新数据库site表对应的sites
             }
             rightFrame1.Visibility = Visibility.Collapsed;
-            rightFrame2.Visibility = Visibility.Collapsed;
-            GetListServer();
-            await Task.CompletedTask;
         }
         //取消
         public void CancelServer()
         {
             rightFrame1.Visibility = Visibility.Collapsed;
-            rightFrame2.Visibility = Visibility.Collapsed;
         }
         //删除
         public async void Delete_Click(object sender, RoutedEventArgs e)
@@ -373,7 +339,6 @@ namespace ServerMonitor.ViewModels
                 if (DBHelper.DeleteOneSite(ServerContext.Site_id) == 1)
                 {
                     rightFrame1.Visibility = Visibility.Collapsed;
-                    rightFrame2.Visibility = Visibility.Collapsed;
                     GetListServer();
                 }
             }));

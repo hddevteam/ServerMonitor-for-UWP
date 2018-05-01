@@ -29,10 +29,7 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <controls:PageHeader RelativePanel.AlignLeftWithPanel="True"
-                             RelativePanel.AlignRightWithPanel="True"
-                             RelativePanel.AlignTopWithPanel="True"
-                             Text="Controls" >
+        <controls:PageHeader Text="Controls" OverflowButtonVisibility="Collapsed">
             <AppBarButton Icon="Add" Foreground="White" Name="AddPage" 
                           Click = "{x:Bind ViewModel.AddContact}"/>
         </controls:PageHeader>
