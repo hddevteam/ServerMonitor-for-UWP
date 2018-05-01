@@ -45,13 +45,14 @@ namespace ServerMonitor.ViewModels
             await Task.CompletedTask;
         }
         #endregion 系统函数
+
         #region 绑定数据
         private static ObservableCollection<ServerItem> serverItems = new ObservableCollection<ServerItem>();
         public static ObservableCollection<ServerItem> ServerItems { get => serverItems; set => serverItems = value; }
         //编辑，新建绑定站点
         public ServerItem RightServer { get => rightServer; set => rightServer = value; }
         private ServerItem rightServer = new ServerItem();
-        
+
         private string rightFrame2Title = "New Server";//新建/编辑
         public string RightFrame2Title
         {
@@ -63,6 +64,7 @@ namespace ServerMonitor.ViewModels
             }
         }
         #endregion 绑定数据
+
         #region 辅助函数
         private static void GetListServer()
         {
@@ -70,7 +72,7 @@ namespace ServerMonitor.ViewModels
             sites = DBHelper.GetAllSite();
             List<Site> q = ProcessSite(sites);
             string site_status;
-            
+
             for (int i = 0; i < q.Count; i++)
             {
                 if (q[i].Is_Monitor)
@@ -115,6 +117,7 @@ namespace ServerMonitor.ViewModels
             }
         }
         #endregion 辅助函数
+
         #region 响应事件
         /// <summary>
         /// 进行筛选的按钮事件
@@ -230,10 +233,11 @@ namespace ServerMonitor.ViewModels
             return q;
         }
 
-            //add server点击事件
+        //add server点击事件
         public void Add_Server(object sender, RoutedEventArgs e)
         {
             ShowAddServerPage();
+            //AddServerPage.ShowWindow();
         }
         private void ShowAddServerPage()
         {
@@ -244,6 +248,7 @@ namespace ServerMonitor.ViewModels
         public void Add_Website(object sender, RoutedEventArgs e)
         {
             ShowAddWebsitePage();
+            //AddWebsitePage.ShowWindow();
         }
         private void ShowAddWebsitePage()
         {
@@ -255,25 +260,24 @@ namespace ServerMonitor.ViewModels
         //进入详细页面
         public void DetailFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var q = from t in ServerItems
-                    where t.Site_id == ServerContext.Site_id
-                    select t;
-
-            var q1 = from t in sites
-                     where t.Id == ServerContext.Site_id
-                     select t;
+            //    var q = from t in ServerItems
+            //            where t.Site_id == ServerContext.Site_id
+            //            select t;
+            //    var q1 = from t in sites
+            //             where t.Id == ServerContext.Site_id
+            //             select t;
             NavigationService.Navigate(typeof(Views.SiteDetail), ServerContext.Site_id);
         }
         //进入编辑页面
         public void EditFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var q = from t in ServerItems
-                    where t.Site_id == ServerContext.Site_id
-                    select t;
+            //var q = from t in ServerItems
+            //        where t.Site_id == ServerContext.Site_id
+            //        select t;
 
-            var q1 = from t in sites
-                     where t.Id == ServerContext.Site_id
-                     select t;
+            //var q1 = from t in sites
+            //         where t.Id == ServerContext.Site_id
+            //         select t;
             var site = DBHelper.GetSiteById(ServerContext.Site_id);
             if (site.Is_server)
             {
@@ -293,9 +297,6 @@ namespace ServerMonitor.ViewModels
         //关闭Server
         public void ClosedFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var q = from t in ServerItems
-                    where t.Site_id == ServerContext.Site_id
-                    select t;
             var q1 = from t in sites
                      where t.Id == ServerContext.Site_id
                      select t;
@@ -382,8 +383,8 @@ namespace ServerMonitor.ViewModels
             }));
             await messageBox.ShowAsync();
         }
+        #endregion 响应事件
     }
-    #endregion 响应事件
     public class ServerItem : ObservableObject
     {
         int site_id;
@@ -394,7 +395,15 @@ namespace ServerMonitor.ViewModels
         string site_type;
         bool is_Monitor;
         string site_status;//站点开关状态
-        public string Site_status { get => site_status; set => site_status = value; }
+        public string Site_status
+        {
+            get => site_status;
+            set
+            {
+                site_status = value;
+                RaisePropertyChanged(() => Site_status);
+            }
+        }
         public int Site_id
         {
             get => site_id;
