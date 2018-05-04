@@ -242,7 +242,6 @@
     <Content Include="Images\ic.filter.png" />
     <Content Include="Images\ic.phone.png" />
     <Content Include="Images\ic.server.png" />
-    <Content Include="Images\ic_server_black.png" />
     <Content Include="Images\ic_website.png" />
     <Content Include="Images\ic_precheck.png" />
     <Content Include="Images\ic_server.png" />
@@ -252,7 +251,6 @@
     <Content Include="Images\Server_Ico.jpg" />
     <Content Include="Images\splash-sdk.png" />
     <Content Include="Images\valley.png" />
-    <Content Include="Images\web3.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />

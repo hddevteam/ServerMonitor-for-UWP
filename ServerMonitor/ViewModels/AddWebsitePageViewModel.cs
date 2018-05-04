@@ -24,6 +24,67 @@ namespace ServerMonitor.ViewModels
         private string _Value = "0";
         public string Value { get { return _Value; } set { Set(ref _Value, value); } }
 
+        #region 绑定数据
+
+        private string _id;
+
+        public string ID
+        {
+            get { return _id; }
+            set { _id = value; }
+        }
+
+        private int _http;
+
+        public int HTTP
+        {
+            //绑定http
+            get { return _http; }
+            set { _http = value; RaisePropertyChanged(() => HTTP); }
+        }
+
+        private int _protocol;
+
+        public int Protocol
+        {
+            get { return _protocol; }
+            set { _protocol = value; }
+        }
+
+
+        private string _domain;
+
+        public string Domain
+        {
+            get { return _domain; }
+            set { _domain = value; RaisePropertyChanged(() => Domain); }
+        }
+
+        private string _name;
+
+        public string Name
+        {
+            get { return _name; }
+            set { _name = value; RaisePropertyChanged(() => Name); }
+        }
+
+        private string _status;
+
+        public string Status
+        {
+            get { return _status; }
+            set { _status = value; RaisePropertyChanged(() => Status); }
+        }
+
+        private string _typecode;
+
+        public string TypeCode
+        {
+            get { return _typecode; }
+            set { _typecode = value; RaisePropertyChanged(() => TypeCode); }
+        }
+
+        #endregion
 
         #region 响应事件
         /// <summary>
@@ -162,67 +223,7 @@ namespace ServerMonitor.ViewModels
 
         #endregion
 
-        #region 绑定数据
-
-        private static string _id;
-
-        public static string ID
-        {
-            get { return _id; }
-            set { _id = value; }
-        }
-
-        private int _http;
-
-        public int HTTP
-        {
-            //绑定http
-            get { return _http; }
-            set { _http = value; RaisePropertyChanged(() => HTTP); }
-        }
-
-        private int _protocol;
-
-        public int Protocol
-        {
-            get { return _protocol; }
-            set { _protocol = value; }
-        }
-
-
-        private string _domain;
-
-        public string Domain
-        {
-            get { return _domain; }
-            set { _domain = value; RaisePropertyChanged(() => Domain); }
-        }
-
-        private string _name;
-
-        public string Name
-        {
-            get { return _name; }
-            set { _name = value; RaisePropertyChanged(() => Name); }
-        }
-
-        private string _status;
-
-        public string Status
-        {
-            get { return _status; }
-            set { _status = value; RaisePropertyChanged(() => Status); }
-        }
-
-        private string _typecode;
-
-        public string TypeCode
-        {
-            get { return _typecode; }
-            set { _typecode = value; RaisePropertyChanged(() => TypeCode); }
-        }
-
-        #endregion
+        
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
     }
 

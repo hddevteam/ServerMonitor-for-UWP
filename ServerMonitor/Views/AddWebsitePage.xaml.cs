@@ -35,7 +35,8 @@ namespace ServerMonitor.Views
         }
         public AddWebsitePage(string id) : this()
         {
-            AddWebsitePageViewModel.ID = id;
+            AddWebsitePageViewModel model = this.ViewModel as AddWebsitePageViewModel;
+            model.ID = id;
         }
     
         private void MessagePopupWindow_Loaded(object sender, RoutedEventArgs e)

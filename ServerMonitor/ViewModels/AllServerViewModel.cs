@@ -63,63 +63,7 @@ namespace ServerMonitor.ViewModels
             }
         }
         #endregion 绑定数据
-
-        #region 辅助函数
-        private void GetListServer()
-        {
-            ServerItems.Clear();
-            sites = DBHelper.GetAllSite();
-            List<Site> q = ProcessSite(sites);
-            string site_status;
-
-            for (int i = 0; i < q.Count; i++)
-            {
-                if (q[i].Is_Monitor)
-                {
-                    site_status = "Open";
-                }
-                else
-                {
-                    site_status = "Close";
-                }
-
-                if (q[i].Is_server)
-                {
-                    ServerItems.Add(new ServerItem()
-                    {
-                        Site_id = q[i].Id,
-                        Site_name = q[i].Site_name,
-                        Site_address = q[i].Site_address,
-                        Site_status_codes = q[i].Status_code,
-                        Is_Monitor = q[i].Is_Monitor,
-                        Site_type = "Server",
-                        Site_status = site_status,
-                        Image_path = "/Images/ic_server.png",
-                    });
-                }
-                else
-                {
-                    ServerItems.Add(new ServerItem()
-                    {
-                        Site_id = q[i].Id,
-                        Site_name = q[i].Site_name,
-                        Site_address = q[i].Site_address,
-                        Site_status_codes = q[i].Status_code,
-                        Is_Monitor = q[i].Is_Monitor,
-                        Site_type = "WebSite",
-                        Site_status = site_status,
-                        Image_path = "/Images/ic_website.png",
-                    });
-                }
-            }
-        }
-        //设置，获取界面右端隐藏元素
-        public void SetFrame(Grid grid1)
-        {
-            rightFrame1 = grid1;
-        }
-        #endregion 辅助函数
-
+        
         #region 响应事件
         /// <summary>
         /// 进行筛选的按钮事件
@@ -208,61 +152,7 @@ namespace ServerMonitor.ViewModels
                 }
             }
         }
-        private List<Site> ProcessSite(List<Site> list)
-        {
-            List<Site> q;
-            if (filter == 2)  //0:Error  1:Normal  2:All Servers,
-            {
-                q = (from t in sites
-                     select t).ToList();
-            }
-            else if (filter == 1)//正常1
-            {
-                q = (from t in sites
-                     where t.Is_Monitor == true
-                     where t.Last_request_result == 1
-                     select t).ToList();
-            }
-            else
-            {
-                q = (from t in sites
-                     where t.Is_Monitor == true
-                     where t.Last_request_result != 1
-                     select t).ToList();
-            }
-            switch (order)  //1:id As 2:id De 3:Al As 4:Al De
-            {
-                case 1:
-                    q = (from t in q
-                         orderby t.Id ascending
-                         select t).ToList();
-                    break;
-                case 2:
-                    q = (from t in q
-                         orderby t.Id descending
-                         select t).ToList();
-                    break;
-                case 3:
-                    q = (from t in q
-                         orderby t.Site_name ascending
-                         select t).ToList();
-                    break;
-                case 4:
-                    q = (from t in q
-                         orderby t.Site_name descending
-                         select t).ToList();
-                    break;
-                default:
-                    break;
-            }
-
-            // 筛选掉 pre-Check
-            q = (from t in q
-                 where t.Is_pre_check == false
-                 select t).ToList();
-
-            return q;
-        }
+        
 
         //add server点击事件
         public void Add_Server(object sender, RoutedEventArgs e)
@@ -349,6 +239,117 @@ namespace ServerMonitor.ViewModels
             await messageBox.ShowAsync();
         }
         #endregion 响应事件
+
+        #region 辅助函数
+        private void GetListServer()
+        {
+            ServerItems.Clear();
+            sites = DBHelper.GetAllSite();
+            List<Site> q = ProcessSite(sites);
+            string site_status;
+
+            for (int i = 0; i < q.Count; i++)
+            {
+                if (q[i].Is_Monitor)
+                {
+                    site_status = "Open";
+                }
+                else
+                {
+                    site_status = "Close";
+                }
+
+                if (q[i].Is_server)
+                {
+                    ServerItems.Add(new ServerItem()
+                    {
+                        Site_id = q[i].Id,
+                        Site_name = q[i].Site_name,
+                        Site_address = q[i].Site_address,
+                        Site_status_codes = q[i].Status_code,
+                        Is_Monitor = q[i].Is_Monitor,
+                        Site_type = "Server",
+                        Site_status = site_status,
+                        Image_path = "/Images/ic_server.png",
+                    });
+                }
+                else
+                {
+                    ServerItems.Add(new ServerItem()
+                    {
+                        Site_id = q[i].Id,
+                        Site_name = q[i].Site_name,
+                        Site_address = q[i].Site_address,
+                        Site_status_codes = q[i].Status_code,
+                        Is_Monitor = q[i].Is_Monitor,
+                        Site_type = "WebSite",
+                        Site_status = site_status,
+                        Image_path = "/Images/ic_website.png",
+                    });
+                }
+            }
+        }
+        private List<Site> ProcessSite(List<Site> list)
+        {
+            List<Site> q;
+            if (filter == 2)  //0:Error  1:Normal  2:All Servers,
+            {
+                q = (from t in sites
+                     select t).ToList();
+            }
+            else if (filter == 1)//正常1
+            {
+                q = (from t in sites
+                     where t.Is_Monitor == true
+                     where t.Last_request_result == 1
+                     select t).ToList();
+            }
+            else
+            {
+                q = (from t in sites
+                     where t.Is_Monitor == true
+                     where t.Last_request_result != 1
+                     select t).ToList();
+            }
+            switch (order)  //1:id As 2:id De 3:Al As 4:Al De
+            {
+                case 1:
+                    q = (from t in q
+                         orderby t.Id ascending
+                         select t).ToList();
+                    break;
+                case 2:
+                    q = (from t in q
+                         orderby t.Id descending
+                         select t).ToList();
+                    break;
+                case 3:
+                    q = (from t in q
+                         orderby t.Site_name ascending
+                         select t).ToList();
+                    break;
+                case 4:
+                    q = (from t in q
+                         orderby t.Site_name descending
+                         select t).ToList();
+                    break;
+                default:
+                    break;
+            }
+
+            // 筛选掉 pre-Check
+            q = (from t in q
+                 where t.Is_pre_check == false
+                 select t).ToList();
+
+            return q;
+        }
+        //设置，获取界面右端隐藏元素
+        public void SetFrame(Grid grid1)
+        {
+            rightFrame1 = grid1;
+        }
+        #endregion 辅助函数
     }
     public class ServerItem : ObservableObject
     {

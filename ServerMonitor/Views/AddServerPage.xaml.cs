@@ -30,12 +30,14 @@ namespace ServerMonitor.Views
             this.Width = Window.Current.Bounds.Width;
             this.Height = Window.Current.Bounds.Height;
             m_Popup.Child = this;
+
             this.Loaded += MessagePopupWindow_Loaded;
             this.Unloaded += MessagePopupWindow_Unloaded;
         }
         public AddServerPage(string id) : this()
         {
-            AddServerPageViewModel.ID = id;           
+            AddServerPageViewModel model = this.ViewModel as AddServerPageViewModel;
+            model.ID = id;         
         }
         private void MessagePopupWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -51,7 +53,7 @@ namespace ServerMonitor.Views
 
         private void MessagePopupWindow_Unloaded(object sender, RoutedEventArgs e)
         {
-            Window.Current.SizeChanged -= MessagePopupWindow_SizeChanged; ;
+            Window.Current.SizeChanged -= MessagePopupWindow_SizeChanged;
         }
 
 
