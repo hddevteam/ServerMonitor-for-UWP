@@ -10,6 +10,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Controls;
 using ServerMonitor.Controls;
 using System.Xml.Linq;
+using GalaSoft.MvvmLight.Threading;
 
 namespace ServerMonitor
 {
@@ -58,6 +59,7 @@ namespace ServerMonitor
             XElement dbName = root.Element("DBFilename");
             DBHelper.InitDB(dbName.Value);
             #endregion
+            DispatcherHelper.Initialize();
             await NavigationService.NavigateAsync(typeof(Views.MainPage));
         }
 

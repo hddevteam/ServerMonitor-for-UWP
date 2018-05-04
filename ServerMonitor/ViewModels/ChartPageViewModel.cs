@@ -99,6 +99,9 @@ namespace ServerMonitor.ViewModels
         //跳转到页面触发
         public override async Task OnNavigatedToAsync(object parameter, NavigationMode mode, IDictionary<string, object> suspensionState)
         {
+            //测试
+            SSHRequest s = new SSHRequest("172.31.0.244", "roots","Lucky.2011");
+            await s.MakeRequest();
             //对象实例化
             var result = InitAsync();
             //加载数据库数据
@@ -158,7 +161,12 @@ namespace ServerMonitor.ViewModels
         public async Task<List<Log>> LoadDbLogAsync()
         {
             await Task.CompletedTask;
-            return DBHelper.GetAllLog();
+            Random r = new Random();
+            List<Log> logs = new List<Log>();
+            logs = DBHelper.GetAllLog();
+            //数据排序，便于图表按序显示
+            logs = logs.OrderBy(o => o.Create_time).ToList();
+            return logs;
         }
 
         /// <summary>

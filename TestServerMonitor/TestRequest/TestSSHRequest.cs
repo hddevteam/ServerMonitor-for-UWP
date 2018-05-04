@@ -11,7 +11,7 @@ namespace TestServerMonitor.TestRequest
     [TestClass]
     public class TestSSHRequest
     {
-        private SSHRequest sshRequest = new SSHRequest("172.31.0.244", "root","Lucky.2011");
+        private SSHRequest sshRequest = new SSHRequest("8.8.8.8", "root","Lucky.2011");
         [TestMethod]
         public void MyTestMethod()
         {

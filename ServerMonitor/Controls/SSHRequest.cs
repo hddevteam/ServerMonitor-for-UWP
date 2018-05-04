@@ -1,4 +1,5 @@
-﻿using Renci.SshNet;
+﻿using GalaSoft.MvvmLight.Threading;
+using Renci.SshNet;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,6 +8,8 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.UI.Core;
+using Windows.UI.Xaml;
 
 namespace ServerMonitor.Controls
 {
@@ -62,30 +65,54 @@ namespace ServerMonitor.Controls
                     // 记录请求耗时
                     Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
+                    
+                    //倒计时1000ms
+                    DispatcherTimer timer = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 0, 0, OverTime) };   
+                    timer.Start();
                     // 二次封装任务
-                    Task<Exception> t = Task.Run( () => 
+                    Task<Exception> t = Task.Run(async() => 
                     {
-                        try
+                        var t1 = Task<Exception>.Factory.StartNew(() => {
+                            try
+                            {
+                                cSSH.Connect();
+                            }
+                            catch (ObjectDisposedException e)
+                            {
+                                Debug.WriteLine("e1:" + e);
+                                return e;
+                            }
+                            catch (InvalidOperationException e)
+                            {
+                                Debug.WriteLine("e2:" + e);
+                                return e;
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.WriteLine("e3:" + e);
+                                return e;
+                            }
+                            return null;
+                        });
+
+                        while (!t1.IsCompleted)
                         {
-                            cSSH.Connect();
+                            if (cts.Token.IsCancellationRequested)
+                            {
+                                Debug.WriteLine("强制取消");
+                                cts.Token.ThrowIfCancellationRequested(); 
+                            }
                         }
-                        catch (ObjectDisposedException e)
-                        {
-                            Debug.WriteLine("e1:" + e);
-                            return e;
-                        }
-                        catch (InvalidOperationException e)
-                        {
-                            Debug.WriteLine("e2:" + e);
-                            return e;
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.WriteLine("e3:"+e);
-                            return e;
-                        }
-                        return null;
+                        return await t1;
                     }, cts.Token);
+                    timer.Tick += new EventHandler<object>((sender, e) =>
+                    {
+                        if (!t.IsCompleted)
+                        {
+                            cts.Cancel();
+                        }
+                        timer.Stop();
+                    });
                     var result = await t;
                     stopwatch.Stop();
                     
@@ -98,10 +125,8 @@ namespace ServerMonitor.Controls
                     }
                     else
                     {
-                        //连接失败（各种原因）
-                        Debug.WriteLine("异常：" + result.Message);
-                        Debug.WriteLine("Connected false.");
-                        // 服务器连接失败（地址用户名密码有误）
+                        Debug.WriteLine("Connected false.+异常：" + result.Message);
+                        // 服务器连接失败（地址/用户名/密码有误）
                         Status = "1002";
                         // 收集捕获到的异常
                         ErrorException = result;
@@ -109,20 +134,9 @@ namespace ServerMonitor.Controls
                         return false;
                     }
                 }
-                // 捕获到请求超时的情况
-                catch (TaskCanceledException e)
+                // 捕获到请求超时的情况(主机ip未开启SSH或不存在都会引起超时)
+                catch (OperationCanceledException e)
                 {
-                    // 服务器超时
-                    Status = "1002";
-                    // 收集捕获到的异常
-                    ErrorException = e;
-                    // 请求耗时设置为超时上限
-                    TimeCost = OverTime;
-                    return false;
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e);
                     // 服务器超时
                     Status = "1002";
                     // 收集捕获到的异常
