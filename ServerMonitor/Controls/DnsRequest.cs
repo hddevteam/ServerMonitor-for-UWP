@@ -138,7 +138,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 
+        /// 判断域名是否合法
         /// </summary>
         /// <param name="Domainname"></param>
         /// <returns></returns>
