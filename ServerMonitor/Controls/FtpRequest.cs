@@ -107,13 +107,15 @@ namespace ServerMonitor.Controls
             // 填入CreateTime
             CreateTime = DateTime.Now;
 
+            
             // 检测服务器的IPAddress是否合法
-            if (string.IsNullOrWhiteSpace(ftpServer.ToString()))
+            if (! ValidateIPv4(ftpServer.ToString()))
             {
                 TimeCost = 0;
                 Status = "1001";
                 ErrorException = new Exception("Server address is invalid!");
                 protocalInfo = "Server address is invalid!";
+                throw new ArgumentNullException("Server address is invalid empty!");
             }
 
             // 建立的Socket Ipv4的协议 采用的面向连接的方式 协议类型 Tcp
@@ -131,7 +133,7 @@ namespace ServerMonitor.Controls
                     // 建立远程连接
                     Task connectTask = Task.Run(async() =>
                     {
-                        await socket.ConnectAsync(new IPEndPoint(IPAddress.Parse("47.94.251.85"), 21));
+                        await socket.ConnectAsync(new IPEndPoint(ftpServer, 21));
 
                         // 获取连接状态
                         if (socket.Connected)
@@ -141,8 +143,16 @@ namespace ServerMonitor.Controls
                             // 存放接受信息内容
                             string strRet = "";
 
+                            // 获取建立连接的返回信息
+                            bytes = socket.Receive(RecvBuffer, RecvBuffer.Length, 0);
+                            strRet = Encoding.ASCII.GetString(RecvBuffer, 0, bytes);
+
                             // 登录指令
                             socket.Send(USERBytes, USERBytes.Length, 0);
+                            // 获取返回信息
+                            bytes = socket.Receive(RecvBuffer, RecvBuffer.Length, 0);
+                            strRet = Encoding.ASCII.GetString(RecvBuffer, 0, bytes);
+
                             // 密码指令
                             socket.Send(PASSBytes, PASSBytes.Length, 0);
                             // 获取返回信息
@@ -251,6 +261,10 @@ namespace ServerMonitor.Controls
                 }
                 else
                 {
+                    if (string.IsNullOrEmpty(protocalInfo))
+                    {
+                        protocalInfo = "Access Failed";
+                    }
                     return false;
                 }
             }
@@ -274,6 +288,29 @@ namespace ServerMonitor.Controls
         private byte[] SendPASSCommand(string Password)
         {
             return string.IsNullOrEmpty(Password) ? null : Encoding.ASCII.GetBytes(string.Format(PASSCOMMAND, Password));
+        }
+
+        /// <summary>
+        ///  用于判断ip是否合法
+        /// </summary>
+        /// <param name="ipString">IPAddress</param>
+        /// <returns>yes:true|no:false</returns>
+        public bool ValidateIPv4(string ipString)
+        {
+            if (String.IsNullOrWhiteSpace(ipString))
+            {
+                return false;
+            }
+
+            string[] splitValues = ipString.Split('.');
+            if (splitValues.Length != 4)
+            {
+                return false;
+            }
+
+            byte tempForParsing;
+
+            return splitValues.All(r => byte.TryParse(r, out tempForParsing));
         }
     }
 
