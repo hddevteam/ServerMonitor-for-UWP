@@ -9,17 +9,16 @@ namespace ServerMonitor.Models
 {
     // 错误日志对象
     public class ErrorLog
-    {
-        
-        private int id;
+    {        
+        int id;
         // 异常类型
-        private string exceptionType = "";
+        string exceptionType = "";
         // 异常内容
-        private string exceptionContent = "";
+        string exceptionContent = "";
         // 异常发生时间
-        private DateTime createTime;
+        DateTime createTime;
         // 其他信息
-        private string others;
+        string others;
 
         //  属性对应的字段👇
         [PrimaryKey, AutoIncrement]

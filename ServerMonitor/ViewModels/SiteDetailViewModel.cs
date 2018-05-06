@@ -49,10 +49,12 @@ namespace ServerMonitor.ViewModels
         public SiteDetailViewModel()
         {
             // 初始化界面变量
-            Infos = new ViewInfo();
-            // 初始化记录变量
-            Infos.Logs = new ObservableCollection<Log>();
-            Infos.RequestTimeList = new ObservableCollection<Log>();
+            Infos = new ViewInfo
+            {
+                // 初始化记录变量
+                Logs = new ObservableCollection<Log>(),
+                RequestTimeList = new ObservableCollection<Log>()
+            };
 
             Debug.WriteLine("Construction function => SiteDetailViewModel();");
         }
@@ -137,10 +139,12 @@ namespace ServerMonitor.ViewModels
         /// <returns></returns>
         public ObservableCollection<PieChartInfo> InitPieChartData()
         {
-            ObservableCollection<PieChartInfo> pi = new ObservableCollection<PieChartInfo>();
-            pi.Add(new PieChartInfo() { Ry = RequestType.Succeed, Count = 0 });
-            pi.Add(new PieChartInfo() { Ry = RequestType.Error, Count = 0 });
-            pi.Add(new PieChartInfo() { Ry = RequestType.OverTime, Count = 0 });
+            ObservableCollection<PieChartInfo> pi = new ObservableCollection<PieChartInfo>
+            {
+                new PieChartInfo() { Ry = RequestType.Succeed, Count = 0 },
+                new PieChartInfo() { Ry = RequestType.Error, Count = 0 },
+                new PieChartInfo() { Ry = RequestType.OverTime, Count = 0 }
+            };
             return pi;
         }
 
@@ -484,9 +488,11 @@ namespace ServerMonitor.ViewModels
                 IPEndPoint iPEndPoint = new IPEndPoint(ip, 53);
                 Tuple<string, string, string, string> tuple = await Request.SocketRequest(iPEndPoint);
                 #region 赋值log
-                log = new Log();
-                log.Site_id = site.Id;
-                log.Create_time = DateTime.Now;
+                log = new Log
+                {
+                    Site_id = site.Id,
+                    Create_time = DateTime.Now
+                };
                 if ("200".Equals(tuple.Item1))
                 {
                     log.Is_error = false;
@@ -519,8 +525,7 @@ namespace ServerMonitor.ViewModels
         /// <returns></returns>
         public async Task<IPAddress> GetIPAddress(string url)
         {
-            IPAddress reIP;
-            if (!IPAddress.TryParse(url, out reIP))
+            if (!IPAddress.TryParse(url, out IPAddress reIP))
             {
                 //如果输入的不是ip地址               
                 //通过域名解析ip地址
@@ -717,9 +722,11 @@ namespace ServerMonitor.ViewModels
             {
                 Debug.WriteLine("成功插入一条日志数据! 日志内容为：" + log.ToString());
                 Infos.Logs.Add(log);
-                var log_temp = new Log();
-                log_temp.Create_time = log.Create_time;
-                log_temp.Request_time = Math.Log10(log.Request_time);
+                var log_temp = new Log
+                {
+                    Create_time = log.Create_time,
+                    Request_time = Math.Log10(log.Request_time)
+                };
                 Infos.RequestTimeList.Add(log_temp);
             }
             else

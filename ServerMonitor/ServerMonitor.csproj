@@ -99,6 +99,7 @@
     <Compile Include="Controls\DataHelper.cs" />
     <Compile Include="Controls\DBHelper.cs" />
     <Compile Include="Controls\DnsRequest.cs" />
+    <Compile Include="Controls\FtpRequest.cs" />
     <Compile Include="Controls\IcmpPacket.cs" />
     <Compile Include="Controls\Request.cs" />
     <Compile Include="Controls\SMTPRequest.cs" />
@@ -385,6 +386,10 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controls\RequestClass\" />
+    <Folder Include="Models\DDL\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
