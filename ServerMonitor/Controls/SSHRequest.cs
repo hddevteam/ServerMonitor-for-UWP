@@ -1,10 +1,12 @@
 ﻿using GalaSoft.MvvmLight.Threading;
 using Renci.SshNet;
+using Renci.SshNet.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,9 +17,7 @@ namespace ServerMonitor.Controls
 {
     public class SSHRequest : BasicRequest
     {
-        /// <summary>
-        /// 服务器IP地址
-        /// </summary>
+        // 服务器IP地址
         private string ipAddress;
 
         public string iPAddress
@@ -43,6 +43,15 @@ namespace ServerMonitor.Controls
             get { return password; }
             set { password = value; }
         }
+        private bool overtime = false;
+
+        private string protocolInfo;
+
+        public string ProtocolInfo
+        {
+            get { return protocolInfo; }
+            set { protocolInfo = value; }
+        }
 
         public SSHRequest(string ipAddress,string username,string password)
         {
@@ -53,104 +62,105 @@ namespace ServerMonitor.Controls
         
         public override async Task<bool> MakeRequest()
         {
+            var con_result = await SSHConnectAsync();
+            var result = await GetRequestResult(con_result);
+            return result;
+        }
+
+        public async Task<Tuple<Tuple<Exception, SocketException, int>, short>> SSHConnectAsync()
+        {
             // 赋值生成请求的时间
             CreateTime = DateTime.Now;
-            using (var cSSH = new SshClient(iPAddress, 22, username, password))
+            var cSSH = new SshClient(iPAddress, 22, username, password);
+            // 二次封装任务
+            Task<Tuple<Exception, SocketException, int>> t = Task.Run(() =>
             {
-                // 超时控制
-                CancellationTokenSource cts = new CancellationTokenSource();
-                cts.CancelAfter(OverTime);
                 try
                 {
-                    // 记录请求耗时
-                    Stopwatch stopwatch = new Stopwatch();
-                    stopwatch.Start();
-                    
-                    //倒计时1000ms
-                    DispatcherTimer timer = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 0, 0, OverTime) };   
-                    timer.Start();
-                    // 二次封装任务
-                    Task<Exception> t = Task.Run(async() => 
-                    {
-                        var t1 = Task<Exception>.Factory.StartNew(() => {
-                            try
-                            {
-                                cSSH.Connect();
-                            }
-                            catch (ObjectDisposedException e)
-                            {
-                                Debug.WriteLine("e1:" + e);
-                                return e;
-                            }
-                            catch (InvalidOperationException e)
-                            {
-                                Debug.WriteLine("e2:" + e);
-                                return e;
-                            }
-                            catch (Exception e)
-                            {
-                                Debug.WriteLine("e3:" + e);
-                                return e;
-                            }
-                            return null;
-                        });
+                    cSSH.Connect();
+                }
+                catch (SshAuthenticationException e)
+                {
+                    throw e;
+                    //return new Tuple<Exception, SocketException, int>(e, null, 1);
+                }
+                catch (SshOperationTimeoutException e)
+                {
+                    throw e;
+                    return new Tuple<Exception, SocketException, int>(e, null, 2);
+                }
+                catch (SocketException e)
+                {
+                    throw e;
+                    return new Tuple<Exception, SocketException, int>(null, e, 3);
+                }
+                catch (SshConnectionException e)
+                {
+                    throw e;
+                    //return new Tuple<Exception, SocketException, int>(e, null, 4);
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                    //return new Tuple<Exception, SocketException, int>(e, null, 5);
+                }
+                return new Tuple<Exception, SocketException, int>(null, null, 0);
+            });
+            // 记录请求耗时
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var result = await t;
+            stopwatch.Stop();
+            cSSH.Disconnect();
+            return new Tuple<Tuple<Exception, SocketException, int>, short>(result,(short)stopwatch.ElapsedMilliseconds);
+        }
 
-                        while (!t1.IsCompleted)
-                        {
-                            if (cts.Token.IsCancellationRequested)
-                            {
-                                Debug.WriteLine("强制取消");
-                                cts.Token.ThrowIfCancellationRequested(); 
-                            }
-                        }
-                        return await t1;
-                    }, cts.Token);
-                    timer.Tick += new EventHandler<object>((sender, e) =>
-                    {
-                        if (!t.IsCompleted)
-                        {
-                            cts.Cancel();
-                        }
-                        timer.Stop();
-                    });
-                    var result = await t;
-                    stopwatch.Stop();
-                    
-                    if (t.IsCompleted&&cSSH.IsConnected)
-                    {
-                        Debug.WriteLine("Connected true.");
-                        Status = "1000";
-                        TimeCost = (short)stopwatch.ElapsedMilliseconds;
-                        return true;
-                    }
-                    else
-                    {
-                        Debug.WriteLine("Connected false.+异常：" + result.Message);
-                        // 服务器连接失败（地址/用户名/密码有误）
-                        Status = "1002";
-                        // 收集捕获到的异常
-                        ErrorException = result;
-                        TimeCost = (short)stopwatch.ElapsedMilliseconds;
-                        return false;
-                    }
-                }
-                // 捕获到请求超时的情况(主机ip未开启SSH或不存在都会引起超时)
-                catch (OperationCanceledException e)
-                {
-                    // 服务器超时
-                    Status = "1002";
-                    // 收集捕获到的异常
-                    ErrorException = e;
-                    // 请求耗时设置为超时上限
-                    TimeCost = OverTime;
-                    return false;
-                }
-                finally
-                {
-                    cSSH.Disconnect();
-                }
+        public async Task<bool> GetRequestResult(Tuple<Tuple<Exception, SocketException, int>, short> tuple)
+        {
+            await Task.CompletedTask;
+            var result = tuple.Item1;
+            var timeCost = tuple.Item2;
+            //若无异常，则认为连接成功
+            if (result.Item1 == result.Item2 )
+            {
+                Debug.WriteLine("Connected true.");
+                Status = "1000";
+                TimeCost = timeCost;
+                return true;
             }
-            
+            else
+            {
+                // 服务器连接失败（各种原因）
+                switch (result.Item3)
+                {
+                    case 1:
+                        ProtocolInfo = "用户名或密码错误"; break;
+                    case 2:
+                        ProtocolInfo = "连接超时";
+                        Status = "1002";
+                        TimeCost = OverTime; break;
+                    case 3:
+                        ProtocolInfo = "(SocketException)" +
+                            result.Item2.SocketErrorCode.ToString(); break;
+                    case 4:
+                        ProtocolInfo = "响应不包含SSH协议标识"; break;
+                    case 5:
+                        ProtocolInfo = "其他错误"; break;
+                    default:
+                        break;
+                }
+                //Debug.WriteLine("Connected false.+异常：" + result.Item1.Message);
+                //非超时错误
+                if (Status == null)
+                {
+                    Status = "1001";
+                    TimeCost = timeCost;
+                }
+                // 收集捕获到的异常
+                ErrorException = result.Item1;
+                
+                return false;
+            }
         }
     }
 }

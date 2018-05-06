@@ -59,7 +59,6 @@ namespace ServerMonitor
             XElement dbName = root.Element("DBFilename");
             DBHelper.InitDB(dbName.Value);
             #endregion
-            DispatcherHelper.Initialize();
             await NavigationService.NavigateAsync(typeof(Views.MainPage));
         }
 

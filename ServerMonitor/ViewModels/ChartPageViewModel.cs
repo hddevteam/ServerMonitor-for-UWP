@@ -100,7 +100,7 @@ namespace ServerMonitor.ViewModels
         public override async Task OnNavigatedToAsync(object parameter, NavigationMode mode, IDictionary<string, object> suspensionState)
         {
             //测试
-            SSHRequest s = new SSHRequest("172.31.0.244", "roots","Lucky.2011");
+            SSHRequest s = new SSHRequest("202.196.96.79", "roots","Lucky.2011");
             await s.MakeRequest();
             //对象实例化
             var result = InitAsync();

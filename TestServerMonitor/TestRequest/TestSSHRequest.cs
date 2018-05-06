@@ -11,11 +11,29 @@ namespace TestServerMonitor.TestRequest
     [TestClass]
     public class TestSSHRequest
     {
-        private SSHRequest sshRequest = new SSHRequest("8.8.8.8", "root","Lucky.2011");
+        //测试信息
+        private string TestSshIP = "172.31.0.244";
+        private string Username = "root";
+        private string Password = "Lucky.2011";
+        private SSHRequest sshRequest;
+
         [TestMethod]
-        public void MyTestMethod()
+        public void CompleteAndCorrectInfo_ShouldReturnNullExceptionAndTimeCostLessOverTime()
         {
-            Assert.AreEqual(true,sshRequest.MakeRequest().Result);
+            var result = sshRequest.SSHConnectAsync().Result;
+            var timeCost = result.Item2;
+            var overtime = sshRequest.OverTime;
+            Assert.Fail
+
+        }
+
+        [TestMethod]
+        public void MakeRequest_Should()
+        {
+            sshRequest = new SSHRequest(TestSshIP, Username, Password);
+            var actual = sshRequest.MakeRequest().Result;
+
+            Assert.IsTrue(actual);
         }
     }
 }
