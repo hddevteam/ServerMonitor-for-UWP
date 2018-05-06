@@ -133,7 +133,7 @@ namespace ServerMonitor.Controls
                     // 建立远程连接
                     Task connectTask = Task.Run(async() =>
                     {
-                        await socket.ConnectAsync(new IPEndPoint(ftpServer, 21));
+                        await socket.ConnectAsync(new IPEndPoint(ftpServer, port));
 
                         // 获取连接状态
                         if (socket.Connected)
@@ -308,9 +308,7 @@ namespace ServerMonitor.Controls
                 return false;
             }
 
-            byte tempForParsing;
-
-            return splitValues.All(r => byte.TryParse(r, out tempForParsing));
+            return splitValues.All(r => byte.TryParse(r, out byte tempForParsing));
         }
     }
 
