@@ -121,12 +121,6 @@ namespace ServerMonitor.ViewModels
             args.Cancel = false;
             await Task.CompletedTask;
         }
-
-        //在界面加载完毕，可以交互时，被MainPage.xaml.cs的Loaded方法调用
-        public void Loaded(ContentDialog contentDialog)
-        {
-            termsOfUseContentDialog = contentDialog;
-        }
         #endregion 系统函数
 
         #region 响应事件
@@ -266,8 +260,9 @@ namespace ServerMonitor.ViewModels
         }
         private void ShowAddServerPage()
         {
-            var msgPopup = new AddServerPage();
-            AddServerPage.ShowWindow();
+            NavigationService.Navigate(typeof(Views.AddServerPage), "");
+            //var msgPopup = new AddServerPage();
+            //AddServerPage.ShowWindow();
         }
 
         /// <summary>
@@ -413,6 +408,14 @@ namespace ServerMonitor.ViewModels
         #endregion 响应事件
 
         #region 辅助函数
+        /// <summary>
+        /// 在界面加载完毕，可以交互时，被MainPage.xaml.cs的Loaded方法调用
+        /// </summary>
+        public void Loaded(ContentDialog contentDialog)
+        {
+            termsOfUseContentDialog = contentDialog;
+        }
+
         /// <summary>
         /// 获取数据 并统一刷新界面数据
         /// </summary>

@@ -120,7 +120,7 @@
     <Compile Include="ViewModels\AllServerViewModel.cs" />
     <Compile Include="ViewModels\AllServer_addserverViewModel.cs" />
     <Compile Include="ViewModels\ChartPageViewModel.cs" />
-    <Compile Include="ViewModels\ContactViewModel.cs" />
+    <Compile Include="ViewModels\ContactPageViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
     <Compile Include="ViewModels\DetailPageViewModel.cs" />
     <Compile Include="ViewModels\SettingsPageViewModel.cs" />
@@ -149,8 +149,8 @@
     <Compile Include="Views\Chart.xaml.cs">
       <DependentUpon>Chart.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Contact.xaml.cs">
-      <DependentUpon>Contact.xaml</DependentUpon>
+    <Compile Include="Views\ContactPage.xaml.cs">
+      <DependentUpon>ContactPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\DetailPage.xaml.cs">
       <DependentUpon>DetailPage.xaml</DependentUpon>
@@ -221,6 +221,7 @@
     <Content Include="Common\Config.xml" />
     <Content Include="Common\example-xmal.xml" />
     <Content Include="Common\README.txt" />
+    <Content Include="Images\addcontact.png" />
     <Content Include="Images\addphone.png" />
     <Content Include="Images\adduser.png" />
     <Content Include="Images\appbar.add.png" />
@@ -234,6 +235,8 @@
     <Content Include="Images\appbar.refresh.png" />
     <Content Include="Images\appbar.seeall.png" />
     <Content Include="Images\appbar.settings.png" />
+    <Content Include="Images\cancel.png" />
+    <Content Include="Images\commit.png" />
     <Content Include="Images\error.png" />
     <Content Include="Images\head.png" />
     <Content Include="Images\ic.app.png" />
@@ -250,6 +253,7 @@
     <Content Include="Images\ServerMonitor_icon.png" />
     <Content Include="Images\Server_Ico.jpg" />
     <Content Include="Images\splash-sdk.png" />
+    <Content Include="Images\test.png" />
     <Content Include="Images\valley.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
@@ -308,7 +312,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Contact.xaml">
+    <Page Include="Views\ContactPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

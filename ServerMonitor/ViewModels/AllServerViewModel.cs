@@ -162,8 +162,8 @@ namespace ServerMonitor.ViewModels
         }
         private void ShowAddServerPage()
         {
-            var msgPopup = new AddServerPage();
-            AddServerPage.ShowWindow();
+            //var msgPopup = new AddServerPage();
+            //AddServerPage.ShowWindow();
         }
         //add website点击事件
         public void Add_Website(object sender, RoutedEventArgs e)
@@ -189,9 +189,9 @@ namespace ServerMonitor.ViewModels
             var site = DBHelper.GetSiteById(ServerContext.Site_id);
             if (site.Is_server)
             {
-                var msgPoput = new AddServerPage(ServerContext.Site_id.ToString());
-                //msgPoput.ShowWindow();
-                AddServerPage.ShowWindow();
+                //var msgPoput = new AddServerPage(ServerContext.Site_id.ToString());
+                ////msgPoput.ShowWindow();
+                //AddServerPage.ShowWindow();
             }
             else
             {
