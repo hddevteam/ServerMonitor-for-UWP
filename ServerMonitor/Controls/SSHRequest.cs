@@ -38,10 +38,6 @@ namespace ServerMonitor.Controls
         public override async Task<bool> MakeRequest()
         {
             await Task.CompletedTask;
-            //if (iPAddress == null || UserName == null || PassWord == null)
-            //{
-            //    throw new ArgumentNullException("one or more parameter is empty");
-            //}
             // 赋值生成请求的时间
             CreateTime = DateTime.Now;
             var cSSH = new SshClient(iPAddress, 22, UserName, PassWord);
