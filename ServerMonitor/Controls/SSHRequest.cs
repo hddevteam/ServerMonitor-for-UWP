@@ -17,150 +17,89 @@ namespace ServerMonitor.Controls
 {
     public class SSHRequest : BasicRequest
     {
-        // 服务器IP地址
-        private string ipAddress;
 
-        public string iPAddress
-        {
-            get { return ipAddress; }
-            set { ipAddress = value; }
-        }
+        public string iPAddress { get; set; }
 
-        //ssh用户名
-        private string username;
+        public string UserName { get; set; }
 
-        public string UserName
-        {
-            get { return username; }
-            set { username = value; }
-        }
-
-        //ssh用户密码
-        private string password;
-
-        public string PassWord
-        {
-            get { return password; }
-            set { password = value; }
-        }
+        public string PassWord { get; set; }
+        
         private bool overtime = false;
 
-        private string protocolInfo;
-
-        public string ProtocolInfo
-        {
-            get { return protocolInfo; }
-            set { protocolInfo = value; }
-        }
-
+        public string ProtocolInfo { get; set; }
+        
         public SSHRequest(string ipAddress,string username,string password)
         {
             this.iPAddress = ipAddress;
-            this.username = username;
-            this.password = password;
+            this.UserName = username;
+            this.PassWord = password;
         }
         
         public override async Task<bool> MakeRequest()
         {
-            var con_result = await SSHConnectAsync();
-            var result = await GetRequestResult(con_result);
-            return result;
-        }
-
-        public async Task<Tuple<Tuple<Exception, SocketException, int>, short>> SSHConnectAsync()
-        {
+            await Task.CompletedTask;
+            //if (iPAddress == null || UserName == null || PassWord == null)
+            //{
+            //    throw new ArgumentNullException("one or more parameter is empty");
+            //}
             // 赋值生成请求的时间
             CreateTime = DateTime.Now;
-            var cSSH = new SshClient(iPAddress, 22, username, password);
-            // 二次封装任务
-            Task<Tuple<Exception, SocketException, int>> t = Task.Run(() =>
-            {
-                try
-                {
-                    cSSH.Connect();
-                }
-                catch (SshAuthenticationException e)
-                {
-                    throw e;
-                    //return new Tuple<Exception, SocketException, int>(e, null, 1);
-                }
-                catch (SshOperationTimeoutException e)
-                {
-                    throw e;
-                    return new Tuple<Exception, SocketException, int>(e, null, 2);
-                }
-                catch (SocketException e)
-                {
-                    throw e;
-                    return new Tuple<Exception, SocketException, int>(null, e, 3);
-                }
-                catch (SshConnectionException e)
-                {
-                    throw e;
-                    //return new Tuple<Exception, SocketException, int>(e, null, 4);
-                }
-                catch (Exception e)
-                {
-                    throw e;
-                    //return new Tuple<Exception, SocketException, int>(e, null, 5);
-                }
-                return new Tuple<Exception, SocketException, int>(null, null, 0);
-            });
+            var cSSH = new SshClient(iPAddress, 22, UserName, PassWord);
+
             // 记录请求耗时
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            var result = await t;
-            stopwatch.Stop();
-            cSSH.Disconnect();
-            return new Tuple<Tuple<Exception, SocketException, int>, short>(result,(short)stopwatch.ElapsedMilliseconds);
-        }
-
-        public async Task<bool> GetRequestResult(Tuple<Tuple<Exception, SocketException, int>, short> tuple)
-        {
-            await Task.CompletedTask;
-            var result = tuple.Item1;
-            var timeCost = tuple.Item2;
-            //若无异常，则认为连接成功
-            if (result.Item1 == result.Item2 )
+            try
             {
-                Debug.WriteLine("Connected true.");
-                Status = "1000";
-                TimeCost = timeCost;
-                return true;
+                cSSH.Connect();
+                if (cSSH.IsConnected)
+                {
+                    stopwatch.Stop();
+                    Status = "1000";
+                    TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                    return true;
+                }
             }
-            else
+            catch (SshAuthenticationException e)
             {
-                // 服务器连接失败（各种原因）
-                switch (result.Item3)
-                {
-                    case 1:
-                        ProtocolInfo = "用户名或密码错误"; break;
-                    case 2:
-                        ProtocolInfo = "连接超时";
-                        Status = "1002";
-                        TimeCost = OverTime; break;
-                    case 3:
-                        ProtocolInfo = "(SocketException)" +
-                            result.Item2.SocketErrorCode.ToString(); break;
-                    case 4:
-                        ProtocolInfo = "响应不包含SSH协议标识"; break;
-                    case 5:
-                        ProtocolInfo = "其他错误"; break;
-                    default:
-                        break;
-                }
-                //Debug.WriteLine("Connected false.+异常：" + result.Item1.Message);
-                //非超时错误
-                if (Status == null)
-                {
-                    Status = "1001";
-                    TimeCost = timeCost;
-                }
-                // 收集捕获到的异常
-                ErrorException = result.Item1;
-                
+                stopwatch.Stop();
+                ProtocolInfo = "Authentication Failed.";
+                ErrorException = e;
+            }
+            catch (SshOperationTimeoutException e)
+            {
+                stopwatch.Stop();
+                ProtocolInfo = "Connection timed out.";
+                Status = "1002";
+                TimeCost = OverTime;
+                ErrorException = e;
                 return false;
             }
+            catch (SocketException e)
+            {
+                stopwatch.Stop();
+                ProtocolInfo = "(SocketException)" + e.SocketErrorCode.ToString();
+                ErrorException = e;
+            }
+            catch (SshConnectionException e)
+            {
+                stopwatch.Stop();
+                ProtocolInfo = "Response does not include the SSH protocol ID.";
+                ErrorException = e;
+            }
+            catch (Exception e)
+            {
+                stopwatch.Stop();
+                ProtocolInfo = "Other errors.";
+                ErrorException = e;
+            }
+            finally
+            {
+                cSSH.Disconnect();
+            }
+            Status = "1001";
+            TimeCost = (short)stopwatch.ElapsedMilliseconds;
+            return false;
         }
     }
 }
