@@ -14,14 +14,12 @@ namespace TestServerMonitor.TestRequest
     {
         //测试信息
         private string TestSshIP = "172.31.0.244";
-        private string Username = "root";
-        private string Password = "Lucky.2011";
         private SSHRequest sshRequest;
 
         [TestInitialize()] // 测试类生成预处理
         public void Initialize()
         {
-            sshRequest = new SSHRequest(TestSshIP, Username, Password);
+            sshRequest = new SSHRequest(TestSshIP, SshLoginType.Identify);
         }
         /// <summary>
         /// 测试MakeRequest
@@ -29,6 +27,8 @@ namespace TestServerMonitor.TestRequest
         [TestMethod]
         public void CompleteAndCorrectInfo_ShouldReturnTrueAndProtocolInfoIsNull()
         {
+            sshRequest.Identification.Username = "root";
+            sshRequest.Identification.Password = "Lucky.2011";
             var actual = sshRequest.MakeRequest().Result;
 
             Assert.IsTrue(actual);
@@ -41,7 +41,8 @@ namespace TestServerMonitor.TestRequest
         [TestMethod]
         public void UsernameOrPassError_ShouldReturnFalseAndProtocolInfoNotNull()
         {
-            sshRequest.UserName = "error";
+            sshRequest.Identification.Username = "error";
+            sshRequest.Identification.Password = "Lucky.2011";
             var actual = sshRequest.MakeRequest().Result;
 
             Assert.IsFalse(actual);
@@ -55,7 +56,8 @@ namespace TestServerMonitor.TestRequest
         public void ServerNotSsh_ShouldReturnFalseAndProtocolInfoNotNull()
         {
             sshRequest.iPAddress = "8.8.8.8";
-            sshRequest.UserName = "root";
+            sshRequest.Identification.Username = "root";
+            sshRequest.Identification.Password = "Lucky.2011";
             var actual = sshRequest.MakeRequest().Result;
 
             Assert.IsFalse(actual);
@@ -68,8 +70,9 @@ namespace TestServerMonitor.TestRequest
         [TestMethod]
         public void ServerIsInvalid_ShouldReturnFalseAndProtocolInfoNotNull()
         {
-            sshRequest.iPAddress = "1.2.3.4";
-            sshRequest.UserName = "root";
+            sshRequest.iPAddress = "111.2.3.4";
+            sshRequest.Identification.Username = "root";
+            sshRequest.Identification.Password = "Lucky.2011";
             var actual = sshRequest.MakeRequest().Result;
 
             Assert.IsFalse(actual);
@@ -83,7 +86,8 @@ namespace TestServerMonitor.TestRequest
         public void ServerIsEmpty_ShouldReturnFalseAndProtocolInfoNotNull()
         {
             sshRequest.iPAddress = "";
-            sshRequest.UserName = "root";
+            sshRequest.Identification.Username = "root";
+            sshRequest.Identification.Password = "Lucky.2011";
             var actual = sshRequest.MakeRequest().Result;
 
             Assert.IsFalse(actual);
@@ -94,10 +98,11 @@ namespace TestServerMonitor.TestRequest
         /// 测试MakeRequest
         /// </summary>
         [TestMethod]
-        public void ShouldThrowAggregateExceptionWhenUsernameOrPassIsEmpty()
+        public void UsernameIsEmpty_ShouldThrowAggregateException()
         {
-            sshRequest.UserName = "";
-            sshRequest.PassWord = "";
+            sshRequest.iPAddress = "172.31.0.244";
+            sshRequest.Identification.Username = "";
+            sshRequest.Identification.Password = "Lucky.2011";
             try
             {
                 var actual = sshRequest.MakeRequest().Result;
@@ -105,18 +110,20 @@ namespace TestServerMonitor.TestRequest
             }
             catch (AggregateException)
             {
-                
-            } 
+
+            }
         }
 
         /// <summary>
         /// 测试MakeRequest
         /// </summary>
         [TestMethod]
-        public void ShouldThrowAggregateExceptionWhenUsernameOrPassIsNull()
+        public void ShouldThrowAggregateExceptionWheniPAddressOrUsernameOrPassIsNull()
         {
-            sshRequest.UserName = null;
-            sshRequest.iPAddress = null;
+            sshRequest.iPAddress = "172.31.0.244";
+            sshRequest.Identification.Username = "root";
+            sshRequest.Identification.Password = null;
+
             try
             {
                 var actual = sshRequest.MakeRequest().Result;

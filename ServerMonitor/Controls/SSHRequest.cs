@@ -17,22 +17,35 @@ namespace ServerMonitor.Controls
 {
     public class SSHRequest : BasicRequest
     {
+        /// <summary>
+        /// Ssh端口
+        /// </summary>
+        private static short port = 22;
 
         public string iPAddress { get; set; }
 
-        public string UserName { get; set; }
-
-        public string PassWord { get; set; }
-        
-        private bool overtime = false;
+        /// <summary>
+        /// Ssh登入类型（匿名|身份验证）
+        /// </summary>
+        private SshLoginType identifyType = SshLoginType.Identify;
+        /// <summary>
+        /// Ssh登入信息
+        /// </summary>
+        private SshIdentificationInfo identification = new SshIdentificationInfo();
 
         public string ProtocolInfo { get; set; }
-        
-        public SSHRequest(string ipAddress,string username,string password)
+        public SshIdentificationInfo Identification { get => identification; set => identification = value; }
+
+        public SSHRequest(string ipAddress,SshLoginType type)
         {
             this.iPAddress = ipAddress;
-            this.UserName = username;
-            this.PassWord = password;
+            identifyType = type;
+            // 选择匿名登入的时候默认设置用户名，密码为anonymous
+            if (SshLoginType.Anonymous.Equals(type))
+            {
+                Identification.Username = "anonymous";
+                Identification.Password = "anonymous";
+            }
         }
         
         public override async Task<bool> MakeRequest()
@@ -40,7 +53,7 @@ namespace ServerMonitor.Controls
             await Task.CompletedTask;
             // 赋值生成请求的时间
             CreateTime = DateTime.Now;
-            var cSSH = new SshClient(iPAddress, 22, UserName, PassWord);
+            var cSSH = new SshClient(iPAddress, port, Identification.Username, Identification.Password);
 
             // 记录请求耗时
             Stopwatch stopwatch = new Stopwatch();
@@ -98,4 +111,40 @@ namespace ServerMonitor.Controls
             return false;
         }
     }
+
+    /// <summary>
+    /// 用户身份验别信息
+    /// </summary>
+    public class SshIdentificationInfo
+    {
+        public SshIdentificationInfo()
+        {
+            Username = "";
+            Password = "";
+        }
+
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        public string Username;
+        /// <summary>
+        /// 用户密码
+        /// </summary>
+        public string Password;
+    }
+
+    /// <summary>
+    /// 用户登入识别类型
+    /// </summary>
+    public enum SshLoginType
+    {
+        /// <summary>
+        /// 匿名登入
+        /// </summary>
+        Anonymous,
+        /// <summary>
+        /// 特定用户登入
+        /// </summary>
+        Identify
+    };
 }

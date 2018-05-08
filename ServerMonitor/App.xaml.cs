@@ -10,7 +10,6 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Controls;
 using ServerMonitor.Controls;
 using System.Xml.Linq;
-using GalaSoft.MvvmLight.Threading;
 
 namespace ServerMonitor
 {

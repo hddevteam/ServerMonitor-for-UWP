@@ -300,9 +300,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Chilkat.uwp">
-      <Version>9.5.0.72</Version>
-    </PackageReference>
     <PackageReference Include="Heijden.Dns.Portable">
       <Version>2.0.19</Version>
     </PackageReference>
