@@ -99,13 +99,13 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
-            <RelativePanel Grid.Column="0" Grid.RowSpan="2">
-                <Grid x:Name="precheck_btn" Height="52"
-                      Margin="4,24,4,0"
-                      RelativePanel.AlignRightWith="sitelist_scroll"
-                      RelativePanel.AlignLeftWith="sitelist_scroll"
-                      RelativePanel.AlignHorizontalCenterWithPanel="True"
-                      HorizontalAlignment="Stretch" Background="{Binding PreCheckColor}">
+            <Grid Grid.Column="0" Grid.RowSpan="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid x:Name="precheck_btn" Height="52" Margin="24,24,24,0"
+                      Background="{Binding PreCheckColor}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -131,14 +131,9 @@
                                    RelativePanel.AlignLeftWithPanel="True"/>
                     </RelativePanel>
                 </Grid>
-                <ScrollViewer x:Name="sitelist_scroll"
-                              RelativePanel.AlignHorizontalCenterWithPanel="True"
-                              VerticalScrollBarVisibility="Auto" Margin="0,116,0,0">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+                <ScrollViewer x:Name="sitelist_scroll" HorizontalScrollBarVisibility="Disabled" Grid.Row="1"
+                              VerticalScrollBarVisibility="Auto" Margin="0,24,0,0">
+                    <StackPanel Orientation="Vertical">
                         <GridView x:Name="sitelist"
                                   ItemsSource="{Binding SiteItems}"
                                   AllowDrop="True" HorizontalAlignment="Center"
@@ -171,7 +166,7 @@
                             </GridView.ItemTemplate>
                         </GridView>
                         <!--site detail-->
-                        <Grid Grid.Row="1" Margin="4,16,0,0">
+                        <Grid Margin="24,24,0,0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
@@ -192,9 +187,9 @@
                                 </GridView.ItemTemplate>
                             </GridView>
                         </Grid>
-                    </Grid>
+                    </StackPanel>
                 </ScrollViewer>
-            </RelativePanel>
+            </Grid>
 
             <Grid x:Name="RightUp" Grid.Row="0" Grid.Column="1" Width="200" BorderThickness="2"
                           BorderBrush="#E5E5E5" Background="#F0F0F0"

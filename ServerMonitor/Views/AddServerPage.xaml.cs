@@ -32,7 +32,7 @@ namespace ServerMonitor.Views
         private void AddServerPage_Loaded(object sender, RoutedEventArgs e)
         {
             model = this.ViewModel as AddServerPageViewModel;
-            model.OnLoaded(contactList);
+            model.OnLoaded(contactList, this.RightFrame1);
         }
     }
 }

@@ -66,13 +66,12 @@
             </Button>
 
             <Grid Grid.Column="4" Width="1" Background="DarkGray"/>
-            <Button Grid.Column="5" Background="{x:Null}">
+            <Button Grid.Column="5" Background="{x:Null}" Click="{x:Bind ViewModel.BindContact_Click}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Images/addcontact.png" Width="16" Height="16" HorizontalAlignment="Right"/>
-                    <TextBlock Text="Add Bind Contact" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
+                    <TextBlock Text="Edit Contact" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
                 </StackPanel>
             </Button>
-            
         </Grid>
         <Grid HorizontalAlignment="Stretch" Grid.Row="2" Margin="24,0,24,0">
             <Grid.ColumnDefinitions>
@@ -87,46 +86,53 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <ComboBox SelectedIndex="0" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center">
+                        <ComboBox SelectedIndex="0" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center" SelectionChanged="{x:Bind ViewModel.ComboBox_SelectionChanged}">
                             <ComboBoxItem Content="ICMP"/>
                             <ComboBoxItem Content="SOCKET"/>
-                            <ComboBoxItem Content="ICMP"/>
-                            <ComboBoxItem Content="ICMP"/>
+                            <ComboBoxItem Content="SSH"/>
+                            <ComboBoxItem Content="FTP"/>
+                            <ComboBoxItem Content="DNS"/>
+                            <ComboBoxItem Content="SMTP"/>
                         </ComboBox>
                         <TextBox Grid.Column="1" Name="domain" PlaceholderText="Domain name/IP   This Field Is Required" Height="30"/>
-                        <TextBox Grid.ColumnSpan="2" Grid.Row="1" Text="{Binding Port,Mode=TwoWay}" PlaceholderText="Port(optional)"
-                                     Margin="0,8,0,0" Height="30" Width="120" HorizontalAlignment="Left"/>
                     </Grid>
+                    <StackPanel Margin="0,8,0,0" Orientation="Horizontal">
+                        <TextBox Text="{Binding Port,Mode=TwoWay}" PlaceholderText="Port(optional)"
+                                 Height="30" Width="120" Visibility="{Binding LivePort}"/>
+                        <TextBlock Padding="0,4,0,0" Text="Port : " Height="30" Width="40" Visibility="{Binding DiePort}"/>
+                        <TextBlock Padding="0,4,0,0" Text="{Binding Port,Mode=TwoWay}" Height="30" TextAlignment="Center" Visibility="{Binding DiePortV}"/>
+                    </StackPanel>
                     <!--<TextBlock Text="NAME" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8"/>-->
                     <TextBox PlaceholderText="Server name   If empty,domain name will be used." Text="" Height="30" Margin="0,8,0,0"></TextBox>
 
                     <!--Authentication-->
-                    <TextBlock Text="AUTHENTICATION" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8"/>
-                    <CheckBox Name="NoAnonymous" Content="No Anonymous" IsChecked="True"/>
-                    <TextBox Grid.Column="1" PlaceholderText="Username" Height="30" Margin="0,8,0,8" Visibility="{Binding ElementName=NoAnonymous,Path=IsChecked}"/>
-                    <TextBox Grid.Column="1" PlaceholderText="Password" Height="30" Visibility="{Binding ElementName=NoAnonymous,Path=IsChecked}"/>
+                    <StackPanel Orientation="Vertical" Visibility ="{Binding NeedUser}">
+                        <TextBlock Text="AUTHENTICATION" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8"/>
+                        <CheckBox Name="NoAnonymous" Content="No Anonymous" IsChecked="True"/>
+                        <TextBox Grid.Column="1" PlaceholderText="Username" Height="30" Margin="0,8,0,8" Visibility="{Binding ElementName=NoAnonymous,Path=IsChecked}"/>
+                        <TextBox Grid.Column="1" PlaceholderText="Password" Height="30" Visibility="{Binding ElementName=NoAnonymous,Path=IsChecked}"/>
+                    </StackPanel>
+                    
                     
                     <!--RECORD-->
-                    <TextBlock Text="RECORD" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8"/>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <ComboBox SelectedIndex="0" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center">
-                            <ComboBoxItem Content="A"/>
-                            <ComboBoxItem Content="CNAME"/>
-                            <ComboBoxItem Content="NS"/>
-                            <ComboBoxItem Content="MX"/>
-                        </ComboBox>
-                        <TextBox Grid.Column="1" PlaceholderText="The domain you want tp lookup" Height="30"/>
-                        
-                    </Grid>
-                    <TextBox Grid.Column="1" Grid.Row="1" Margin="0,8,0,0" PlaceholderText="The expected results,separated by comma(,)" Height="30"/>
+                    <StackPanel Orientation="Vertical" Visibility ="{Binding NeedRecord}">
+                        <TextBlock Text="RECORD" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox SelectedIndex="0" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center">
+                                <ComboBoxItem Content="A"/>
+                                <ComboBoxItem Content="CNAME"/>
+                                <ComboBoxItem Content="NS"/>
+                                <ComboBoxItem Content="MX"/>
+                            </ComboBox>
+                            <TextBox Grid.Column="1" PlaceholderText="The domain you want tp lookup" Height="30"/>
+
+                        </Grid>
+                        <TextBox Grid.Column="1" Grid.Row="1" Margin="0,8,0,0" PlaceholderText="The expected results,separated by comma(,)" Height="30"/>
+                    </StackPanel>
                     
                     <!--PRIORITY-->
                     <TextBlock Text="PRIORITY" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8"/>
@@ -136,10 +142,32 @@
                         <ComboBoxItem Content="High"/>
                     </ComboBox>
 
-                    <!--CONTACT-->
-                    <Grid Margin="0,24,0,8">
-                        <TextBlock Text="CONTACT" Foreground="Black" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                    </Grid>
+                    <!--CONTACTS-->
+                    <TextBlock Margin="0,24,0,8" Text="CONTACTS" Foreground="Black" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <ListView SelectionMode="None" Margin="-12,0,0,0"
+                             ItemsSource="{Binding SelectedContacts}" Foreground="White">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,8,8,8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="360"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Contact_name}" FontWeight="Bold"/>
+                                    <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                        <Image Source="/Images/e-mail.png" Width="16" Height="16" Margin="0,0,4,0"/>
+                                        <TextBlock Text="{Binding Contact_email}" Width="180"/>
+                                        <Image Source="/Images/phone.png" Width="16" Height="16" Margin="0,0,4,0"/>
+                                        <TextBlock Text="{Binding Telephone}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
                 </StackPanel>
             </ScrollViewer>
         </Grid>
@@ -160,16 +188,33 @@
             
             <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
                 <ListView x:Name="contactList" SelectionMode="Multiple"
-                                  ItemsSource="{Binding Contacts}" 
-                                  Foreground="White" IsItemClickEnabled="True">
+                          ItemClick="{x:Bind ViewModel.Contactlist_ItemClick}"
+                          ItemsSource="{Binding Contacts}"
+                          Foreground="White" IsItemClickEnabled="True">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="8">
-                                <StackPanel>
-                                    <TextBlock Text="{Binding Contact_name}" FontWeight="Bold"/>
-                                    <TextBlock Text="{Binding Contact_email}"/>
+                            <!--<StackPanel Orientation="Vertical" Margin="8">
+                                <TextBlock Text="{Binding Contact_name}" FontWeight="Bold"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="/Images/e-mail.png" Width="16" Height="16" Margin="0,0,4,0"/>
+                                    <TextBlock Text="{Binding Contact_email}" Width="132"/>
+                                    <Image Source="/Images/phone.png" Width="16" Height="16" Margin="0,0,4,0"/>
+                                    <TextBlock Text="{Binding Telephone}"/>
                                 </StackPanel>
-                            </StackPanel>
+                            </StackPanel>-->
+                            <Grid Margin="8">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="{Binding Contact_name}" FontWeight="Bold"/>
+                                <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                    <Image Source="/Images/e-mail.png" Width="16" Height="16" Margin="0,0,4,0"/>
+                                    <TextBlock Text="{Binding Contact_email}" Width="180"/>
+                                    <Image Source="/Images/phone.png" Width="16" Height="16" Margin="0,0,4,0"/>
+                                    <TextBlock Text="{Binding Telephone}"/>
+                                </StackPanel>
+                            </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
@@ -179,10 +224,10 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <!--Click="{x:Bind ViewModel.CancelContact}"-->
-                <Button Content="OK" Grid.Column="0" HorizontalAlignment="Stretch"
+                <!--Click="{x:Bind ViewModel.Ok_Click}"-->
+                <Button Content="OK" Grid.Column="0" HorizontalAlignment="Stretch" Click="{x:Bind ViewModel.Ok_Click}"
                         Background="#0063B1" Margin="0,0,8,0" Foreground="White"/>
-                <Button Content="CANCEL" Grid.Column="1" HorizontalAlignment="Stretch" Margin="8,0,0,0"/>
+                <Button Content="CANCEL" Grid.Column="1" HorizontalAlignment="Stretch" Margin="8,0,0,0" Click="{x:Bind ViewModel.Cancel_Click}"/>
             </Grid>
         </Grid>
     </Grid>
