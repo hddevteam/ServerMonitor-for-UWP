@@ -20,7 +20,7 @@ namespace ServerMonitor.Controls
         /// <summary>
         /// 定义的请求超时时长
         /// </summary>
-        private short overTime = 3000;
+        private short overTime = 5000;
         /// <summary>
         /// 请求返回的结果
         /// </summary>
