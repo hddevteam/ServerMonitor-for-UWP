@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using ServerMonitor.Controls;
 using SQLite.Net.Attributes;
 using System;
 using System.Collections.Generic;
@@ -96,6 +97,7 @@ namespace ServerMonitor.Models
             {
                 is_Monitor = value;
                 RaisePropertyChanged(() => Is_Monitor);
+                //DBHelper.UpdateSite(this);
             }
         }
         [DefaultValue(value: "5", type: typeof(int))]
@@ -210,8 +212,19 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Last_request_result);
             }
         }
+        [DefaultValue(value: "", type: typeof(string))]
+        public string Others
+        {
+            get => others;
+            set => others = value;
+        }
+        [DefaultValue(value: "", type: typeof(string))]
+        public string ProtocolIdentification
+        {
+            get => protocolIdentification;
+            set => protocolIdentification = value;
+        }
 
-        public string Others { get => others; set => others = value; }
-        public string ProtocolIdentification { get => protocolIdentification; set => protocolIdentification = value; }
+
     }
 }

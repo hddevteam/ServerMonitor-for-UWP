@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" ?> 
-<DB_Config>
-  <DBFilename>ServerMonitor.sqlite</DBFilename>
-  <DBPath>C:\Users\Administrator\AppData\Local\Packages\92211ab1-5481-4a1a-9111-a3dd87b81b72_8zmgqd0netmce\LocalState</DBPath>
-  <DBAccount>bin</DBAccount>
-  <DBPassword>test123</DBPassword>
-</DB_Config>
