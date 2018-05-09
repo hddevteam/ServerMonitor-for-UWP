@@ -34,5 +34,7 @@ namespace ServerMonitor.Views
             model = this.ViewModel as AddServerPageViewModel;
             model.OnLoaded(contactList, this.RightFrame1);
         }
+
+
     }
 }

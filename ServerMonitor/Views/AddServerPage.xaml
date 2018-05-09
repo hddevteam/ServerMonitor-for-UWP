@@ -44,7 +44,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button Background="{x:Null}">
+            <Button Background="{x:Null}" IsEnabled="{Binding IsEnabled}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Images/commit.png" Width="16" Height="16"/>
                     <TextBlock Text="Save" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
@@ -94,23 +94,31 @@
                             <ComboBoxItem Content="DNS"/>
                             <ComboBoxItem Content="SMTP"/>
                         </ComboBox>
-                        <TextBox Grid.Column="1" Name="domain" PlaceholderText="Domain name/IP   This Field Is Required" Height="30"/>
+                        <TextBox Grid.Column="1" Name="domain" PlaceholderText="Domain name/IP   This Field Is Required"
+                                 DataContext="{Binding EditSite}" Text="{Binding Site_address, Mode=TwoWay}"
+                                 Height="30" TextChanged="{x:Bind ViewModel.Domain_TextChanged}"/>
                     </Grid>
                     <StackPanel Margin="0,8,0,0" Orientation="Horizontal">
                         <TextBox Text="{Binding Port,Mode=TwoWay}" PlaceholderText="Port(optional)"
                                  Height="30" Width="120" Visibility="{Binding LivePort}"/>
                         <TextBlock Padding="0,4,0,0" Text="Port : " Height="30" Width="40" Visibility="{Binding DiePort}"/>
-                        <TextBlock Padding="0,4,0,0" Text="{Binding Port,Mode=TwoWay}" Height="30" TextAlignment="Center" Visibility="{Binding DiePortV}"/>
+                        <TextBlock Padding="0,4,0,0" Text="{Binding Port,Mode=TwoWay}" Height="30" TextAlignment="Center" Visibility="{Binding DiePort}"/>
                     </StackPanel>
                     <!--<TextBlock Text="NAME" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8"/>-->
-                    <TextBox PlaceholderText="Server name   If empty,domain name will be used." Text="" Height="30" Margin="0,8,0,0"></TextBox>
+                    <TextBox Height="30" Margin="0,8,0,0"
+                             DataContext="{Binding EditSite}" Text="{Binding Site_name, Mode=TwoWay}"
+                             PlaceholderText="Server name   If empty,domain name will be used."/>
 
                     <!--Authentication-->
                     <StackPanel Orientation="Vertical" Visibility ="{Binding NeedUser}">
                         <TextBlock Text="AUTHENTICATION" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8"/>
                         <CheckBox Name="NoAnonymous" Content="No Anonymous" IsChecked="True"/>
-                        <TextBox Grid.Column="1" PlaceholderText="Username" Height="30" Margin="0,8,0,8" Visibility="{Binding ElementName=NoAnonymous,Path=IsChecked}"/>
-                        <TextBox Grid.Column="1" PlaceholderText="Password" Height="30" Visibility="{Binding ElementName=NoAnonymous,Path=IsChecked}"/>
+                        <TextBox Grid.Column="1" PlaceholderText="Username" Height="30" Margin="0,8,0,8" 
+                                 Visibility="{Binding ElementName=NoAnonymous,Path=IsChecked}"
+                                 Text="{Binding Username, Mode=TwoWay}"/>
+                        <TextBox Grid.Column="1" PlaceholderText="Password" Height="30" 
+                                 Visibility="{Binding ElementName=NoAnonymous,Path=IsChecked}"
+                                 Text="{Binding Password, Mode=TwoWay}"/>
                     </StackPanel>
                     
                     
@@ -122,21 +130,23 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <ComboBox SelectedIndex="0" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center">
+                            <ComboBox SelectedIndex="{Binding RecordType, Mode=TwoWay}" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center">
                                 <ComboBoxItem Content="A"/>
                                 <ComboBoxItem Content="CNAME"/>
                                 <ComboBoxItem Content="NS"/>
                                 <ComboBoxItem Content="MX"/>
                             </ComboBox>
-                            <TextBox Grid.Column="1" PlaceholderText="The domain you want tp lookup" Height="30"/>
-
+                            <TextBox Grid.Column="1" Height="30" PlaceholderText="The domain you want tp lookup"
+                                     Text="{Binding Lookup, Mode=TwoWay}"/>
                         </Grid>
-                        <TextBox Grid.Column="1" Grid.Row="1" Margin="0,8,0,0" PlaceholderText="The expected results,separated by comma(,)" Height="30"/>
+                        <TextBox Grid.Column="1" Grid.Row="1" Margin="0,8,0,0" Height="30"
+                                 PlaceholderText="The expected results,separated by comma(,)"
+                                 Text="{Binding ExpectedResults, Mode=TwoWay}"/>
                     </StackPanel>
                     
                     <!--PRIORITY-->
                     <TextBlock Text="PRIORITY" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8"/>
-                    <ComboBox SelectedIndex="0" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center">
+                    <ComboBox SelectedIndex="{Binding Priority, Mode=TwoWay}" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center">
                         <ComboBoxItem Content="Low"/>
                         <ComboBoxItem Content="Normal"/>
                         <ComboBoxItem Content="High"/>
@@ -159,7 +169,7 @@
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="{Binding Contact_name}" FontWeight="Bold"/>
                                     <StackPanel Orientation="Horizontal" Grid.Row="1">
-                                        <Image Source="/Images/e-mail.png" Width="16" Height="16" Margin="0,0,4,0"/>
+                                        <Image Source="/Images/e-mail.png" Width="16" Height="16" Margin="0,0,8,0"/>
                                         <TextBlock Text="{Binding Contact_email}" Width="180"/>
                                         <Image Source="/Images/phone.png" Width="16" Height="16" Margin="0,0,4,0"/>
                                         <TextBlock Text="{Binding Telephone}"/>
@@ -209,7 +219,7 @@
                                 </Grid.RowDefinitions>
                                 <TextBlock Text="{Binding Contact_name}" FontWeight="Bold"/>
                                 <StackPanel Orientation="Horizontal" Grid.Row="1">
-                                    <Image Source="/Images/e-mail.png" Width="16" Height="16" Margin="0,0,4,0"/>
+                                    <Image Source="/Images/e-mail.png" Width="16" Height="16" Margin="0,0,8,0"/>
                                     <TextBlock Text="{Binding Contact_email}" Width="180"/>
                                     <Image Source="/Images/phone.png" Width="16" Height="16" Margin="0,0,4,0"/>
                                     <TextBlock Text="{Binding Telephone}"/>
