@@ -99,6 +99,7 @@
     <Compile Include="TestRequest\TestDnsRequest.cs" />
     <Compile Include="TestRequest\TestFtpRequest.cs" />
     <Compile Include="TestRequest\TestSSHRequest.cs" />
+    <Compile Include="TestViewModel\TestChartViewModel.cs" />
     <Compile Include="UnitTestApp.xaml.cs">
       <DependentUpon>UnitTestApp.xaml</DependentUpon>
     </Compile>
@@ -127,6 +128,9 @@
     <Content Include="Properties\UnitTestApp.rd.xml" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Etg.SimpleStubs">
+      <Version>2.4.6</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.0.8</Version>
     </PackageReference>

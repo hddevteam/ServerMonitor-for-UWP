@@ -121,8 +121,10 @@
     <Compile Include="ViewModels\AddWebsitePageViewModel.cs" />
     <Compile Include="ViewModels\AllServerViewModel.cs" />
     <Compile Include="ViewModels\AllServer_addserverViewModel.cs" />
+    <Compile Include="ViewModels\ChartManger.cs" />
     <Compile Include="ViewModels\ChartPageViewModel.cs" />
     <Compile Include="ViewModels\ContactViewModel.cs" />
+    <Compile Include="ViewModels\IChartDao.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
     <Compile Include="ViewModels\DetailPageViewModel.cs" />
     <Compile Include="ViewModels\SettingsPageViewModel.cs" />
