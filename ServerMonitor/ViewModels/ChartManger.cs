@@ -18,6 +18,13 @@ namespace ServerMonitor.ViewModels
         public ObservableCollection<BarChartData> BarChart { get; set; }
 
         public ObservableCollection<BarChartData> GridChart { get; set; }
+
+        public ChartManger()
+        {
+            Lengend = new ObservableCollection<ChartLengend>();
+            BarChart = new ObservableCollection<BarChartData>();
+            GridChart = new ObservableCollection<BarChartData>();
+        }
         /// <summary>
         /// 对从数据库获取的site做初始处理，初始化统计站点，初始化站点选中状态
         /// </summary>
