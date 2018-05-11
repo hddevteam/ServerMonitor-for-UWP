@@ -157,7 +157,8 @@ namespace ServerMonitor.ViewModels
         //add server点击事件
         public void Add_Server(object sender, RoutedEventArgs e)
         {
-            ShowAddServerPage();
+            //ShowAddServerPage();
+            NavigationService.Navigate(typeof(Views.AddServerPage), "2,-1"); //1MainPage, 2 AllServer; -1没有id是新建site
             //AddServerPage.ShowWindow();
         }
         private void ShowAddServerPage()
@@ -189,6 +190,7 @@ namespace ServerMonitor.ViewModels
             var site = DBHelper.GetSiteById(ServerContext.Site_id);
             if (site.Is_server)
             {
+                NavigationService.Navigate(typeof(Views.AddServerPage), "2,"+ ServerContext.Site_id); //1MainPage, 2 AllServer; -1没有id是新建site
                 //var msgPoput = new AddServerPage(ServerContext.Site_id.ToString());
                 ////msgPoput.ShowWindow();
                 //AddServerPage.ShowWindow();

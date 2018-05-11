@@ -50,7 +50,7 @@
                     <TextBlock Text="Save" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
                 </StackPanel>
             </Button>
-            <Button Grid.Column="1" Background="{x:Null}">
+            <Button Grid.Column="1" Background="{x:Null}" Click="{x:Bind ViewModel.CancelBack}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Images/cancel.png" Width="12" Height="12"/>
                     <TextBlock Text="Cancel" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
@@ -86,7 +86,7 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <ComboBox SelectedIndex="0" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center" SelectionChanged="{x:Bind ViewModel.ComboBox_SelectionChanged}">
+                        <ComboBox SelectedIndex="{Binding ProtocolType, Mode=TwoWay}" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center" SelectionChanged="{x:Bind ViewModel.ComboBox_SelectionChanged}">
                             <ComboBoxItem Content="ICMP"/>
                             <ComboBoxItem Content="SOCKET"/>
                             <ComboBoxItem Content="SSH"/>
@@ -116,9 +116,9 @@
                         <TextBox Grid.Column="1" PlaceholderText="Username" Height="30" Margin="0,8,0,8" 
                                  Visibility="{Binding ElementName=NoAnonymous,Path=IsChecked}"
                                  Text="{Binding Username, Mode=TwoWay}"/>
-                        <TextBox Grid.Column="1" PlaceholderText="Password" Height="30" 
+                        <PasswordBox Grid.Column="1" PlaceholderText="Password" Height="30"
                                  Visibility="{Binding ElementName=NoAnonymous,Path=IsChecked}"
-                                 Text="{Binding Password, Mode=TwoWay}"/>
+                                 Password="{Binding Password, Mode=TwoWay}"/>
                     </StackPanel>
                     
                     

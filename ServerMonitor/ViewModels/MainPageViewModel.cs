@@ -256,11 +256,11 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public void Add_Server(object sender, RoutedEventArgs e)
         {
+            NavigationService.Navigate(typeof(Views.AddServerPage), "1,-1"); //1MainPage, 2 AllServerPage; -1没有id是新建site
             ShowAddServerPage();
         }
         private void ShowAddServerPage()
         {
-            NavigationService.Navigate(typeof(Views.AddServerPage), "");
             //var msgPopup = new AddServerPage();
             //AddServerPage.ShowWindow();
         }

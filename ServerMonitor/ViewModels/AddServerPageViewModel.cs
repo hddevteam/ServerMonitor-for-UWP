@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ServerMonitor.Controls;
 using ServerMonitor.Models;
 using System;
@@ -30,6 +31,8 @@ namespace ServerMonitor.ViewModels
         private Grid rightFrame1;
         Dictionary<int, bool> vs = new Dictionary<int, bool>(); //记录绑定联系人的结果
         Dictionary<int, bool> tempVs = new Dictionary<int, bool>(); //记录绑定联系人过程中的选择变化
+        int page = 1;  //1MainPage, 2 AllServerPage
+        int siteId = -1;  //-1没有id是新建site
 
         private string _Value = "Default";
         public string Value { get { return _Value; } set { Set(ref _Value, value); } }
@@ -42,6 +45,23 @@ namespace ServerMonitor.ViewModels
             GetListContact();
             Value = (suspensionState.ContainsKey(nameof(Value))) ? suspensionState[nameof(Value)]?.ToString() : parameter?.ToString();
             await Task.CompletedTask;
+            await Task.Run(()=> {
+                string[] arr = Value.Split(',');
+                try
+                {
+                    page = int.Parse(arr[0]);
+                    siteId = int.Parse(arr[1]);
+                }
+                catch (Exception)
+                {        //解析错误，page=1，任务完成跳MainPage，siteId = -1无id新建站点
+                    page = 1;
+                    siteId = -1;
+                }
+                if (siteId != -1)
+                {
+                    GetEditSite();  //需要id 放这里
+                }
+            });
         }
 
         public override async Task OnNavigatedFromAsync(IDictionary<string, object> suspensionState, bool suspending)
@@ -124,8 +144,8 @@ namespace ServerMonitor.ViewModels
         private ObservableCollection<Contact> selectedContacts = new ObservableCollection<Contact>();  //选中的绑定联系人
         public ObservableCollection<Contact> SelectedContacts { get => selectedContacts; set => selectedContacts = value; }
 
-        private string protocolType;
-        public string ProtocolType
+        private int protocolType = 0;
+        public int ProtocolType
         {
             get => protocolType;
             set
@@ -241,7 +261,6 @@ namespace ServerMonitor.ViewModels
         public void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ChangeDisplay((sender as ComboBox).SelectedIndex);
-            ProtocolType = ((ComboBoxItem)((sender as ComboBox).SelectedItem)).Content.ToString();
         }
         /// <summary>
         /// BindContact按钮点击事件 呼出侧边栏
@@ -309,21 +328,30 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public void Save()
         {
-            Site site = new Site
+            Site site;
+            if (siteId == -1)
             {
-                Is_server = true,
-                Monitor_interval = 5,
-                Is_Monitor = true,
-
-                Protocol_type = ProtocolType,
-                Site_address = SiteAddress,
-                Server_port = Port,
-                Create_time = DateTime.Now,
-                Update_time = DateTime.Now,
-                Last_request_result = 2,
-                Status_code = "1000/0",
-                Request_succeed_code = "1000",
-            };
+                site = new Site()
+                {
+                    Is_server = true,
+                    Monitor_interval = 5,
+                    Is_Monitor = true,
+                    Create_time = DateTime.Now,
+                    Last_request_result = 2,
+                    Status_code = "1000/0",
+                    Request_succeed_code = "1000",
+                };
+            }
+            else
+            {
+                site = DBHelper.GetSiteById(siteId);
+            }
+            
+            site.Protocol_type = GetProtocolType(ProtocolType);
+            site.Site_address = SiteAddress;
+            site.Server_port = Port;
+            site.Update_time = DateTime.Now;
+            
             if (SiteName == null|| SiteName.Equals(""))
             {
                 site.Site_name = SiteAddress;
@@ -340,10 +368,25 @@ namespace ServerMonitor.ViewModels
             {
                 site.ProtocolIdentification = GetJson(RecordType, Lookup, ExpectedResults);
             }
-            if (DBHelper.InsertOneSite(site) == 1)
+            if (siteId == -1)
             {
-                
+                if (DBHelper.InsertOneSite(site) == 1)
+                {
+                    Jump();
+                }
             }
+            else
+            {
+                if (DBHelper.UpdateSite(site) == 1)
+                {
+                    Jump();
+                }
+            }
+        }
+
+        public void CancelBack()
+        {
+            Jump();
         }
         #endregion
 
@@ -356,7 +399,8 @@ namespace ServerMonitor.ViewModels
             rightFrame1 = grid;   //侧边栏
             this.contactList = contactList;   //侧边栏联系人列表
             rightFrame1.Visibility = Visibility.Collapsed;  //关闭侧边栏
-            GetEditSite();  //需要id 放这里
+            
+            
         }
 
         /// <summary>
@@ -428,7 +472,33 @@ namespace ServerMonitor.ViewModels
 
         private void GetEditSite()
         {
+            Site site = DBHelper.GetSiteById(siteId);
+            ProtocolType = GetProtocolType(site.Protocol_type);
+            SiteAddress = site.Site_address;
+            SiteName = site.Site_name;
+            Port = site.Server_port;
+
             
+            if (ProtocolType == 2 || ProtocolType == 3)
+            {
+                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
+                Username = js["useaname"].ToString();//用户名
+                Password = js["password"].ToString();//用户名
+            }
+            else if(ProtocolType == 4)
+            {
+                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
+                try
+                {
+                    RecordType = int.Parse(js["recordType"].ToString());
+                }
+                catch (Exception)
+                {
+                    RecordType = 0;//出错 默认选第一个
+                }
+                Lookup = js["lookup"].ToString();
+                ExpectedResults = js["expectedResults"].ToString();
+            }
         }
 
         /// <summary>
@@ -511,6 +581,99 @@ namespace ServerMonitor.ViewModels
             protocolIdentification.Add("lookup", lookup);
             protocolIdentification.Add("expectedResults", expectedResults);
             return JsonConvert.SerializeObject(protocolIdentification);
+        }
+
+        private string GetProtocolType(int type)
+        {
+            string str = "ICMP";
+            switch (type)
+            {
+                case 0:
+                    str = "ICMP";
+                    break;
+                case 1:
+                    str = "SOCKET";
+                    break;
+                case 2:
+                    str = "SSH";
+                    break;
+                case 3:
+                    str = "FTP";
+                    break;
+                case 4:
+                    str = "DNS";
+                    break;
+                case 5:
+                    str = "SMTP";
+                    break;
+                default:
+                    break;
+            }
+            return str;
+        }
+
+        private int GetProtocolType(string type)
+        {
+            int i = 0;
+            switch (type)
+            {
+                case "ICMP":
+                    i = 0;
+                    break;
+                case "SOCKET":
+                    i = 1;
+                    break;
+                case "SSH":
+                    i = 2;
+                    break;
+                case "FTP":
+                    i = 3;
+                    break;
+                case "DNS":
+                    i = 4;
+                    break;
+                case "SMTP":
+                    i = 5;
+                    break;
+                default:
+                    break;
+            }
+            return i;
+        }
+
+        private int GetRecordType(string type)
+        {
+            int i = 0;
+            switch (type)
+            {
+                case "A":
+                    i = 0;
+                    break;
+                case "CNAME":
+                    i = 1;
+                    break;
+                case "NS":
+                    i = 2;
+                    break;
+                case "MX":
+                    i = 3;
+                    break;
+                default:
+                    break;
+            }
+            return i;
+        }
+
+        private void Jump()
+        {
+            if (page == 1)
+            {
+                NavigationService.Navigate(typeof(Views.MainPage));
+            }
+            if (page == 2)
+            {
+                NavigationService.Navigate(typeof(Views.AllServer));
+            }
         }
         #endregion
     }
