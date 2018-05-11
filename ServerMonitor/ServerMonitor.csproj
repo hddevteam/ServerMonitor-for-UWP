@@ -109,7 +109,7 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\Contact.cs" />
-    <Compile Include="Models\CustomHandler.cs" />
+    <Compile Include="Common\CustomHandler.cs" />
     <Compile Include="DAO\ContactDao.cs" />
     <Compile Include="DAO\IDAO\IContactDao.cs" />
     <Compile Include="Models\ErrorLog.cs" />
@@ -187,6 +187,7 @@
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <Content Include="Common\Config.xml" />
     <Content Include="Images\addphone.png" />
     <Content Include="Images\adduser.png" />
     <Content Include="Images\appbar.add.png" />
@@ -346,7 +347,9 @@
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Util\" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

@@ -13,6 +13,7 @@ namespace ServerMonitor.Services.RequestServices
 {
     /**
      * Http 请求模块
+     * 使用了单例模式 -- 完全延迟加载
      */
     public class HTTPRequest : BasicRequest
     {
@@ -26,18 +27,35 @@ namespace ServerMonitor.Services.RequestServices
         /// </summary>
         private const short HTTPSPORT = 443;
         /// <summary>
-        /// 网页站点返回的信息
+        /// 请求的路由地址
         /// </summary>
-        private string webResponse = null;
-        
+        private string uri = "";
+        /// <summary>
+        /// 线程安全的请求对象 --完全延迟加载
+        /// </summary>
+        public static HTTPRequest Instance
+        {
+            get
+            {
+                return Nested.instance;
+            }
+        }
+        /// <summary>
+        /// 请求的类型 http | https ,默认是 http
+        /// </summary>
+        private TransportProtocol httpOrhttps = TransportProtocol.http;
+
+        public string Uri { set => uri = value; }
+        public TransportProtocol ProtocolType { set => httpOrhttps = value; }
+
+        private HTTPRequest() { }
 
         /// <summary>
         /// 发起一次HTTP请求，返回状态码和请求时间(ms)
         /// </summary>
         /// <param name="uri">请求的URI</param>
-        public async static Task<string> HttpRequest(string uri)
+        public async Task<bool> HttpRequest(string uri)
         {
-            HttpReturn _return = new HttpReturn();
             try
             {
                 // 生成默认请求的处理帮助器
@@ -46,71 +64,71 @@ namespace ServerMonitor.Services.RequestServices
                     // 设置程序是否跟随重定向
                     AllowAutoRedirect = false
                 };
-                //// 生成自定义的请求处理器
-                //CustomHandler cu = new CustomHandler
-                //{
-                //    InnerHandler = handler
-                //};
-                //HttpClient client = new HttpClient(cu);
-                HttpClient client = new HttpClient();
+                HttpClient client = new HttpClient(handler);
                 //设置标头
                 client.DefaultRequestHeaders.Referrer = new Uri(uri);
+                // 设置请求预期超时时间 TimeSpan的参数需要传递一个 long ticks ，并且传递的参数的单位为100毫微秒,即0.1毫秒
+                client.Timeout = new TimeSpan(OverTime * 10);
+                // 加入请求任务超时控制
                 CancellationTokenSource ctx = new CancellationTokenSource();
-                ctx.CancelAfter(TimeSpan.FromSeconds(5));//5s放弃请求
+                ctx.CancelAfter(TimeSpan.FromSeconds(OverTime));//5s放弃请求
                 DateTime start_time = DateTime.Now;
                 HttpResponseMessage message = await client.GetAsync(uri, ctx.Token);
-                if (message.IsSuccessStatusCode)
-                {
-                    DateTime end_time = DateTime.Now;
-                    TimeSpan timeSpan = end_time - start_time;
-                    int chtime = (int)timeSpan.TotalMilliseconds;
-                    _return.RequestTime = chtime;
-                    int status_code_num = (int)Enum.Parse(typeof(System.Net.HttpStatusCode), message.StatusCode.ToString());//状态码strign to num
-                    _return.StatusCode = status_code_num.ToString();
-                    _return.Color = "1";
-                    string backJson = JsonConvert.SerializeObject(_return);
-                    return backJson;
-                }
-                else
-                {
-                    DateTime end_time = DateTime.Now;//请求失败计算时间
-                    TimeSpan timeSpan = end_time - start_time;
-                    int chtime = (int)timeSpan.TotalMilliseconds;
-                    _return.RequestTime = chtime;
-                    //请求失败状态码
-                    int status_code_num = (int)Enum.Parse(typeof(System.Net.HttpStatusCode), message.StatusCode.ToString());//状态码strign to num
-                    _return.StatusCode = status_code_num.ToString();
-                    _return.Color = "0";
-                    string backJson = JsonConvert.SerializeObject(_return);
-                    return backJson;
-                }
+
+                //请求失败计算时间
+                DateTime end_time = DateTime.Now;
+                TimeSpan timeSpan = end_time - start_time;
+                TimeCost = (short)timeSpan.TotalMilliseconds;
+                //请求失败状态码
+                Status = Enum.Parse(typeof(System.Net.HttpStatusCode), message.StatusCode.ToString()).ToString();//状态码strign to num
+                return true;
             }
             catch (TaskCanceledException e)
             {
                 Debug.WriteLine("请求超时");
                 DBHelper.InsertErrorLog(e);
-                _return.Color = "-1";
-                _return.RequestTime = 5000;
-                _return.StatusCode = "1002";
-                //return "请求超时";
-                string backJson = JsonConvert.SerializeObject(_return);
-                return backJson;
+                TimeCost = OverTime;
+                Status = "1002";
+                ErrorException = e;
+                return false;
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Debug.WriteLine("请求失败" + ex.Message);
-                DBHelper.InsertErrorLog(ex);
-                _return.Color = "2";
-                _return.RequestTime = -1;
-                //return "请求失败";
-                string backJson = JsonConvert.SerializeObject(_return);
-                return backJson;
+                Debug.WriteLine("请求失败" + e.Message);
+                DBHelper.InsertErrorLog(e);
+                TimeCost = -1;
+                ErrorException = e;
+                return false;
             }
         }
 
-        public override Task<bool> MakeRequest()
+        /// <summary>
+        /// http请求方法
+        /// </summary>
+        /// <returns></returns>
+        public async override Task<bool> MakeRequest()
         {
-            throw new NotImplementedException();
+            bool result =  false;
+            switch (httpOrhttps)
+            {
+                case TransportProtocol.http:
+                    result = await HttpRequest(uri);
+                    return result;
+                default:
+                    return result;
+            }
+        }
+
+        /// <summary>
+        /// 用于控制线程安全的内部类
+        /// </summary>
+        private class Nested
+        {
+            static Nested()
+            {
+
+            }
+            internal static readonly HTTPRequest instance = new HTTPRequest();
         }
     }
 
@@ -128,4 +146,6 @@ namespace ServerMonitor.Services.RequestServices
         /// </summary>
         https
     };
+
+    
 }
