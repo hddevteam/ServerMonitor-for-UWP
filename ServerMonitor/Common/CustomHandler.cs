@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.Models
 {
+    /// <summary>
+    ///  自定义请求处理器 类似filter
+    /// </summary>
     class CustomHandler : DelegatingHandler
     {
         // 此处放置构造和其它代码。

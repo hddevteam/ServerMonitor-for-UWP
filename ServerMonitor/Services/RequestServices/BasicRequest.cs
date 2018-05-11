@@ -41,7 +41,6 @@ namespace ServerMonitor.Controls
         public string Others { get => others; set => others = value; }
         public Exception ErrorException { get => errorException; set => errorException = value; }
         
-
         public abstract Task<bool> MakeRequest();
     }
 }
