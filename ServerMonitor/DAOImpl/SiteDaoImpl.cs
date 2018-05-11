@@ -11,14 +11,14 @@ using SQLite.Net.Platform.WinRT;
 
 namespace ServerMonitor.SiteDb
 {
-    class SiteDaoImpl : SiteDao
+    class SiteDaoImpl : SiteDAO
     {
-        //构造器为DBPath赋值
-        //private string DBPath;
-        //public SiteDaoImpl(string DBPath)
-        //{
-        //    this.DBPath = DBPath;
-        //}
+        /// <summary>
+        /// 使用SQL语句对Site数据库进行修改
+        /// </summary>
+        /// <param name="command">sql语句</param>
+        /// <param name="param">sql语句所需参数</param>
+        /// <returns></returns>
         public List<Site> DBExcuteSiteCommand(string command, object[] param)
         {
             List<Site> result;
@@ -29,7 +29,27 @@ namespace ServerMonitor.SiteDb
             }
             return result;
         }
+        public int UpdateSite(Site site)
+        {
+            // result = -1 表示异常返回值，执行操作失败
+            int result = -1;
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
+            {
+                try
+                {
+                    result = conn.Update(site);
+                    Debug.WriteLine(string.Format("更新站点{0} 成功！站点当前已经请求{1}次", site.Id, site.Request_count));
+                }
+                // 若捕获到数据库相关的异常，如未找到此条记录
+                catch (SQLite.Net.SQLiteException e)
+                {
+                    result = -1;
+                    DBHelper.InsertErrorLog(e);
+                }
 
+            }
+            return result;
+        }
         public int DeleteOneSite(int siteId)
         {
             int result = -1;
@@ -42,7 +62,7 @@ namespace ServerMonitor.SiteDb
 
         public List<Site> GetAllSite()
         {
-            List<Site> r;
+            List<Site> r;//返回Site列表
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
             {
                 r = conn.Table<Site>().ToList<Site>();
@@ -97,26 +117,6 @@ namespace ServerMonitor.SiteDb
             return result;
         }
 
-        public int UpdateSite(Site site)
-        {
-            // result = -1 表示异常返回值，执行操作失败
-            int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
-            {
-                try
-                {
-                    result = conn.Update(site);
-                    Debug.WriteLine(string.Format("更新站点{0} 成功！站点当前已经请求{1}次", site.Id, site.Request_count));
-                }
-                // 若捕获到数据库相关的异常，如未找到此条记录
-                catch (SQLite.Net.SQLiteException e)
-                {
-                    result = -1;
-                    DBHelper.InsertErrorLog(e);
-                }
-
-            }
-            return result;
-        }
+       
     }
 }

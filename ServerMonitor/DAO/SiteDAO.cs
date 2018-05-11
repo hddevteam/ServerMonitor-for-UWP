@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.SiteDb
 {
-    public interface SiteDao
+    public interface SiteDAO
     {
         List<Site> GetAllSite();
         Site GetSiteById(int id);
@@ -16,6 +16,12 @@ namespace ServerMonitor.SiteDb
         int DeleteOneSite(int siteId);
         int UpdateSite(Site site);
         int UpdateListSite(List<Site> sites);
+        /// <summary>
+        /// 使用SQL语句对Site数据库进行修改
+        /// </summary>
+        /// <param name="command">sql语句</param>
+        /// <param name="param">参数</param>
+        /// <returns></returns>
         List<Site> DBExcuteSiteCommand(string command, object[] param);
     }
 }

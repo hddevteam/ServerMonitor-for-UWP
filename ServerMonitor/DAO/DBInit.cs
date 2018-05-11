@@ -8,7 +8,10 @@ namespace ServerMonitor.SiteDb
 {
     interface DBInit
     {
+
+        //设置数据库名称
         void SetDBFilename(string Filename);
+        // 初始化数据库
         void InitDB(string DBFilename);
     }
 }

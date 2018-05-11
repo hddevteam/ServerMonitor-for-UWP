@@ -14,17 +14,29 @@ namespace ServerMonitor.SiteDb
 {
     public class DbInitImpl : DBInit
     {
-        private SiteDao siteDao;
+        /// <summary>
+        /// 持有SiteDAO对象实现对Site的操作
+        /// </summary>
+        private SiteDAO siteDao;
+        /// <summary>
+        /// 数据库名称
+        /// </summary>
         private static string DbFilename;
+        /// <summary>
+        /// 数据库路径，通过私有方法生成
+        /// </summary>
         private static string DBPath;
         public static string DbFilename1 { get => DbFilename; set => DbFilename = value; }
+        /// <summary>
+        /// 数据库路径由私有方法生成，所以设为只读变量
+        /// </summary>
         public static string DBPath1 { get => DBPath; }
         public void InitDB(string DBFilename)
         {
             SetDBFilename(DBFilename);
             siteDao = new SiteDaoImpl();
             // ApplicationData.Current.LocalFolder.Path balabala的指的是这个位置 ->C:\Users\xiao22805378\AppData\Local\Packages\92211ab1-5481-4a1a-9111-a3dd87b81b72_8zmgqd0netmce\LocalState\
-            if (!File.Exists(DBPath))
+            if (!File.Exists(DBPath))//判断数据库文件是否存在
             {
                 // ApplicationData.Current.LocalFolder.Path balabala的指的是这个位置 ->C:\Users\xiao22805378\AppData\Local\Packages\92211ab1-5481-4a1a-9111-a3dd87b81b72_8zmgqd0netmce\LocalState\
                 using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
