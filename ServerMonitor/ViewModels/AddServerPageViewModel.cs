@@ -24,28 +24,29 @@ namespace ServerMonitor.ViewModels
     {
         public AddServerPageViewModel() //先-> ComboBox_SelectionChanged-> OnNavigatedToAsync-> OnLoaded
         {
-            
+            ChangeDisplay(0);
+            //因为其中的Contacts.Add(list[i]);另开了线程，所以如果晚执行比如在OnLoaded中，会导致Contacts中短时间内没有数据
+            //而在这个短时间内，触发BindContact_Click会导致(ListViewItem)contactList.ContainerFromIndex(i)为null
+            GetListContact();
         }
         #region 全局变量
-        private ListView contactList;
-        private Grid rightFrame1;
+        private ListView contactList;  //联系人列表
+        private Grid rightFrame1;    //右部侧边栏
         Dictionary<int, bool> vs = new Dictionary<int, bool>(); //记录绑定联系人的结果
         Dictionary<int, bool> tempVs = new Dictionary<int, bool>(); //记录绑定联系人过程中的选择变化
         int page = 1;  //1MainPage, 2 AllServerPage
-        int siteId = -1;  //-1没有id是新建site
+        int siteId = -1;  //-1没有id是新建site  ，不为-1代表Edit那个站点
 
-        private string _Value = "Default";
+        private string _Value = "Default";  //保存传过来的信息  为 "page,siteId"
         public string Value { get { return _Value; } set { Set(ref _Value, value); } }
         #endregion
 
         #region 系统函数
         public override async Task OnNavigatedToAsync(object parameter, NavigationMode mode, IDictionary<string, object> suspensionState)
         {
-            ChangeDisplay(0);
-            GetListContact();
             Value = (suspensionState.ContainsKey(nameof(Value))) ? suspensionState[nameof(Value)]?.ToString() : parameter?.ToString();
             await Task.CompletedTask;
-            await Task.Run(()=> {
+            await Task.Run(()=> {    // OnNavigatedToAsync为异步方法，与OnLoaded谁先谁后不一定
                 string[] arr = Value.Split(',');
                 try
                 {
@@ -270,9 +271,13 @@ namespace ServerMonitor.ViewModels
             rightFrame1.Visibility = Visibility.Visible;
             for (int i = 0; i < contactList.Items.Count; i++)
             {
-                //在contactList的item里添加新控件时在这一步报错时，关闭vs，再打开看看
-                ((ListViewItem)contactList.ContainerFromIndex(i)).IsSelected = vs[Contacts[i].Id];//根据vs设置contactList选中效果
-                tempVs[Contacts[i].Id] = vs[Contacts[i].Id];
+                ListViewItem vss = (ListViewItem)contactList.ContainerFromIndex(i);
+                if (vss != null) //有时数据没有初始化完全，所以可能为空
+                {
+                    //在contactList的item里添加新控件时在这一步报错时，关闭vs，再打开看看
+                    vss.IsSelected = vs[Contacts[i].Id];//根据vs设置contactList选中效果 
+                    tempVs[Contacts[i].Id] = vs[Contacts[i].Id];
+                }
             }
         }
 
@@ -329,7 +334,7 @@ namespace ServerMonitor.ViewModels
         public void Save()
         {
             Site site;
-            if (siteId == -1)
+            if (siteId == -1)  //新建Site
             {
                 site = new Site()
                 {
@@ -342,16 +347,16 @@ namespace ServerMonitor.ViewModels
                     Request_succeed_code = "1000",
                 };
             }
-            else
+            else    //Edit site
             {
                 site = DBHelper.GetSiteById(siteId);
             }
-            
+            site.Update_time = DateTime.Now;
+
+            //将界面数据保存下来
             site.Protocol_type = GetProtocolType(ProtocolType);
             site.Site_address = SiteAddress;
             site.Server_port = Port;
-            site.Update_time = DateTime.Now;
-            
             if (SiteName == null|| SiteName.Equals(""))
             {
                 site.Site_name = SiteAddress;
@@ -368,11 +373,13 @@ namespace ServerMonitor.ViewModels
             {
                 site.ProtocolIdentification = GetJson(RecordType, Lookup, ExpectedResults);
             }
+
+            //数据库操作
             if (siteId == -1)
             {
-                if (DBHelper.InsertOneSite(site) == 1)
+                if (DBHelper.InsertOneSite(site) == 1) 
                 {
-                    Jump();
+                    Jump(); //返回原界面
                 }
             }
             else
@@ -384,6 +391,9 @@ namespace ServerMonitor.ViewModels
             }
         }
 
+        /// <summary>
+        /// 取消修改/添加 返回原界面
+        /// </summary>
         public void CancelBack()
         {
             Jump();
@@ -399,17 +409,15 @@ namespace ServerMonitor.ViewModels
             rightFrame1 = grid;   //侧边栏
             this.contactList = contactList;   //侧边栏联系人列表
             rightFrame1.Visibility = Visibility.Collapsed;  //关闭侧边栏
-            
-            
         }
 
         /// <summary>
-        /// 获取联系人 初始化变量 只调用一次
+        /// 获取联系人列表 初始化变量 只调用一次
         /// </summary>
         private void GetListContact()  //不可测
         {
             List<Contact> list = DBHelper.GetAllContact();
-            Contacts.Clear();
+            //Contacts.Clear();
             for (int i = 0; i < list.Count; i++)
             {
                 vs.Add(list[i].Id, false);
@@ -470,6 +478,10 @@ namespace ServerMonitor.ViewModels
             }
         }
 
+        //在siteId!=-1时调用， 即Edit site 时调用
+        /// <summary>
+        /// Edit site 时调用 将数据库数据分配到绑定字段里
+        /// </summary>
         private void GetEditSite()
         {
             Site site = DBHelper.GetSiteById(siteId);
@@ -477,7 +489,6 @@ namespace ServerMonitor.ViewModels
             SiteAddress = site.Site_address;
             SiteName = site.Site_name;
             Port = site.Server_port;
-
             
             if (ProtocolType == 2 || ProtocolType == 3)
             {
@@ -517,13 +528,15 @@ namespace ServerMonitor.ViewModels
             {
                 try
                 {
-                    Boolean _ipcheck = Regex.IsMatch(domain, "^(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|[1-9])\\."
-                                            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
-                                            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
-                                            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)$");//是ip
-                    Regex rg = new Regex("^[\u4e00-\u9fa5]+$");//是中文
-                    Boolean _domaincheck = rg.IsMatch(domain);
-                    if (!_ipcheck && _domaincheck)
+                    Regex reg = new Regex(@"^((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]\d)|\d)(\.((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]\d)|\d)){3}$");
+                    Boolean _domaincheck = reg.IsMatch(domain);
+                    //Boolean _ipcheck = Regex.IsMatch(domain, "^(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|[1-9])\\."
+                    //                        + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
+                    //                        + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
+                    //                        + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)$");//是ip
+                    //Regex rg = new Regex("^[\u4e00-\u9fa5]+$");//是中文
+                    //Boolean _domaincheck = rg.IsMatch(domain);
+                    if (_domaincheck)
                     {
                         return false;
                     }
@@ -583,6 +596,11 @@ namespace ServerMonitor.ViewModels
             return JsonConvert.SerializeObject(protocolIdentification);
         }
 
+        /// <summary>
+        /// 将int型的站点协议转换为string
+        /// </summary>
+        /// <param name="type">int型的站点协议</param>
+        /// <returns>string型的站点协议</returns>
         private string GetProtocolType(int type)
         {
             string str = "ICMP";
@@ -612,6 +630,11 @@ namespace ServerMonitor.ViewModels
             return str;
         }
 
+        /// <summary>
+        /// 将string型的站点协议转换为int，与界面的下拉列表对应
+        /// </summary>
+        /// <param name="type">string型的站点协议</param>
+        /// <returns>int型的站点协议</returns>
         private int GetProtocolType(string type)
         {
             int i = 0;
@@ -641,6 +664,11 @@ namespace ServerMonitor.ViewModels
             return i;
         }
 
+        /// <summary>
+        /// 将string型的RecordType转换为int, 与界面的下拉列表对应
+        /// </summary>
+        /// <param name="type">string型的RecordType</param>
+        /// <returns>int型的RecordType</returns>
         private int GetRecordType(string type)
         {
             int i = 0;
@@ -664,6 +692,9 @@ namespace ServerMonitor.ViewModels
             return i;
         }
 
+        /// <summary>
+        /// 返回原界面
+        /// </summary>
         private void Jump()
         {
             if (page == 1)
