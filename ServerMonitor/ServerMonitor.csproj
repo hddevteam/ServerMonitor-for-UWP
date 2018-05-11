@@ -95,6 +95,10 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DAOImpl\DbInitImpl.cs" />
+    <Compile Include="DAOImpl\SiteDaoImpl.cs" />
+    <Compile Include="DAO\DBInit.cs" />
+    <Compile Include="DAO\SiteDAO.cs" />
     <Compile Include="Services\RequestServices\BasicRequest.cs" />
     <Compile Include="Common\DataHelper.cs" />
     <Compile Include="Controls\DBHelper.cs" />
