@@ -121,12 +121,6 @@ namespace ServerMonitor.ViewModels
             args.Cancel = false;
             await Task.CompletedTask;
         }
-
-        //在界面加载完毕，可以交互时，被MainPage.xaml.cs的Loaded方法调用
-        public void Loaded(ContentDialog contentDialog)
-        {
-            termsOfUseContentDialog = contentDialog;
-        }
         #endregion 系统函数
 
         #region 响应事件
@@ -262,12 +256,13 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public void Add_Server(object sender, RoutedEventArgs e)
         {
+            NavigationService.Navigate(typeof(Views.AddServerPage), "1,-1"); //1MainPage, 2 AllServerPage; -1没有id是新建site
             ShowAddServerPage();
         }
         private void ShowAddServerPage()
         {
-            var msgPopup = new AddServerPage();
-            AddServerPage.ShowWindow();
+            //var msgPopup = new AddServerPage();
+            //AddServerPage.ShowWindow();
         }
 
         /// <summary>
@@ -360,9 +355,6 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public void CloseFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var q = from t in SiteItems
-                    where t.Id == rightTapped_SiteId
-                    select t;
             var q1 = from t in sites
                      where t.Id == rightTapped_SiteId
                      select t;
@@ -416,6 +408,14 @@ namespace ServerMonitor.ViewModels
         #endregion 响应事件
 
         #region 辅助函数
+        /// <summary>
+        /// 在界面加载完毕，可以交互时，被MainPage.xaml.cs的Loaded方法调用
+        /// </summary>
+        public void Loaded(ContentDialog contentDialog)
+        {
+            termsOfUseContentDialog = contentDialog;
+        }
+
         /// <summary>
         /// 获取数据 并统一刷新界面数据
         /// </summary>

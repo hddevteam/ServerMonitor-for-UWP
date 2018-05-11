@@ -33,7 +33,7 @@ namespace ServerMonitor.Views
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             AllServerViewModel model = this.ViewModel as AllServerViewModel;
-            model.SetFrame(this.RightFrame1, this.RightFrame2);
+            model.SetFrame(this.RightFrame1);
         }
         
         public void List_RightTapped(object sender, RightTappedRoutedEventArgs e)

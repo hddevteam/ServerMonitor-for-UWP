@@ -1,5 +1,5 @@
 ﻿<Page
-    x:Class="ServerMonitor.Views.Contact"
+    x:Class="ServerMonitor.Views.ContactPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:ServerMonitor.Views"
@@ -9,7 +9,7 @@
     xmlns:vm="using:ServerMonitor.ViewModels"
     mc:Ignorable="d">
     <Page.DataContext>
-        <vm:ContactViewModel x:Name="ViewModel"/>
+        <vm:ContactPageViewModel x:Name="ViewModel"/>
     </Page.DataContext>
     <Grid Background="White">
         <VisualStateManager.VisualStateGroups>
@@ -29,12 +29,11 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <controls:PageHeader RelativePanel.AlignLeftWithPanel="True"
-                             RelativePanel.AlignRightWithPanel="True"
-                             RelativePanel.AlignTopWithPanel="True"
-                             Text="Controls" >
-            <AppBarButton Icon="Add" Foreground="White" Name="AddPage" 
-                          Click = "{x:Bind ViewModel.AddContact}"/>
+        <controls:PageHeader Text="Controls" OverflowButtonVisibility="Collapsed">
+            <controls:PageHeader.PrimaryCommands>
+                <AppBarButton Icon="Add" Foreground="White" Name="AddPage" Click = "{x:Bind ViewModel.AddContact}"/>
+            </controls:PageHeader.PrimaryCommands>
+            
         </controls:PageHeader>
         <!--联系人列表-->
         <Grid Grid.Row="1" >
@@ -150,8 +149,8 @@
                        Foreground="Black"
                        FontSize="20" Margin="24,24,0,16"/>
             <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
-                <StackPanel  Margin="0,0,0,32" Orientation="Vertical"
-                             DataContext="{Binding RightContact}">
+                <StackPanel Margin="0,0,0,32" Orientation="Vertical"
+                            DataContext="{Binding RightContact}">
                     <Grid Width="120" Height="120" Margin="24,8,24,32"
                           HorizontalAlignment="Left"
                           CornerRadius="60">

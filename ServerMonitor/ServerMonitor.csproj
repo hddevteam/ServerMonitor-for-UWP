@@ -127,7 +127,7 @@
     <Compile Include="ViewModels\AllServerViewModel.cs" />
     <Compile Include="ViewModels\AllServer_addserverViewModel.cs" />
     <Compile Include="ViewModels\ChartPageViewModel.cs" />
-    <Compile Include="ViewModels\ContactViewModel.cs" />
+    <Compile Include="ViewModels\ContactPageViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
     <Compile Include="ViewModels\DetailPageViewModel.cs" />
     <Compile Include="ViewModels\SettingsPageViewModel.cs" />
@@ -156,8 +156,8 @@
     <Compile Include="Views\Chart.xaml.cs">
       <DependentUpon>Chart.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Contact.xaml.cs">
-      <DependentUpon>Contact.xaml</DependentUpon>
+    <Compile Include="Views\ContactPage.xaml.cs">
+      <DependentUpon>ContactPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\DetailPage.xaml.cs">
       <DependentUpon>DetailPage.xaml</DependentUpon>
@@ -192,35 +192,25 @@
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
     <Content Include="Common\Config.xml" />
+    <Content Include="Images\addcontact.png" />
     <Content Include="Images\addphone.png" />
     <Content Include="Images\adduser.png" />
-    <Content Include="Images\appbar.add.png" />
-    <Content Include="Images\appbar.back.png" />
-    <Content Include="Images\appbar.cancel.png" />
-    <Content Include="Images\appbar.check.png" />
-    <Content Include="Images\appbar.delete.png" />
-    <Content Include="Images\appbar.eventlist.png" />
-    <Content Include="Images\appbar.home.png" />
-    <Content Include="Images\appbar.move.png" />
-    <Content Include="Images\appbar.refresh.png" />
-    <Content Include="Images\appbar.seeall.png" />
-    <Content Include="Images\appbar.settings.png" />
+    <Content Include="Images\cancel.png" />
+    <Content Include="Images\commit.png" />
+    <Content Include="Images\delete.png" />
+    <Content Include="Images\e-mail.png" />
     <Content Include="Images\error.png" />
     <Content Include="Images\head.png" />
-    <Content Include="Images\ic.app.png" />
-    <Content Include="Images\ic.edit.png" />
-    <Content Include="Images\ic.email.png" />
-    <Content Include="Images\ic.filter.png" />
-    <Content Include="Images\ic.phone.png" />
-    <Content Include="Images\ic.server.png" />
     <Content Include="Images\ic_website.png" />
     <Content Include="Images\ic_precheck.png" />
     <Content Include="Images\ic_server.png" />
     <Content Include="Images\iconfont_add.png" />
+    <Content Include="Images\phone.png" />
     <Content Include="Images\radio02.png" />
     <Content Include="Images\ServerMonitor_icon.png" />
     <Content Include="Images\Server_Ico.jpg" />
     <Content Include="Images\splash-sdk.png" />
+    <Content Include="Images\test.png" />
     <Content Include="Images\valley.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="README.txt" />
@@ -273,7 +263,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Contact.xaml">
+    <Page Include="Views\ContactPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
