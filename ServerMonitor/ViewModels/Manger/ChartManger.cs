@@ -34,48 +34,35 @@ namespace ServerMonitor.ViewModels
         {
             var selectSites = new ObservableCollection<SelectSite>();
             var Sites = new List<Site>();
-            foreach (var item in sites)
+            foreach (var item in sites.Where(i => i.Is_pre_check == false).Select(i => i))
             {
                 //初始时默认选中前五条
-                if (!item.Is_pre_check)
+                if (selectSites.Count < 5)
                 {
-                    if (selectSites.Count < 5)
+                    Sites.Add(item);
+                    if (item.Is_server)
                     {
-                        Sites.Add(item);
-                        selectSites.Add(new SelectSite() { Site = item, IsSelected = true });
+                        selectSites.Add(new SelectSite() { Site = item, IsSelected = true, ImagePath = "../images/ic_server.png", SiteType = "SERVER" });
                     }
                     else
                     {
-                        selectSites.Add(new SelectSite() { Site = item, IsSelected = false });
+                        selectSites.Add(new SelectSite() { Site = item, IsSelected = true, ImagePath = "../images/ic_website.png", SiteType = "WEBSITE" });
+                    }
+                }
+                else
+                {
+                    if (item.Is_server)
+                    {
+                        selectSites.Add(new SelectSite() { Site = item, IsSelected = false, ImagePath = "../images/ic_server.png", SiteType = "SERVER" });
+                    }
+                    else
+                    {
+                        selectSites.Add(new SelectSite() { Site = item, IsSelected = false, ImagePath = "../images/ic_website.png", SiteType = "WEBSITE" });
                     }
                 }
             }
             await Task.CompletedTask;
             return new Tuple<ObservableCollection<SelectSite>, List<Site>>(selectSites, Sites);
-        }
-
-        /// <summary>
-        /// 站点信息补全，添加图片及类型说明
-        /// </summary>
-        /// <param name="selectSites"></param>
-        /// <returns></returns>
-        public async Task<ObservableCollection<SelectSite>> SelectSiteInfoAsync(ObservableCollection<SelectSite> selectSites)
-        {
-            foreach (var item in selectSites)
-            {
-                if (item.Site.Is_server)
-                {
-                    item.ImagePath = "../images/ic_server.png";
-                    item.SiteType = "SERVER";
-                }
-                else
-                {
-                    item.ImagePath = "../images/ic_website.png";
-                    item.SiteType = "WEBSITE";
-                }
-            }
-            await Task.CompletedTask;
-            return selectSites;
         }
 
         /// <summary>

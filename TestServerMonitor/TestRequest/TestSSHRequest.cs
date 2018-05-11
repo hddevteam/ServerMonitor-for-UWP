@@ -23,6 +23,7 @@ namespace TestServerMonitor.TestRequest
         }
         /// <summary>
         /// 测试MakeRequest
+        /// 用例说明：测试IP/用户名/密码正确匹配，登录成功
         /// </summary>
         [TestMethod]
         public void CompleteAndCorrectInfo_ShouldReturnTrueAndProtocolInfoIsNull()
@@ -37,6 +38,7 @@ namespace TestServerMonitor.TestRequest
 
         /// <summary>
         /// 测试MakeRequest
+        /// 用例说明：测试用户名/密码匹配不正确，登录失败
         /// </summary>
         [TestMethod]
         public void UsernameOrPassError_ShouldReturnFalseAndProtocolInfoNotNull()
@@ -51,6 +53,7 @@ namespace TestServerMonitor.TestRequest
 
         /// <summary>
         /// 测试MakeRequest
+        /// 用例说明：测试输入IP为非FTP服务器的IP，登录失败
         /// </summary>
         [TestMethod]
         public void ServerNotSsh_ShouldReturnFalseAndProtocolInfoNotNull()
@@ -66,6 +69,7 @@ namespace TestServerMonitor.TestRequest
 
         /// <summary>
         /// 测试MakeRequest
+        /// 用例说明：测试输入IP不合法地址，登录失败
         /// </summary>
         [TestMethod]
         public void ServerIsInvalid_ShouldReturnFalseAndProtocolInfoNotNull()
@@ -81,6 +85,7 @@ namespace TestServerMonitor.TestRequest
 
         /// <summary>
         /// 测试MakeRequest
+        /// 用例说明：测试输入IP为空，登录失败
         /// </summary>
         [TestMethod]
         public void ServerIsEmpty_ShouldReturnFalseAndProtocolInfoNotNull()
@@ -96,6 +101,7 @@ namespace TestServerMonitor.TestRequest
 
         /// <summary>
         /// 测试MakeRequest
+        /// 用例说明：测试输入用户名为空，抛出异常，登录失败
         /// </summary>
         [TestMethod]
         public void UsernameIsEmpty_ShouldThrowAggregateException()
@@ -116,6 +122,7 @@ namespace TestServerMonitor.TestRequest
 
         /// <summary>
         /// 测试MakeRequest
+        /// 用例说明：测试IP/用户名/密码为null，抛出异常，登录失败
         /// </summary>
         [TestMethod]
         public void ShouldThrowAggregateExceptionWheniPAddressOrUsernameOrPassIsNull()

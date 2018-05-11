@@ -35,13 +35,7 @@ namespace ServerMonitor.ViewModels
     {
         #region 变量
 
-        private ChartManger chartManger;
-
-        public ChartManger CManger
-        {
-            get { return chartManger; }
-            set { chartManger = value; RaisePropertyChanged(() => CManger); }
-        }
+        public IChartDao ChartDao { get; set; }
 
         private SiteRequestCountInfo infos;
 
@@ -78,6 +72,16 @@ namespace ServerMonitor.ViewModels
                 }
             }
         }
+
+        private int myVar = 5;
+
+        public int My
+        {
+            get { return myVar; }
+            set { myVar = value; RaisePropertyChanged(() => My); }
+        }
+
+
         //图表1数据序列集合（前台绑定的非此属性，而是可变副本）
         private ObservableCollection<ObservableCollection<Chart1>> chart1Collection;
 
@@ -106,28 +110,14 @@ namespace ServerMonitor.ViewModels
             var log = await LoadDbLogAsync();
             var site = await LoadDbSiteAsync();
 
-            var selectResult = await CManger.SelectSitesAsync(site);
+            var selectResult = await ChartDao.SelectSitesAsync(site);
 
             Infos.Sites =  selectResult.Item2;
             Infos.Logs = log;
             Infos.SelectSites = selectResult.Item1;
-            
-            //数据库是否有日志记录
-            if (Infos.Logs.Count != 0)
-            {
-                //计算图表数据
-                var getResult= await Task.Run(()=>CManger.CacuChartAsync(Infos.Sites,Infos.Logs));
-                foreach (var item in getResult.Item1)
-                {
-                    Chart1Collection.Add(item);
-                }
-                //此处不能直接赋值，图表绑定会有问题??
-                //Chart1Collection = getResult.Item1;
-                CManger.CacuBarChart(Infos.Sites, getResult.Item2);
-            }
 
-            await ChartLengendAsync(Infos.Sites);
-            Infos.SelectSites = await SelectSiteInfoAsync(Infos.SelectSites);
+            //计算图表数据
+            await ChartAsync(Infos.Sites, Infos.Logs);
 
             //图表加载完毕后切换加载状态
             Infos.State3 = Visibility.Collapsed;
@@ -139,7 +129,7 @@ namespace ServerMonitor.ViewModels
         public async Task<bool> InitAsync()
         {
             Lengend = new ObservableCollection<ChartLengend>();
-            CManger = new ChartManger();
+            ChartDao = new ChartManger();
             Infos.Chart1CollectionCopy = new ObservableCollection<ObservableCollection<Chart1>>();
             Infos.SelectSites = new ObservableCollection<SelectSite>();
             Infos.Sites = new List<Site>();
@@ -169,75 +159,27 @@ namespace ServerMonitor.ViewModels
             return logs;
         }
 
-        /// <summary>
-        /// 对从数据库获取的site做初始处理，初始化统计站点，初始化站点选中状态
-        /// </summary>
-        /// <param name="sites"></param>
-        /// <returns></returns>
-        public async Task<Tuple<ObservableCollection<SelectSite>,List<Site>>> SelectSitesAsync(List<Site> sites)
-        {
-            var result = await CManger.SelectSitesAsync(sites);
-
-            return result;
-        }
-
-        /// <summary>
-        /// 站点信息补全，添加图片及类型说明
-        /// </summary>
-        /// <param name="selectSites"></param>
-        /// <returns></returns>
-        public async Task<ObservableCollection<SelectSite>> SelectSiteInfoAsync(ObservableCollection<SelectSite> selectSites)
-        {
-            var result = await CManger.SelectSiteInfoAsync(selectSites);
-
-            return result;
-        }
-
-        /// <summary>
-        /// 线性图图例
-        /// </summary>
-        /// <param name="sites"></param>
-        /// <returns></returns>
-        public async Task<ObservableCollection<ChartLengend>> ChartLengendAsync(List<Site> sites)
-        {
-            var result = await CManger.ChartLengendAsync(sites);
-
-            Lengend = result;
-
-            return Lengend;
-        }
         #endregion
 
-        #region 数据统计
         /// <summary>
-        /// 计算线性图结果
+        /// 计算图表相关数据
         /// </summary>
-        /// <param name="sites"></param>
-        /// <param name="logs"></param>
         /// <returns></returns>
-        public async Task<Tuple<ObservableCollection<ObservableCollection<Chart1>>, int[,]>> CacuChartAsync(List<Site> sites,List<Log> logs)
+        public async Task<bool> ChartAsync(List<Site> sites,List<Log> logs)
         {
-            var result = await CManger.CacuChartAsync(sites,logs);
-
-            return result;
+            var getResult = await Task.Run(() => ChartDao.CacuChartAsync(sites, logs));
+            foreach (var item in getResult.Item1)
+            {
+                Chart1Collection.Add(item);
+            }
+            //此处不能直接赋值，图表绑定会有问题??
+            //Chart1Collection = getResult.Item1;
+            var barAndGridData = ChartDao.CacuBarChart(sites, getResult.Item2);
+            Infos.BarChart = barAndGridData.Item1;
+            Infos.GridChart = barAndGridData.Item2;
+            Lengend = await ChartDao.ChartLengendAsync(sites);
+            return true;
         }
-
-        /// <summary>
-        /// 计算柱状图结果，列表数据同
-        /// </summary>
-        /// <param name="sites"></param>
-        /// <param name="requestResults"></param>
-        /// <returns></returns>
-        public Tuple<ObservableCollection<BarChartData>,ObservableCollection<BarChartData>> CacuBarChart(List<Site> sites, int[,] requestResults)
-        {
-            var result = CManger.CacuBarChart(sites,requestResults);
-
-            Infos.BarChart = result.Item1;
-            Infos.GridChart = result.Item2;
-            return result;
-
-        }
-        #endregion
 
         #region 响应事件
         /// <summary>
@@ -279,10 +221,16 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void ChartFliter_Click(object sender, RoutedEventArgs e)
+        public void ChartFliter_Click()
         {
             Infos.State1 = Visibility.Collapsed;
             Infos.State2 = Visibility.Visible;
+        }
+
+        //被测方法
+        public void TestClick()
+        {
+            My = 10;
         }
 
         /// <summary>
@@ -310,17 +258,12 @@ namespace ServerMonitor.ViewModels
             {
                 Infos.State1 = Visibility.Visible;
                 Infos.State2 = Visibility.Collapsed;
+
                 //重新统计数据
-                var getResult = await Task.Run(() => CacuChartAsync(Infos.Sites, Infos.Logs));
-                foreach (var item in getResult.Item1)
-                {
-                    Chart1Collection.Add(item);
-                }
-                //Chart1Collection = getResult.Item1;
-                CacuBarChart(Infos.Sites, getResult.Item2);
+                await ChartAsync(Infos.Sites, Infos.Logs);
+
                 //统计完成后触发此方法，计算前台需要显示的数据
                 TypeChanged_Data(Type);
-                await ChartLengendAsync(Infos.Sites);
             }
         }
 
@@ -341,7 +284,7 @@ namespace ServerMonitor.ViewModels
 
             Pivot _p = sender as Pivot;
             int _selectedIndex = _p.SelectedIndex;
-            Debug.WriteLine("Pivot_SelectionChanged();");
+
             switch (_selectedIndex)
             {
                 case 0:
@@ -550,6 +493,7 @@ namespace ServerMonitor.ViewModels
             set { result = value; RaisePropertyChanged(() => Result); }
         }
     }
+
     //柱形图（列表）数据类
     public class BarChartData : ObservableObject
     {
@@ -573,6 +517,7 @@ namespace ServerMonitor.ViewModels
                 RaisePropertyChanged(() => SiteName);
             }
         }
+        //以下为站点请求结果
         private int error;
 
         public int Error
@@ -584,7 +529,6 @@ namespace ServerMonitor.ViewModels
                 RaisePropertyChanged(() => Error);
             }
         }
-        //以下为站点请求结果
         private int success;
 
         public int Success

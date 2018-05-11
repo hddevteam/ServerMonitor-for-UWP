@@ -5,14 +5,21 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telerik.UI.Xaml.Controls.Chart;
 
 namespace ServerMonitor.ViewModels
 {
     public interface IChartDao
     {
-        Task<Tuple<ObservableCollection<SelectSite>, List<Site>>> SelectSitesAsync(List<Site> sites);
+        ChartPalette DefaultPalette { get; }
 
-        Task<ObservableCollection<SelectSite>> SelectSiteInfoAsync(ObservableCollection<SelectSite> selectSites);
+        ObservableCollection<ChartLengend> Lengend { get; set; }
+
+        ObservableCollection<BarChartData> BarChart { get; set; }
+
+        ObservableCollection<BarChartData> GridChart { get; set; }
+
+        Task<Tuple<ObservableCollection<SelectSite>, List<Site>>> SelectSitesAsync(List<Site> sites);
 
         Task<ObservableCollection<ChartLengend>> ChartLengendAsync(List<Site> sites);
 
