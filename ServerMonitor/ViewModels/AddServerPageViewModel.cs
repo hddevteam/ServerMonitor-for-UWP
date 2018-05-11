@@ -21,16 +21,19 @@ namespace ServerMonitor.ViewModels
 {
     class AddServerPageViewModel : ViewModelBase, INotifyPropertyChanged
     {
-        private ListView contactList;
-        private Grid rightFrame1;
-        Dictionary<int,bool> vs = new Dictionary<int, bool>(); //记录绑定联系人的结果
-        Dictionary<int, bool> tempVs = new Dictionary<int, bool>(); //记录绑定联系人过程中的选择变化
         public AddServerPageViewModel() //先-> ComboBox_SelectionChanged-> OnNavigatedToAsync-> OnLoaded
         {
             
         }
+        #region 全局变量
+        private ListView contactList;
+        private Grid rightFrame1;
+        Dictionary<int, bool> vs = new Dictionary<int, bool>(); //记录绑定联系人的结果
+        Dictionary<int, bool> tempVs = new Dictionary<int, bool>(); //记录绑定联系人过程中的选择变化
+
         private string _Value = "Default";
         public string Value { get { return _Value; } set { Set(ref _Value, value); } }
+        #endregion
 
         #region 系统函数
         public override async Task OnNavigatedToAsync(object parameter, NavigationMode mode, IDictionary<string, object> suspensionState)
@@ -121,8 +124,38 @@ namespace ServerMonitor.ViewModels
         private ObservableCollection<Contact> selectedContacts = new ObservableCollection<Contact>();  //选中的绑定联系人
         public ObservableCollection<Contact> SelectedContacts { get => selectedContacts; set => selectedContacts = value; }
 
-        private Site editSite = new Site();
-        public Site EditSite { get => editSite; set => editSite = value; }
+        private string protocolType;
+        public string ProtocolType
+        {
+            get => protocolType;
+            set
+            {
+                protocolType = value;
+                RaisePropertyChanged(() => ProtocolType);
+            }
+        }
+
+        private string siteAddress;
+        public string SiteAddress
+        {
+            get => siteAddress;
+            set
+            {
+                siteAddress = value;
+                RaisePropertyChanged(() => SiteAddress);
+            }
+        }
+
+        private string siteName;
+        public string SiteName
+        {
+            get => siteName;
+            set
+            {
+                siteName = value;
+                RaisePropertyChanged(() => SiteName);
+            }
+        }
 
         private int port;
         public int Port
@@ -208,10 +241,7 @@ namespace ServerMonitor.ViewModels
         public void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ChangeDisplay((sender as ComboBox).SelectedIndex);
-            if(EditSite!=null)
-            {
-                EditSite.Protocol_type = ((ComboBoxItem)((sender as ComboBox).SelectedItem)).Content.ToString();
-            }
+            ProtocolType = ((ComboBoxItem)((sender as ComboBox).SelectedItem)).Content.ToString();
         }
         /// <summary>
         /// BindContact按钮点击事件 呼出侧边栏
@@ -279,23 +309,38 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public void Save()
         {
-            EditSite.Is_server = true;
-            EditSite.Monitor_interval = 5;
-            EditSite.Is_Monitor = true;
-            EditSite.Server_port = Port;
-            if (EditSite.Site_name==null|| EditSite.Site_name.Equals(""))
+            Site site = new Site
             {
-                EditSite.Site_name = EditSite.Site_address;
-            }
-            if (EditSite.Protocol_type.Equals("SSH")|| EditSite.Protocol_type.Equals("FTP"))
+                Is_server = true,
+                Monitor_interval = 5,
+                Is_Monitor = true,
+
+                Protocol_type = ProtocolType,
+                Site_address = SiteAddress,
+                Server_port = Port,
+                Create_time = DateTime.Now,
+                Update_time = DateTime.Now,
+                Last_request_result = 2,
+                Status_code = "1000/0",
+                Request_succeed_code = "1000",
+            };
+            if (SiteName == null|| SiteName.Equals(""))
             {
-                EditSite.ProtocolIdentification = GetJson(Username, Password);
+                site.Site_name = SiteAddress;
             }
-            else if(EditSite.Protocol_type.Equals("DNS"))
+            else
             {
-                EditSite.ProtocolIdentification = GetJson(RecordType, Lookup, ExpectedResults);
+                site.Site_name = SiteName;
             }
-            if (DBHelper.InsertOneSite(EditSite) == 1)
+            if (site.Protocol_type.Equals("SSH")|| site.Protocol_type.Equals("FTP"))
+            {
+                site.ProtocolIdentification = GetJson(Username, Password);
+            }
+            else if(site.Protocol_type.Equals("DNS"))
+            {
+                site.ProtocolIdentification = GetJson(RecordType, Lookup, ExpectedResults);
+            }
+            if (DBHelper.InsertOneSite(site) == 1)
             {
                 
             }
@@ -383,7 +428,7 @@ namespace ServerMonitor.ViewModels
 
         private void GetEditSite()
         {
-            //EditSite.Protocol_type = "ICMP";
+            
         }
 
         /// <summary>
