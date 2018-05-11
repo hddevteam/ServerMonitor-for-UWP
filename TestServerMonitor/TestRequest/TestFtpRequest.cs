@@ -59,7 +59,6 @@ namespace TestServerMonitor.TestRequest
         [TestMethod]
         [Owner("Bin")]
         [Priority(3)]
-        [Timeout(5000)]
         public void TestMakeRequest_ServerNotFTP()
         {           
             request.FtpServer = IPAddress.Parse("8.8.8.8");

@@ -22,7 +22,7 @@ namespace ServerMonitor.Controls
         /// </summary>
         private static short port = 22;
 
-        public string iPAddress { get; set; }
+        public string IPAddress { get; set; }
 
         /// <summary>
         /// Ssh登入类型（匿名|身份验证）
@@ -38,7 +38,7 @@ namespace ServerMonitor.Controls
 
         public SSHRequest(string ipAddress,SshLoginType type)
         {
-            this.iPAddress = ipAddress;
+            this.IPAddress = ipAddress;
             identifyType = type;
             // 选择匿名登入的时候默认设置用户名，密码为anonymous
             if (SshLoginType.Anonymous.Equals(type))
@@ -53,7 +53,7 @@ namespace ServerMonitor.Controls
             await Task.CompletedTask;
             // 赋值生成请求的时间
             CreateTime = DateTime.Now;
-            var cSSH = new SshClient(iPAddress, port, Identification.Username, Identification.Password);
+            var cSSH = new SshClient(IPAddress, port, Identification.Username, Identification.Password);
 
             // 记录请求耗时
             Stopwatch stopwatch = new Stopwatch();

@@ -54,8 +54,9 @@ namespace ServerMonitor.Services.RequestServices
         /// 发起一次HTTP请求，返回状态码和请求时间(ms)
         /// </summary>
         /// <param name="uri">请求的URI</param>
-        public async Task<bool> HttpRequest(string uri)
+        private async Task<bool> HttpRequest(string uri)
         {
+            CreateTime = DateTime.Now;
             try
             {
                 // 生成默认请求的处理帮助器
