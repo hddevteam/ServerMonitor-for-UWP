@@ -31,6 +31,10 @@ namespace ServerMonitor.SiteDb
         /// 数据库路径由私有方法生成，所以设为只读变量
         /// </summary>
         public static string DBPath1 { get => DBPath; }
+        /// <summary>
+        /// 初始化数据库
+        /// </summary>
+        /// <param name="DBFilename">数据库名称</param>
         public void InitDB(string DBFilename)
         {
             SetDBFilename(DBFilename);
@@ -197,7 +201,10 @@ namespace ServerMonitor.SiteDb
                  */
             }
         }
-
+        /// <summary>
+        /// 设置数据库名
+        /// </summary>
+        /// <param name="Filename">数据库文件名</param>
         public void SetDBFilename(string Filename)
         {
             if (string.IsNullOrEmpty(Filename) && string.IsNullOrWhiteSpace(Filename))

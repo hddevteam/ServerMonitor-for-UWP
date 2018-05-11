@@ -11,7 +11,10 @@ namespace ServerMonitor.SiteDb
 
         //设置数据库名称
         void SetDBFilename(string Filename);
-        // 初始化数据库
+        /// <summary>
+        /// 初始化数据库
+        /// </summary>
+        /// <param name="DBFilename">数据库名称</param>
         void InitDB(string DBFilename);
     }
 }

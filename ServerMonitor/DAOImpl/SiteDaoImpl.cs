@@ -11,13 +11,14 @@ using SQLite.Net.Platform.WinRT;
 
 namespace ServerMonitor.SiteDb
 {
+    
     class SiteDaoImpl : SiteDAO
     {
         /// <summary>
-        /// 使用SQL语句对Site数据库进行修改
+        /// 执行有返回对象(Site)的命令
         /// </summary>
-        /// <param name="command">sql语句</param>
-        /// <param name="param">sql语句所需参数</param>
+        /// <param name="command"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
         public List<Site> DBExcuteSiteCommand(string command, object[] param)
         {
@@ -29,6 +30,11 @@ namespace ServerMonitor.SiteDb
             }
             return result;
         }
+        /// <summary>
+        /// 更新站点信息
+        /// </summary>
+        /// <param name="site"></param>
+        /// <returns></returns>
         public int UpdateSite(Site site)
         {
             // result = -1 表示异常返回值，执行操作失败
@@ -50,6 +56,11 @@ namespace ServerMonitor.SiteDb
             }
             return result;
         }
+        /// <summary>
+        /// 删除一个站点
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
         public int DeleteOneSite(int siteId)
         {
             int result = -1;
@@ -59,7 +70,10 @@ namespace ServerMonitor.SiteDb
             }
             return result;
         }
-
+        /// <summary>
+        /// 返回所有的站点
+        /// </summary>
+        /// <returns></returns>
         public List<Site> GetAllSite()
         {
             List<Site> r;//返回Site列表
@@ -69,7 +83,11 @@ namespace ServerMonitor.SiteDb
             }
             return r;
         }
-
+        /// <summary>
+        /// 根据站点id获取站点
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public Site GetSiteById(int id)
         {
             Site s;
@@ -86,7 +104,11 @@ namespace ServerMonitor.SiteDb
             }
             return s;
         }
-
+        /// <summary>
+        /// 插入多条站点
+        /// </summary>
+        /// <param name="sites"></param>
+        /// <returns></returns>
         public int InsertListSite(List<Site> sites)
         {
             int result = -1;
@@ -96,7 +118,11 @@ namespace ServerMonitor.SiteDb
             }
             return result;
         }
-
+        /// <summary>
+        /// 插入一个站点
+        /// </summary>
+        /// <param name="site"></param>
+        /// <returns></returns>
         public int InsertOneSite(Site site)
         {
             int result = -1;
@@ -106,7 +132,11 @@ namespace ServerMonitor.SiteDb
             }
             return result;
         }
-
+        /// <summary>
+        /// 更新多个站点信息
+        /// </summary>
+        /// <param name="sites"></param>
+        /// <returns></returns>
         public int UpdateListSite(List<Site> sites)
         {
             int result = -1;
