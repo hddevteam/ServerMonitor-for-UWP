@@ -10,7 +10,7 @@
     RequestedTheme ="Light"
     mc:Ignorable="d">
     <Page.DataContext>
-        <vm1:AddServerPageViewModel x:Name="ViewModel" />
+        <vm1:AddServerPageViewModel x:Name="ViewModel"/>
     </Page.DataContext>
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <VisualStateManager.VisualStateGroups>
@@ -44,7 +44,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button Background="{x:Null}" IsEnabled="{Binding IsEnabled}">
+            <Button Background="{x:Null}" IsEnabled="{Binding IsEnabled}" Click="{x:Bind ViewModel.Save}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Images/commit.png" Width="16" Height="16"/>
                     <TextBlock Text="Save" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>

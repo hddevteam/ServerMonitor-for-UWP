@@ -1,4 +1,5 @@
-﻿using ServerMonitor.Controls;
+﻿using Newtonsoft.Json;
+using ServerMonitor.Controls;
 using ServerMonitor.Models;
 using System;
 using System.Collections.Generic;
@@ -270,32 +271,33 @@ namespace ServerMonitor.ViewModels
         public void Domain_TextChanged(object sender, TextChangedEventArgs e)
         {
             string domain = (sender as TextBox).Text.ToString();
+            IsEnabled = CheckDomain(domain);
+        }
 
-            //非空判断 正则验证
-            if ("".Equals(domain))
+        /// <summary>
+        /// 上传提交，保存到数据库
+        /// </summary>
+        public void Save()
+        {
+            EditSite.Is_server = true;
+            EditSite.Monitor_interval = 5;
+            EditSite.Is_Monitor = true;
+            EditSite.Server_port = Port;
+            if (EditSite.Site_name==null|| EditSite.Site_name.Equals(""))
             {
-                IsEnabled = false;
+                EditSite.Site_name = EditSite.Site_address;
             }
-            else
+            if (EditSite.Protocol_type.Equals("SSH")|| EditSite.Protocol_type.Equals("FTP"))
             {
-                try
-                {
-                    Boolean _ipcheck = Regex.IsMatch(domain, "^(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|[1-9])\\."
-                                            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
-                                            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
-                                            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)$");//是ip
-                    Regex rg = new Regex("^[\u4e00-\u9fa5]+$");//是中文
-                    Boolean _domaincheck = rg.IsMatch(domain);
-                    if (!_ipcheck && _domaincheck)
-                    {
-                        IsEnabled = false;
-                    }
-                    else
-                    {
-                        IsEnabled = true;
-                    }
-                }
-                catch { }
+                EditSite.ProtocolIdentification = GetJson(Username, Password);
+            }
+            else if(EditSite.Protocol_type.Equals("DNS"))
+            {
+                EditSite.ProtocolIdentification = GetJson(RecordType, Lookup, ExpectedResults);
+            }
+            if (DBHelper.InsertOneSite(EditSite) == 1)
+            {
+                
             }
         }
         #endregion
@@ -351,24 +353,28 @@ namespace ServerMonitor.ViewModels
                     DiePort = true;
                     NeedUser = true;
                     NeedRecord = false;
+                    Port = 22;
                     break;
                 case 3:   //FTP
                     LivePort = false;
                     DiePort = true;
                     NeedUser = true;
                     NeedRecord = false;
+                    Port = 21;
                     break;
                 case 4:    //DNS
                     LivePort = false;
                     DiePort = true;
                     NeedUser = false;
                     NeedRecord = true;
+                    Port = 53;
                     break;
                 case 5:    //SMTP
                     LivePort = false;
                     DiePort = true;
                     NeedUser = false;
                     NeedRecord = false;
+                    Port = 25;
                     break;
                 default:
                     break;
@@ -378,6 +384,88 @@ namespace ServerMonitor.ViewModels
         private void GetEditSite()
         {
             //EditSite.Protocol_type = "ICMP";
+        }
+
+        /// <summary>
+        /// 检验地址是否合法
+        /// </summary>
+        /// <param name="domain">地址字符串</param>
+        /// <returns>是否合法</returns>
+        private bool CheckDomain(string domain)  //可测
+        {
+            //非空判断 正则验证
+            if ("".Equals(domain))
+            {
+                return false;
+            }
+            else
+            {
+                try
+                {
+                    Boolean _ipcheck = Regex.IsMatch(domain, "^(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|[1-9])\\."
+                                            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
+                                            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
+                                            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)$");//是ip
+                    Regex rg = new Regex("^[\u4e00-\u9fa5]+$");//是中文
+                    Boolean _domaincheck = rg.IsMatch(domain);
+                    if (!_ipcheck && _domaincheck)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 将用户信息变成Json数据
+        /// </summary>
+        /// <param name="username">用户名</param>
+        /// <param name="password">密码</param>
+        /// <returns>Json数据字符串</returns>
+        private string GetJson(string username,string password)
+        {
+            Dictionary<string, string> protocolIdentification = new Dictionary<string, string>();
+            protocolIdentification.Add("useaname", Username);
+            protocolIdentification.Add("password", Password);
+            return JsonConvert.SerializeObject(protocolIdentification);
+        }
+        /// <summary>
+        /// 将record信息变成Json数据，只有DNS站点调用
+        /// </summary>
+        /// <param name="lookup">被解析的站点域名</param>
+        /// <param name="password">可能的结果</param>
+        /// <returns>Json数据字符串</returns>
+        private string GetJson(int type, string lookup, string expectedResults)
+        {
+            Dictionary<string, string> protocolIdentification = new Dictionary<string, string>();
+            switch (type)
+            {
+                case 0:
+                    protocolIdentification.Add("recordType", "A");
+                    break;
+                case 1:
+                    protocolIdentification.Add("recordType", "CNAME");
+                    break;
+                case 2:
+                    protocolIdentification.Add("recordType", "NS");
+                    break;
+                case 3:
+                    protocolIdentification.Add("recordType", "MX");
+                    break;
+                default:
+                    break;
+            }
+            protocolIdentification.Add("lookup", lookup);
+            protocolIdentification.Add("expectedResults", expectedResults);
+            return JsonConvert.SerializeObject(protocolIdentification);
         }
         #endregion
     }
