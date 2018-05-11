@@ -192,8 +192,6 @@
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
     <Content Include="Common\Config.xml" />
-    <Content Include="Common\example-xmal.xml" />
-    <Content Include="Common\README.txt" />
     <Content Include="Images\addcontact.png" />
     <Content Include="Images\addphone.png" />
     <Content Include="Images\adduser.png" />
