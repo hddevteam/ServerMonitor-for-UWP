@@ -158,7 +158,11 @@ namespace ServerMonitor.ViewModels
         public async Task<List<Log>> LoadDbLogAsync()
         {
             await Task.CompletedTask;
-            return DBHelper.GetAllLog();
+            List<Log> logs = new List<Log>();
+            logs = DBHelper.GetAllLog();
+            //数据排序，便于图表按序显示
+            logs = logs.OrderBy(o => o.Create_time).ToList();
+            return logs;
         }
 
         /// <summary>
