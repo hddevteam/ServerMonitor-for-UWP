@@ -17,8 +17,6 @@ namespace TestServerMonitor.TestViewModel
     public class TestChartViewModel
     {
         private ChartPageViewModel viewModel;
-        private List<Site> sites;
-        private List<Log> logs;
 
         public ChartPalette DefaultPalette { get { return ChartPalettes.DefaultLight; } }
         public List<Site> Sites { get; set; }
@@ -38,11 +36,11 @@ namespace TestServerMonitor.TestViewModel
         }
 
         /// <summary>
-        /// 测试ChartAsync
-        /// 用例说明：测试方法正常执行，返回true
+        /// 测试ChartAsync方法
+        /// 用例说明：测试方法正常调用，返回true，返回正确值
         /// </summary>
         [TestMethod]
-        public void TestMethodIsPerfomedNormall_ShouldReturnTrue()
+        public void TestChartAsync_ShouldReturnTrueWhenNormallyExcuted()
         {
             var stub = new StubIChartDao(MockBehavior.Strict);
             viewModel.ChartDao = stub;
@@ -50,27 +48,14 @@ namespace TestServerMonitor.TestViewModel
             stub.ChartLengendAsync(async (sites) =>
             {
                 ObservableCollection<ChartLengend> s = new ObservableCollection<ChartLengend>();
-                for (int i = 0; i < sites.Count; i++)
-                {
-                    s.Add(new ChartLengend() { Title = "Site" + i});
-                }
                 await Task.CompletedTask;
-                except1 = s.Count;
+                except1 = sites.Count;
                 return s;
             }, Times.Once);
             stub.CacuChartAsync(async (sites, logs) => 
             {
                 ObservableCollection<ObservableCollection<Chart1>> data = new ObservableCollection<ObservableCollection<Chart1>>();
-                foreach (var item in sites)
-                {
-                    ObservableCollection<Chart1> chart1Series = new ObservableCollection<Chart1>();
-                    for (int i = 0; i < logs.Count; i++)
-                    {
-                        chart1Series.Add(new Chart1() { Result="result"+i});
-                    }
-                    data.Add(chart1Series);
-                }
-                except2 = data.Count;
+                except2 = sites.Count+logs.Count;
                 int[,] array = new int[sites.Count,3];
                 await Task.CompletedTask;
                 return new Tuple<ObservableCollection<ObservableCollection<Chart1>>, int[,]>(data, array);
@@ -79,31 +64,91 @@ namespace TestServerMonitor.TestViewModel
             {
                 ObservableCollection<BarChartData> data1 = new ObservableCollection<BarChartData>();
                 ObservableCollection<BarChartData> data2 = new ObservableCollection<BarChartData>();
-                for (int i = 0; i < sites.Count; i++)
-                {
-                    data1.Add(new BarChartData() { SiteName = "site" + i });
-                    data2.Add(new BarChartData() { SiteName = "site" + i });
-                }
-                except3 = data1.Count + data2.Count;
+                except3 = sites.Count;
                 return new Tuple<ObservableCollection<BarChartData>, ObservableCollection<BarChartData>>(data1, data2);
             }, Times.Once);
 
             Assert.IsTrue(viewModel.ChartAsync(Sites, Logs).Result);
             Assert.AreEqual(5, except1);
-            Assert.AreEqual(5, except2);
-            Assert.AreEqual(10, except3);
+            Assert.AreEqual(10, except2);
+            Assert.AreEqual(5, except3);
         }
 
+        /// <summary>
+        /// 测试Accept_ClickAsync方法
+        /// 用例说明：测试选择站点数目小于等于5，返回true,大于5，返回false
+        /// </summary>
         [TestMethod]
-        public void 
-
-        [TestMethod]
-        public void Test()
+        public void TestAccept_ClickAsync_ShouldReturnTrueWhenNumberOfSitesLE5()
         {
-            viewModel.TestClick(); //调用被测试方法
+            Assert.IsTrue(viewModel.InitAsync().Result);
+            var stub = new StubIChartDao(MockBehavior.Strict);
+            viewModel.ChartDao = stub;
+            for (int i = 0; i < 4; i++)
+            {
+                viewModel.Infos.SelectSites.Add(new SelectSite() { IsSelected = true });
+            }
+            stub.ChartLengendAsync(async (sites) =>
+            {
+                ObservableCollection<ChartLengend> s = new ObservableCollection<ChartLengend>();
+                await Task.CompletedTask;
+                return s;
+            }, Times.Once);
+            stub.CacuChartAsync(async (sites, logs) =>
+            {
+                ObservableCollection<ObservableCollection<Chart1>> data = new ObservableCollection<ObservableCollection<Chart1>>();
+                int[,] array = new int[sites.Count, 3];
+                await Task.CompletedTask;
+                return new Tuple<ObservableCollection<ObservableCollection<Chart1>>, int[,]>(data, array);
+            }, Times.Twice);
+            stub.CacuBarChart((sites, array) =>
+            {
+                ObservableCollection<BarChartData> data1 = new ObservableCollection<BarChartData>();
+                ObservableCollection<BarChartData> data2 = new ObservableCollection<BarChartData>();
+                return new Tuple<ObservableCollection<BarChartData>, ObservableCollection<BarChartData>>(data1, data2);
+            }, Times.Once);
 
-            Assert.AreEqual(10, viewModel.My);//My为在该方法内被改变的某个全局变量
+            //less
+            Assert.IsTrue(viewModel.Accept_ClickAsync().Result);
+            //equal
+            viewModel.Infos.SelectSites.Add(new SelectSite() { IsSelected = true });
+            Assert.IsTrue(viewModel.Accept_ClickAsync().Result);
+
+            //greater
+            viewModel.Infos.SelectSites.Add(new SelectSite() { IsSelected = true });
+            Assert.IsFalse(viewModel.Accept_ClickAsync().Result);
         }
+
+        /// <summary>
+        /// 测试TypeChanged_Data方法
+        /// 用例说明：测试方法正确计算,返回true
+        /// </summary>
+        [TestMethod]
+        public void TestTypeChanged_ShouldReturnTrueWhenCalculationCorrect()
+        {
+            Assert.IsTrue(viewModel.InitAsync().Result);
+            
+            ObservableCollection<Chart1> item = new ObservableCollection<Chart1>();
+            item.Add(new Chart1() { Result = "Error" });
+            item.Add(new Chart1() { Result = "Success" });
+            item.Add(new Chart1() { Result = "OverTime" });
+            item.Add(new Chart1() { Result = "Success" });
+            item.Add(new Chart1() { Result = "Error" });
+            viewModel.Chart1Collection.Add(item);
+
+            Assert.IsTrue(viewModel.TypeChanged("All"));
+            Assert.AreEqual(5, viewModel.Infos.Chart1CollectionCopy[0].Count);
+
+            Assert.IsTrue(viewModel.TypeChanged("Success"));
+            Assert.AreEqual(2, viewModel.Infos.Chart1CollectionCopy[0].Count);
+
+            Assert.IsTrue(viewModel.TypeChanged("Error"));
+            Assert.AreEqual(2, viewModel.Infos.Chart1CollectionCopy[0].Count);
+
+            Assert.IsTrue(viewModel.TypeChanged("OverTime"));
+            Assert.AreEqual(1, viewModel.Infos.Chart1CollectionCopy[0].Count);
+        }
+
 
     }
 }

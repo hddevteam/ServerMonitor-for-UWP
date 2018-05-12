@@ -84,19 +84,14 @@
                     <ColumnDefinition Width="1*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <!--区间切换-->
-                <Pivot x:Name="period" Grid.Row="0" Grid.Column="0" SelectedIndex="0" Grid.ColumnSpan="2"
-                       SelectionChanged="{x:Bind ViewModel.Pivot_SelectionChanged}">
-                    <PivotItem Header="Today" >
-                    </PivotItem>
-                    <PivotItem Header="Three Days">
-                    </PivotItem>
-                    <PivotItem Header="Seven Days">
-                    </PivotItem>
+                <Pivot x:Name="period" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                       >
+                    
                 </Pivot>
                 <!--选择类型--> 
                 <ComboBox x:Name="selectionTypeCombo" Grid.Row="1" Grid.Column="0" Width="225"
-                          HorizontalAlignment="Left" Height="40" Grid.ColumnSpan="2"
-                          ItemsSource="{Binding RequestResult}" SelectedItem="{x:Bind ViewModel.Type,Mode=TwoWay}" Margin="10">
+                          HorizontalAlignment="Left" Height="40" Grid.ColumnSpan="2" SelectedIndex="0"
+                          ItemsSource="{Binding RequestResult}" Margin="10" SelectedItem="{x:Bind ViewModel.Type,Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
@@ -114,11 +109,11 @@
                             <telerik:LinearAxis Title="RequestTime" FontWeight="Medium"/>
                         </telerik:RadCartesianChart.VerticalAxis>
                         <telerik:RadCartesianChart.HorizontalAxis>
-                            <telerik:DateTimeContinuousAxis x:Name="axis" Title="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.ChartTitle,Mode=OneWay}"
-                                                            Maximum="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.MaxnumDateTime,Mode=OneWay}"
-                                                            Minimum="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.MinnumDateTime,Mode=OneWay}"
-                                                            MajorStep="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.MajorStep,Mode=OneWay}"
-                                                            MajorStepUnit="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.MajorStepUnit,Mode=OneWay}"
+                            <telerik:DateTimeContinuousAxis x:Name="axis" Title="{x:Bind ViewModel.Infos.HAxisProperties.ChartTitle,Mode=OneWay}"
+                                                            Maximum="{x:Bind ViewModel.Infos.HAxisProperties.MaxnumDateTime,Mode=OneWay}"
+                                                            Minimum="{x:Bind ViewModel.Infos.HAxisProperties.MinnumDateTime,Mode=OneWay}"
+                                                            MajorStep="{x:Bind ViewModel.Infos.HAxisProperties.MajorStep,Mode=OneWay}"
+                                                            MajorStepUnit="{x:Bind ViewModel.Infos.HAxisProperties.MajorStepUnit,Mode=OneWay}"
                                                             LabelFormat="{}{0,0:MM-dd HH:mm}"
                                                             FontWeight="Medium">
                             </telerik:DateTimeContinuousAxis>
@@ -126,37 +121,6 @@
                         <telerik:RadCartesianChart.Grid>
                             <telerik:CartesianChartGrid MajorLinesVisibility="Y"/>
                         </telerik:RadCartesianChart.Grid>
-
-                        <!--  引入一个类似自定义过滤器概念的资源(在数据绑定的传递数据过程中对数据进行pre-handle) -->
-                        <telerik:RadCartesianChart.Resources>
-                            <local1:CustomConverter x:Key="Converter"/>
-                           
-                        </telerik:RadCartesianChart.Resources>
-                        
-                        <!-- 字面上理解是设置图表的一些基本特性（行为）-->
-                        <telerik:RadCartesianChart.Behaviors>
-                            <!-- 哎这个是设置图表的帮助理解的提示框,就是鼠标悬停在图表上，会有提示信息 -->
-                            <telerik:ChartTooltipBehavior>
-                                <!-- 如果要用到数据绑定通常都要使用到xxx template->DataTemplate -->
-                                <telerik:ChartTooltipBehavior.ContentTemplate>
-                                    <!-- 数据绑定模块  -->
-                                    <DataTemplate>
-                                        <!-- 以下的是每个数据显示使用的模板 -->
-                                        <Border BorderBrush="#80D6F4" BorderThickness="1">
-                                            <StackPanel Background="white">
-                                                <TextBlock Text="{Binding DataPoint.Value,Converter={StaticResource Converter}, ConverterParameter=Value}" Foreground="#99441D"/>
-                                                <TextBlock Text="{Binding DataPoint.Category, Converter={StaticResource Converter}, ConverterParameter=Category}" Foreground="#506005"/>
-                                            </StackPanel>
-                                        </Border>
-                                        <!-- end -->
-                                    </DataTemplate>
-                                    <!--end-->
-                                </telerik:ChartTooltipBehavior.ContentTemplate>
-                                <!--end-->
-                            </telerik:ChartTooltipBehavior>
-                            <!--end-->
-                        </telerik:RadCartesianChart.Behaviors>
-                        <!--end-->
 
                         <telerik:RadCartesianChart.SeriesProvider >
                             <telerik:ChartSeriesProvider x:Name="provider" Source="{x:Bind ViewModel.Infos.Chart1CollectionCopy,Mode=TwoWay}">
