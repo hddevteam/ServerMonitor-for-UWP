@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ServerMonitor.Controls;
+using ServerMonitor.Services.RequestServices;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -58,7 +59,7 @@ namespace TestServerMonitor.TestRequest
         [TestMethod]
         public void ServerNotSsh_ShouldReturnFalseAndProtocolInfoNotNull()
         {
-            sshRequest.iPAddress = "8.8.8.8";
+            sshRequest.IPAddress = "8.8.8.8";
             sshRequest.Identification.Username = "root";
             sshRequest.Identification.Password = "Lucky.2011";
             var actual = sshRequest.MakeRequest().Result;
@@ -74,7 +75,7 @@ namespace TestServerMonitor.TestRequest
         [TestMethod]
         public void ServerIsInvalid_ShouldReturnFalseAndProtocolInfoNotNull()
         {
-            sshRequest.iPAddress = "111.2.3.4";
+            sshRequest.IPAddress = "111.2.3.4";
             sshRequest.Identification.Username = "root";
             sshRequest.Identification.Password = "Lucky.2011";
             var actual = sshRequest.MakeRequest().Result;
@@ -90,7 +91,7 @@ namespace TestServerMonitor.TestRequest
         [TestMethod]
         public void ServerIsEmpty_ShouldReturnFalseAndProtocolInfoNotNull()
         {
-            sshRequest.iPAddress = "";
+            sshRequest.IPAddress = "";
             sshRequest.Identification.Username = "root";
             sshRequest.Identification.Password = "Lucky.2011";
             var actual = sshRequest.MakeRequest().Result;
@@ -106,7 +107,7 @@ namespace TestServerMonitor.TestRequest
         [TestMethod]
         public void UsernameIsEmpty_ShouldThrowAggregateException()
         {
-            sshRequest.iPAddress = "172.31.0.244";
+            sshRequest.IPAddress = "172.31.0.244";
             sshRequest.Identification.Username = "";
             sshRequest.Identification.Password = "Lucky.2011";
             try
@@ -127,7 +128,7 @@ namespace TestServerMonitor.TestRequest
         [TestMethod]
         public void ShouldThrowAggregateExceptionWheniPAddressOrUsernameOrPassIsNull()
         {
-            sshRequest.iPAddress = "172.31.0.244";
+            sshRequest.IPAddress = "172.31.0.244";
             sshRequest.Identification.Username = "root";
             sshRequest.Identification.Password = null;
 

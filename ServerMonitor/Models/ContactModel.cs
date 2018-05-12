@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace ServerMonitor.Models
 {
     // 联系人类
-    public class Contact : ObservableObject
+    public class ContactModel : ObservableObject
     {
         private int id;
         // 姓名

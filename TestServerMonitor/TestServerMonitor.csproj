@@ -98,6 +98,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestRequest\TestDnsRequest.cs" />
     <Compile Include="TestRequest\TestFtpRequest.cs" />
+    <Compile Include="TestRequest\TestHTTPRequest.cs" />
     <Compile Include="TestRequest\TestSSHRequest.cs" />
     <Compile Include="TestViewModel\TestChartViewModel.cs" />
     <Compile Include="UnitTestApp.xaml.cs">
@@ -142,13 +143,16 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TestDAO\" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\ServerMonitor\ServerMonitor.csproj">
       <Project>{7af708e6-950f-4ccb-9add-9c5356d0eb12}</Project>
       <Name>ServerMonitor</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

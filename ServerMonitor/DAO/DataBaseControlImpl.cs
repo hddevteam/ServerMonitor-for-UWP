@@ -45,14 +45,15 @@ namespace ServerMonitor.SiteDb
                 // ApplicationData.Current.LocalFolder.Path balabala的指的是这个位置 ->C:\Users\xiao22805378\AppData\Local\Packages\92211ab1-5481-4a1a-9111-a3dd87b81b72_8zmgqd0netmce\LocalState\
                 using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
                 {
-                    conn.CreateTable<Site>();
-                    conn.CreateTable<Log>();
-                    conn.CreateTable<ErrorLog>();
-                    conn.CreateTable<Contact>();
-                    List<Site> l_site = new List<Site>
+                    conn.CreateTable<SiteModel>();
+                    conn.CreateTable<LogModel>();
+                    conn.CreateTable<ErrorLogModel>();
+                    conn.CreateTable<ContactModel>();
+                    conn.CreateTable<ContactSiteModel>();
+                    List<SiteModel> l_site = new List<SiteModel>
                     {
                         // 插入默认的五条数据
-                        new Site()
+                        new SiteModel()
                         {
                             Site_name = "Google",
                             Site_address = "https://www.google.com",
@@ -69,7 +70,7 @@ namespace ServerMonitor.SiteDb
                             Request_succeed_code = "200",
                             Last_request_result = 0
                         },
-                        new Site()
+                        new SiteModel()
                         {
                             Site_name = "Yahoo",
                             Site_address = "http://www.yahoo.com",
@@ -86,7 +87,7 @@ namespace ServerMonitor.SiteDb
                             Request_succeed_code = "200",
                             Last_request_result = 1
                         },
-                        new Site()
+                        new SiteModel()
                         {
                             Site_name = "Bing",
                             Site_address = "http://www.bing.com",
@@ -103,7 +104,7 @@ namespace ServerMonitor.SiteDb
                             Request_succeed_code = "200",
                             Last_request_result = -1
                         },
-                        new Site()
+                        new SiteModel()
                         {
                             Site_name = "Google",
                             Site_address = "8.8.8.8",
@@ -120,7 +121,7 @@ namespace ServerMonitor.SiteDb
                             Request_succeed_code = "1000",
                             Last_request_result = 2
                         },
-                        new Site()
+                        new SiteModel()
                         {
                             Site_name = "Google",
                             Site_address = "https://www.google.com",
@@ -143,9 +144,9 @@ namespace ServerMonitor.SiteDb
                     //    l_site.Add(new Site() { Site_name = "Baidu" + i, Is_server = false, Request_succeed_code = "200" });
                     //}
                     siteDao.InsertListSite(l_site);
-                    List<Log> l_log = new List<Log>
+                    List<LogModel> l_log = new List<LogModel>
                     {
-                        new Log()
+                        new LogModel()
                         {
                             Site_id = 1,
                             Status_code = "200",
@@ -154,7 +155,7 @@ namespace ServerMonitor.SiteDb
                             Is_error = false,
                             Log_record = null
                         },
-                        new Log()
+                        new LogModel()
                         {
                             Site_id = 2,
                             Status_code = "200",
@@ -163,7 +164,7 @@ namespace ServerMonitor.SiteDb
                             Is_error = false,
                             Log_record = null
                         },
-                        new Log()
+                        new LogModel()
                         {
                             Site_id = 3,
                             Status_code = "1000",
@@ -172,7 +173,7 @@ namespace ServerMonitor.SiteDb
                             Is_error = false,
                             Log_record = null
                         },
-                        new Log()
+                        new LogModel()
                         {
                             Site_id = 4,
                             Status_code = "1000",
@@ -181,7 +182,7 @@ namespace ServerMonitor.SiteDb
                             Is_error = false,
                             Log_record = null
                         },
-                        new Log()
+                        new LogModel()
                         {
                             Site_id = 5,
                             Status_code = "1000",

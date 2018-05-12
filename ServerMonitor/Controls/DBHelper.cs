@@ -45,14 +45,15 @@ namespace ServerMonitor.Controls
                 // ApplicationData.Current.LocalFolder.Path balabala的指的是这个位置 ->C:\Users\xiao22805378\AppData\Local\Packages\92211ab1-5481-4a1a-9111-a3dd87b81b72_8zmgqd0netmce\LocalState\
                 using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
                 {
-                    conn.CreateTable<Site>();
-                    conn.CreateTable<Log>();
-                    conn.CreateTable<ErrorLog>();
-                    conn.CreateTable<Contact>();
-                    List<Site> l_site = new List<Site>
+                    conn.CreateTable<SiteModel>();
+                    conn.CreateTable<LogModel>();
+                    conn.CreateTable<ErrorLogModel>();
+                    conn.CreateTable<ContactModel>();
+                    conn.CreateTable<ContactSiteModel>();
+                    List<SiteModel> l_site = new List<SiteModel>
                     {
                         // 插入默认的五条数据
-                        new Site()
+                        new SiteModel()
                         {
                             Site_name = "Google",
                             Site_address = "https://www.google.com",
@@ -69,7 +70,7 @@ namespace ServerMonitor.Controls
                             Request_succeed_code = "200",
                             Last_request_result = 0
                         },
-                        new Site()
+                        new SiteModel()
                         {
                             Site_name = "Yahoo",
                             Site_address = "http://www.yahoo.com",
@@ -86,7 +87,7 @@ namespace ServerMonitor.Controls
                             Request_succeed_code = "200",
                             Last_request_result = 1
                         },
-                        new Site()
+                        new SiteModel()
                         {
                             Site_name = "Bing",
                             Site_address = "http://www.bing.com",
@@ -103,7 +104,7 @@ namespace ServerMonitor.Controls
                             Request_succeed_code = "200",
                             Last_request_result = -1
                         },
-                        new Site()
+                        new SiteModel()
                         {
                             Site_name = "Google",
                             Site_address = "8.8.8.8",
@@ -120,7 +121,7 @@ namespace ServerMonitor.Controls
                             Request_succeed_code = "1000",
                             Last_request_result = 2
                         },
-                        new Site()
+                        new SiteModel()
                         {
                             Site_name = "Google",
                             Site_address = "https://www.google.com",
@@ -143,9 +144,9 @@ namespace ServerMonitor.Controls
                     //    l_site.Add(new Site() { Site_name = "Baidu" + i, Is_server = false, Request_succeed_code = "200" });
                     //}
                     InsertListSite(l_site);
-                    List<Log> l_log = new List<Log>
+                    List<LogModel> l_log = new List<LogModel>
                     {
-                        new Log()
+                        new LogModel()
                         {
                             Site_id = 1,
                             Status_code = "200",
@@ -154,7 +155,7 @@ namespace ServerMonitor.Controls
                             Is_error = false,
                             Log_record = null
                         },
-                        new Log()
+                        new LogModel()
                         {
                             Site_id = 2,
                             Status_code = "200",
@@ -163,7 +164,7 @@ namespace ServerMonitor.Controls
                             Is_error = false,
                             Log_record = null
                         },
-                        new Log()
+                        new LogModel()
                         {
                             Site_id = 3,
                             Status_code = "1000",
@@ -172,7 +173,7 @@ namespace ServerMonitor.Controls
                             Is_error = false,
                             Log_record = null
                         },
-                        new Log()
+                        new LogModel()
                         {
                             Site_id = 4,
                             Status_code = "1000",
@@ -181,7 +182,7 @@ namespace ServerMonitor.Controls
                             Is_error = false,
                             Log_record = null
                         },
-                        new Log()
+                        new LogModel()
                         {
                             Site_id = 5,
                             Status_code = "1000",
@@ -207,12 +208,12 @@ namespace ServerMonitor.Controls
         /// 返回所有的站点
         /// </summary>
         /// <returns></returns>
-        public static List<Site> GetAllSite()
+        public static List<SiteModel> GetAllSite()
         {
-            List<Site> r;
+            List<SiteModel> r;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
             {
-                r = conn.Table<Site>().ToList<Site>();
+                r = conn.Table<SiteModel>().ToList<SiteModel>();
             }
             return r;
 
@@ -222,12 +223,12 @@ namespace ServerMonitor.Controls
         /// 返回所有的日志
         /// </summary>
         /// <returns></returns>
-        public static List<Log> GetAllLog()
+        public static List<LogModel> GetAllLog()
         {
-            List<Log> r;
+            List<LogModel> r;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
             {
-                r = conn.Table<Log>().ToList<Log>();
+                r = conn.Table<LogModel>().ToList<LogModel>();
             }
             return r;
         }
@@ -237,18 +238,18 @@ namespace ServerMonitor.Controls
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static Site GetSiteById(int id)
+        public static SiteModel GetSiteById(int id)
         {
-            Site s;
+            SiteModel s;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
             {
                 try
                 {
-                    s = conn.Table<Site>().Where(v => v.Id == id).ToList<Site>()[0];
+                    s = conn.Table<SiteModel>().Where(v => v.Id == id).ToList<SiteModel>()[0];
                 }
                 catch
                 {
-                    s = new Site();
+                    s = new SiteModel();
                 }
             }
             return s;
@@ -259,18 +260,18 @@ namespace ServerMonitor.Controls
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static Log GetLogById(int id)
+        public static LogModel GetLogById(int id)
         {
-            Log l;
+            LogModel l;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
             {
                 try
                 {
-                    l = conn.Table<Log>().Where(v => v.Id == id).ToList<Log>()[0];
+                    l = conn.Table<LogModel>().Where(v => v.Id == id).ToList<LogModel>()[0];
                 }
                 catch
                 {
-                    l = new Log();
+                    l = new LogModel();
                 }
             }
             return l;
@@ -281,18 +282,18 @@ namespace ServerMonitor.Controls
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static List<Log> GetLogsBySiteId(int id)
+        public static List<LogModel> GetLogsBySiteId(int id)
         {
-            List<Log> l;
+            List<LogModel> l;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
             {
                 try
                 {
-                    l = conn.Table<Log>().Where(v => v.Site_id == id).ToList<Log>();
+                    l = conn.Table<LogModel>().Where(v => v.Site_id == id).ToList<LogModel>();
                 }
                 catch
                 {
-                    l = new List<Log>();
+                    l = new List<LogModel>();
                 }
             }
             return l;
@@ -303,7 +304,7 @@ namespace ServerMonitor.Controls
         /// </summary>
         /// <param name="site"></param>
         /// <returns></returns>
-        public static int InsertOneSite(Site site)
+        public static int InsertOneSite(SiteModel site)
         {
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
@@ -318,7 +319,7 @@ namespace ServerMonitor.Controls
         /// </summary>
         /// <param name="log"></param>
         /// <returns></returns>
-        public static int InsertOneLog(Log log)
+        public static int InsertOneLog(LogModel log)
         {
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
@@ -333,7 +334,7 @@ namespace ServerMonitor.Controls
         /// </summary>
         /// <param name="sites"></param>
         /// <returns></returns>
-        public static int InsertListSite(List<Site> sites)
+        public static int InsertListSite(List<SiteModel> sites)
         {
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
@@ -348,7 +349,7 @@ namespace ServerMonitor.Controls
         /// </summary>
         /// <param name="logs"></param>
         /// <returns></returns>
-        public static int InsertListLog(List<Log> logs)
+        public static int InsertListLog(List<LogModel> logs)
         {
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
@@ -418,7 +419,7 @@ namespace ServerMonitor.Controls
         /// </summary>
         /// <param name="site"></param>
         /// <returns></returns>
-        public static int UpdateSite(Site site)
+        public static int UpdateSite(SiteModel site)
         {
             // result = -1 表示异常返回值，执行操作失败
             int result = -1;
@@ -444,7 +445,7 @@ namespace ServerMonitor.Controls
         /// </summary>
         /// <param name="log"></param>
         /// <returns></returns>
-        public static int UpdateLog(Log log)
+        public static int UpdateLog(LogModel log)
         {
             int result;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
@@ -459,7 +460,7 @@ namespace ServerMonitor.Controls
         /// </summary>
         /// <param name="sites"></param>
         /// <returns></returns>
-        public static int UpdateListSite(List<Site> sites)
+        public static int UpdateListSite(List<SiteModel> sites)
         {
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
@@ -474,7 +475,7 @@ namespace ServerMonitor.Controls
         /// </summary>
         /// <param name="logs"></param>
         /// <returns></returns>
-        public static int UpdateListLog(List<Log> logs)
+        public static int UpdateListLog(List<LogModel> logs)
         {
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
@@ -493,7 +494,7 @@ namespace ServerMonitor.Controls
             int result = -1;
 
             //构成一个错误日志对象
-            ErrorLog log = new ErrorLog() {
+            ErrorLogModel log = new ErrorLogModel() {
                 ExceptionType = e.GetType().ToString(),
                 CreateTime = DateTime.Now,
                 ExceptionContent = e.Message,
@@ -539,13 +540,13 @@ namespace ServerMonitor.Controls
         /// <param name="command"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static List<Site> DBExcuteSiteCommand(string command, object[] param)
+        public static List<SiteModel> DBExcuteSiteCommand(string command, object[] param)
         {
-            List<Site> result;
+            List<SiteModel> result;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
             {
                 SQLiteCommand cmd = conn.CreateCommand(command, param);
-                result = cmd.ExecuteQuery<Site>();
+                result = cmd.ExecuteQuery<SiteModel>();
             }
             return result;
         }
@@ -556,13 +557,13 @@ namespace ServerMonitor.Controls
         /// <param name="command"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public static List<Log> DBExcuteLogCommand(string command, object[] param)
+        public static List<LogModel> DBExcuteLogCommand(string command, object[] param)
         {
-            List<Log> result;
+            List<LogModel> result;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
             {
                 SQLiteCommand cmd = conn.CreateCommand(command, param);
-                result = cmd.ExecuteQuery<Log>();
+                result = cmd.ExecuteQuery<LogModel>();
             }
             return result;
         }
@@ -572,12 +573,12 @@ namespace ServerMonitor.Controls
         /// 返回所有的联系人
         /// </summary>
         /// <returns></returns>
-        public static List<Contact> GetAllContact()
+        public static List<ContactModel> GetAllContact()
         {
-            List<Contact> r;
+            List<ContactModel> r;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
             {
-                r = conn.Table<Contact>().ToList<Contact>();
+                r = conn.Table<ContactModel>().ToList<ContactModel>();
             }
             return r;
         }
@@ -587,18 +588,18 @@ namespace ServerMonitor.Controls
         /// </summary>
         /// <param name="siteId"></param>
         /// <returns></returns>
-        public static List<Contact> GetContactBySiteId(int siteId)
+        public static List<ContactModel> GetContactBySiteId(int siteId)
         {
-            List<Contact> contactList;
+            List<ContactModel> contactList;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
             {
                 try
                 {
-                    contactList = conn.Table<Contact>().Where(v => v.SiteId == siteId).ToList<Contact>();
+                    contactList = conn.Table<ContactModel>().Where(v => v.SiteId == siteId).ToList<ContactModel>();
                 }
                 catch
                 {
-                    contactList = new List<Contact>();
+                    contactList = new List<ContactModel>();
                 }
             }
             return contactList;
@@ -609,7 +610,7 @@ namespace ServerMonitor.Controls
         /// </summary>
         /// <param name="Contact"></param>
         /// <returns></returns>
-        public static int InsertOneContact(Contact contact)
+        public static int InsertOneContact(ContactModel contact)
         {
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
@@ -639,7 +640,7 @@ namespace ServerMonitor.Controls
         /// </summary>
         /// <param name="contact"></param>
         /// <returns></returns>
-        public static int UpdateContact(Contact contact)
+        public static int UpdateContact(ContactModel contact)
         {
             // result = -1 表示异常返回值，执行操作失败
             int result = -1;

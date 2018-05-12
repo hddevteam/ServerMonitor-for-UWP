@@ -20,13 +20,13 @@ namespace ServerMonitor.SiteDb
         /// <param name="command"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public List<Site> DBExcuteSiteCommand(string command, object[] param)
+        public List<SiteModel> DBExcuteSiteCommand(string command, object[] param)
         {
-            List<Site> result;
+            List<SiteModel> result;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
             {
                 SQLiteCommand cmd = conn.CreateCommand(command, param);
-                result = cmd.ExecuteQuery<Site>();
+                result = cmd.ExecuteQuery<SiteModel>();
             }
             return result;
         }
@@ -35,7 +35,7 @@ namespace ServerMonitor.SiteDb
         /// </summary>
         /// <param name="site"></param>
         /// <returns></returns>
-        public int UpdateSite(Site site)
+        public int UpdateSite(SiteModel site)
         {
             // result = -1 表示异常返回值，执行操作失败
             int result = -1;
@@ -74,12 +74,12 @@ namespace ServerMonitor.SiteDb
         /// 返回所有的站点
         /// </summary>
         /// <returns></returns>
-        public List<Site> GetAllSite()
+        public List<SiteModel> GetAllSite()
         {
-            List<Site> r;//返回Site列表
+            List<SiteModel> r;//返回Site列表
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
             {
-                r = conn.Table<Site>().ToList<Site>();
+                r = conn.Table<SiteModel>().ToList<SiteModel>();
             }
             return r;
         }
@@ -88,18 +88,18 @@ namespace ServerMonitor.SiteDb
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Site GetSiteById(int id)
+        public SiteModel GetSiteById(int id)
         {
-            Site s;
+            SiteModel s;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
             {
                 try
                 {
-                    s = conn.Table<Site>().Where(v => v.Id == id).ToList<Site>()[0];
+                    s = conn.Table<SiteModel>().Where(v => v.Id == id).ToList<SiteModel>()[0];
                 }
                 catch
                 {
-                    s = new Site();
+                    s = new SiteModel();
                 }
             }
             return s;
@@ -109,7 +109,7 @@ namespace ServerMonitor.SiteDb
         /// </summary>
         /// <param name="sites"></param>
         /// <returns></returns>
-        public int InsertListSite(List<Site> sites)
+        public int InsertListSite(List<SiteModel> sites)
         {
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
@@ -123,7 +123,7 @@ namespace ServerMonitor.SiteDb
         /// </summary>
         /// <param name="site"></param>
         /// <returns></returns>
-        public int InsertOneSite(Site site)
+        public int InsertOneSite(SiteModel site)
         {
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
@@ -137,7 +137,7 @@ namespace ServerMonitor.SiteDb
         /// </summary>
         /// <param name="sites"></param>
         /// <returns></returns>
-        public int UpdateListSite(List<Site> sites)
+        public int UpdateListSite(List<SiteModel> sites)
         {
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))

@@ -95,7 +95,7 @@ namespace ServerMonitor.ViewModels
             //添加服务器 //Value是0代表是新增，否则value代表修改项的id
             if (ID == null)
             {
-                Site _site = new Site
+                SiteModel _site = new SiteModel
                 {
                     Is_server = false,
                     Monitor_interval = 5,
@@ -128,7 +128,7 @@ namespace ServerMonitor.ViewModels
             }
             else
             {
-                Site _site = new Site
+                SiteModel _site = new SiteModel
                 {
                     Monitor_interval = 5,
                     Is_Monitor = true,
@@ -174,7 +174,7 @@ namespace ServerMonitor.ViewModels
             if (ID != null)
             {
                 //id不为空,则从数据库查询相关数据进行binding
-                Site _mysite = DBHelper.GetSiteById(int.Parse(ID));//如果是修改站点或者服务器， 这里查询到服务器或站点的信息
+                SiteModel _mysite = DBHelper.GetSiteById(int.Parse(ID));//如果是修改站点或者服务器， 这里查询到服务器或站点的信息
                                                                    //修改绑定值为数据库值
                 Domain = _mysite.Site_address;
                 Name = _mysite.Site_name;

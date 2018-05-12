@@ -126,27 +126,26 @@ namespace ServerMonitor.ViewModels
             Chart1Collection = new ObservableCollection<ObservableCollection<Chart1>>();
             Infos.Chart1CollectionCopy = new ObservableCollection<ObservableCollection<Chart1>>();
             Infos.SelectSites = new ObservableCollection<SelectSite>();
-            Infos.Sites = new List<Site>();
-            Infos.Logs = new List<Log>();
+            Infos.Sites = new List<SiteModel>();
+            Infos.Logs = new List<LogModel>();
             Infos.BarChart = new ObservableCollection<BarChartData>();
             Infos.GridChart = new ObservableCollection<BarChartData>();
             await Task.CompletedTask;
             return true;
         }
 
-        //加载数据库站点
-        public async Task<List<Site>> LoadDbSiteAsync()
+        //加载数据库数据
+        public async Task<List<SiteModel>> LoadDbSiteAsync()
         {
             var sites = DBHelper.GetAllSite();
 
             await Task.CompletedTask;
             return DBHelper.GetAllSite();
         }
-        //数据库站点日志
-        public async Task<List<Log>> LoadDbLogAsync()
+        public async Task<List<LogModel>> LoadDbLogAsync()
         {
             await Task.CompletedTask;
-            List<Log> logs = new List<Log>();
+            List<LogModel> logs = new List<LogModel>();
             logs = DBHelper.GetAllLog();
             //数据排序，便于图表按序显示
             logs = logs.OrderBy(o => o.Create_time).ToList();
@@ -403,9 +402,9 @@ namespace ServerMonitor.ViewModels
             set { siteType = value; RaisePropertyChanged(() => SiteType); }
         }
 
-        private Site site;
+        private SiteModel site;
 
-        public Site Site
+        public SiteModel Site
         {
             get { return site; }
             set
@@ -530,11 +529,11 @@ namespace ServerMonitor.ViewModels
             =new Chart1HAxisProperties();
 
         //数据库日志
-        private List<Log> logs;
+        private List<LogModel> logs;
         //选择站点
         private ObservableCollection<SelectSite> selectSites;
         //获取被选中的站点
-        private List<Site> sites;
+        private List<SiteModel> sites;
         //柱形图数据
         private ObservableCollection<BarChartData> barChart;
         //图表1所有系列集合
@@ -569,7 +568,7 @@ namespace ServerMonitor.ViewModels
             set { state3 = value; RaisePropertyChanged(() => State3); }
         }
 
-        public List<Log> Logs
+        public List<LogModel> Logs
         {
             get => logs;
             set
@@ -579,7 +578,7 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        public List<Site> Sites
+        public List<SiteModel> Sites
         {
             get { return sites; }
             set { sites = value; RaisePropertyChanged(() => Sites); }

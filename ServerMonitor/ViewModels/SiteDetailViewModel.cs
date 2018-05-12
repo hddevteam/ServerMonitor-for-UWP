@@ -30,7 +30,7 @@ namespace ServerMonitor.ViewModels
 
         #region 变量声明
         // 用来保存由刷新产生的最新的一条记录   属性
-        private Log refresh_log;
+        private LogModel refresh_log;
         // 整个界面中封装的所有变量   属性
         private ViewInfo infos;
         // 传进来的站点id    属性
@@ -40,7 +40,7 @@ namespace ServerMonitor.ViewModels
         // 界面的信息  字段   ->  infos
         public ViewInfo Infos { get => infos; set => infos = value; }
         // 字段  ->  refresh_log
-        public Log Refresh_log { get => refresh_log; set { Set(ref refresh_log, value); RaisePropertyChanged(() => Refresh_log); } }
+        public LogModel Refresh_log { get => refresh_log; set { Set(ref refresh_log, value); RaisePropertyChanged(() => Refresh_log); } }
         // 临时变量  站点id  ->  由字符串转换来的
         public int id = 0;
         #endregion
@@ -52,8 +52,8 @@ namespace ServerMonitor.ViewModels
             Infos = new ViewInfo
             {
                 // 初始化记录变量
-                Logs = new ObservableCollection<Log>(),
-                RequestTimeList = new ObservableCollection<Log>()
+                Logs = new ObservableCollection<LogModel>(),
+                RequestTimeList = new ObservableCollection<LogModel>()
             };
 
             Debug.WriteLine("Construction function => SiteDetailViewModel();");
@@ -209,7 +209,7 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="logs"></param>
         /// <returns></returns>
-        public Tuple<double, double> CountAverageMax(ObservableCollection<Log> logs)
+        public Tuple<double, double> CountAverageMax(ObservableCollection<LogModel> logs)
         {
             // 构建一个存储请求时间的数组
             double[] request_array = new double[logs.Count];
@@ -244,7 +244,7 @@ namespace ServerMonitor.ViewModels
 
             // 获取关于站点的信息
             Infos.Detail_Site = DBHelper.GetSiteById(id);
-            Infos.ContactCollection = new ObservableCollection<Contact>();
+            Infos.ContactCollection = new ObservableCollection<ContactModel>();
             Infos.IsMonitor = Infos.Detail_Site.Is_Monitor;
             Infos.IsWebSite = !Infos.Detail_Site.Is_server;            
 
@@ -267,10 +267,10 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public void InitLogsData()
         {
-            List<Log> l = DBHelper.GetLogsBySiteId(id);
+            List<LogModel> l = DBHelper.GetLogsBySiteId(id);
             if (l.Count == 0)
             {
-                Infos.LastRequest = new Log();
+                Infos.LastRequest = new LogModel();
                 Infos.LastRequestWords = "None Data !";
             }
             else
@@ -278,12 +278,12 @@ namespace ServerMonitor.ViewModels
                 foreach (var log in l)
                 {
                     Infos.Logs.Add(log);
-                    var log_temp = new Log();
+                    var log_temp = new LogModel();
                     log_temp.Create_time = log.Create_time;
                     log_temp.Request_time = Math.Log10(log.Request_time);
                     Infos.RequestTimeList.Add(log_temp);
                 }
-                Infos.LastRequest = l.First<Log>();
+                Infos.LastRequest = l.First<LogModel>();
                 infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.Request_time);
             }
         }
@@ -294,12 +294,12 @@ namespace ServerMonitor.ViewModels
         public void InitContactData()
         {
             // 初始化封装的信息集合
-            Infos.ContactCollection = new ObservableCollection<Contact>();
-            List<Contact> contactList = DBHelper.GetContactBySiteId(id);
+            Infos.ContactCollection = new ObservableCollection<ContactModel>();
+            List<ContactModel> contactList = DBHelper.GetContactBySiteId(id);
             if (contactList.Count == 0)
             {
                 Debug.WriteLine("无联系人!");
-                Infos.ContactCollection.Add(new Contact() { Contact_name = "No Data!", Contact_email = "No Data!", Telephone = "No Data!" });
+                Infos.ContactCollection.Add(new ContactModel() { Contact_name = "No Data!", Contact_email = "No Data!", Telephone = "No Data!" });
             }
             else
             {
@@ -348,7 +348,7 @@ namespace ServerMonitor.ViewModels
         {
             // P操作 禁用刷新按钮
             Infos.RequestAsyncStat = false;
-            Log log = await MakeRequest();
+            LogModel log = await MakeRequest();
             // 确认返回的log有效
             if (null != log)
             {
@@ -367,7 +367,7 @@ namespace ServerMonitor.ViewModels
             {
                 Infos.MedianValue = 0;
                 Infos.AverageValue = 0;
-                Infos.LastRequest = new Log();
+                Infos.LastRequest = new LogModel();
                 Infos.LastRequestWords = "No Data!";
             }
             // V操作 启用刷新按钮
@@ -378,9 +378,9 @@ namespace ServerMonitor.ViewModels
         /// 发起请求主体
         /// </summary>
         /// <returns>请求结果Log</returns>
-        public async Task<Log> MakeRequest()
+        public async Task<LogModel> MakeRequest()
         {
-            Log log;
+            LogModel log;
             if (Infos.IsWebSite)
             {
                 log = await RequestWebsite();
@@ -415,12 +415,12 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="serverProtocol"></param>
         /// <returns></returns>
-        public async Task<Log> RequestServerIcmp(Site site)
+        public async Task<LogModel> RequestServerIcmp(SiteModel site)
         {
-            Log log = null;
+            LogModel log = null;
             try
             {
-                log = new Log();
+                log = new LogModel();
                 IPAddress ip = await GetIPAddress(site.Site_address);
                 Dictionary<string, string> datas = Request.IcmpRequest(ip);
 
@@ -465,9 +465,9 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="serverProtocol"></param>
         /// <returns></returns>
-        public async Task<Log> RequestDNSServer(Site site)
+        public async Task<LogModel> RequestDNSServer(SiteModel site)
         {
-            Log log = null;
+            LogModel log = null;
 
             if (null != site.Site_address && !("".Equals(site.Site_address)))
             {
@@ -488,7 +488,7 @@ namespace ServerMonitor.ViewModels
                 IPEndPoint iPEndPoint = new IPEndPoint(ip, 53);
                 Tuple<string, string, string, string> tuple = await Request.SocketRequest(iPEndPoint);
                 #region 赋值log
-                log = new Log
+                log = new LogModel
                 {
                     Site_id = site.Id,
                     Create_time = DateTime.Now
@@ -551,10 +551,10 @@ namespace ServerMonitor.ViewModels
         /// 请求网站，并存入一条记录
         /// </summary>
         /// <returns></returns>
-        public async Task<Log> RequestWebsite()
+        public async Task<LogModel> RequestWebsite()
         {
             // 定义需要的变量
-            Log newLog = new Log();
+            LogModel newLog = new LogModel();
             JObject result = null;
             string httpRequestStatus = "";
             int httpRequestInterval = 0;
@@ -633,7 +633,7 @@ namespace ServerMonitor.ViewModels
         /// <param name="site"></param>
         /// <param name="statusCode"></param>
         /// <returns></returns>
-        public bool SuccessCodeMatch(Site site, string statusCode)
+        public bool SuccessCodeMatch(SiteModel site, string statusCode)
         {
             string[] successCodes = getSuccStatusCode(Infos.Detail_Site);
             foreach (var i in successCodes)
@@ -652,7 +652,7 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="site"></param>
         /// <returns></returns>
-        public string[] getSuccStatusCode(Site site)
+        public string[] getSuccStatusCode(SiteModel site)
         {
             if (site.Request_succeed_code.Contains(','))
             {
@@ -669,10 +669,10 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public void InitChartData()
         {
-            if (Infos.Logs.Count<Log>() == 0)
+            if (Infos.Logs.Count<LogModel>() == 0)
             {
                 // 没有数据则显示无数据的提醒
-                Infos.LastRequest = new Log();
+                Infos.LastRequest = new LogModel();
                 Infos.LastRequestWords = string.Format("No Datas ! ");
             }
             else
@@ -694,7 +694,7 @@ namespace ServerMonitor.ViewModels
                     #endregion
                 }
                 // 更新上次请求记录
-                Infos.LastRequest = Infos.Logs.First<Log>();
+                Infos.LastRequest = Infos.Logs.First<LogModel>();
                 Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.Request_time);
             }
         }
@@ -716,13 +716,13 @@ namespace ServerMonitor.ViewModels
         /// 界面数据添加一条新的记录
         /// </summary>
         /// <param name="log"></param>
-        public void AddNewLog(Log log)
+        public void AddNewLog(LogModel log)
         {
             if (DBHelper.InsertOneLog(log) == 1)
             {
                 Debug.WriteLine("成功插入一条日志数据! 日志内容为：" + log.ToString());
                 Infos.Logs.Add(log);
-                var log_temp = new Log
+                var log_temp = new LogModel
                 {
                     Create_time = log.Create_time,
                     Request_time = Math.Log10(log.Request_time)
@@ -742,7 +742,7 @@ namespace ServerMonitor.ViewModels
         /// 插入一条记录的时候更新下面两个图表的信息
         /// </summary>
         /// <param name="log"></param>
-        public void UpdateChart(Log log)
+        public void UpdateChart(LogModel log)
         {
             #region 添加第二个表格需要的数据
             if (!"200".Equals(log.Status_code))
@@ -964,19 +964,19 @@ namespace ServerMonitor.ViewModels
     {
         private bool isMonitor;
         private bool isWebSite;
-        private Site site;
-        private ObservableCollection<Log> logs;
+        private SiteModel site;
+        private ObservableCollection<LogModel> logs;
         private ObservableCollection<RequestCountInfo> re;
         private ObservableCollection<PieChartInfo> pieinfo;
         private DateTime maxmumDatetime;
         private DateTime minmumDatetime;
-        private Log lastRequest;
+        private LogModel lastRequest;
         private string lastRequestWords;
         private double medianValue;
         private double averageValue;
-        private ObservableCollection<Log> requestTimeList;
+        private ObservableCollection<LogModel> requestTimeList;
         private FirstChartAxisProperties firstChartAxisProperties;
-        private ObservableCollection<Contact> contactCollection;
+        private ObservableCollection<ContactModel> contactCollection;
         private bool loadAsyncStat =false;
         private bool requestAsyncStat = true;
 
@@ -991,7 +991,7 @@ namespace ServerMonitor.ViewModels
             }
         }
         // 对应图标站点的详细信息
-        public Site Detail_Site
+        public SiteModel Detail_Site
         {
             get => site;
             set
@@ -1001,7 +1001,7 @@ namespace ServerMonitor.ViewModels
             }
         }
         // 对应的图表上站点的访问记录
-        public ObservableCollection<Log> Logs
+        public ObservableCollection<LogModel> Logs
         {
             get => logs;
             set
@@ -1060,7 +1060,7 @@ namespace ServerMonitor.ViewModels
         }
 
         // 记录上次请求的结果
-        public Log LastRequest
+        public LogModel LastRequest
         {
             get => lastRequest;
             set
@@ -1102,7 +1102,7 @@ namespace ServerMonitor.ViewModels
         /// <summary>
         /// 请求时间列表
         /// </summary>
-        public ObservableCollection<Log> RequestTimeList
+        public ObservableCollection<LogModel> RequestTimeList
         {
             get => requestTimeList;
             set
@@ -1128,7 +1128,7 @@ namespace ServerMonitor.ViewModels
         /// <summary>
         /// 联系人集合
         /// </summary>
-        public ObservableCollection<Contact> ContactCollection {
+        public ObservableCollection<ContactModel> ContactCollection {
             get => contactCollection;
             set
             {
