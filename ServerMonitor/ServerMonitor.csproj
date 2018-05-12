@@ -95,13 +95,13 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DAOImpl\Contact_SiteDAOImpl.cs" />
-    <Compile Include="DAOImpl\DbInitImpl.cs" />
-    <Compile Include="DAOImpl\SiteDaoImpl.cs" />
-    <Compile Include="DAO\Contact_SiteDao.cs" />
-    <Compile Include="DAO\DBInit.cs" />
-    <Compile Include="DAO\SiteDAO.cs" />
-    <Compile Include="Models\Contact_Site.cs" />
+    <Compile Include="DAO\ContactSiteDAOImpl.cs" />
+    <Compile Include="DAO\DataBaseControlImpl.cs" />
+    <Compile Include="DAO\SiteDAOImpl.cs" />
+    <Compile Include="DAO\IContact_SiteDao.cs" />
+    <Compile Include="DAO\IDatbaBaseControl.cs" />
+    <Compile Include="DAO\ISiteDAO.cs" />
+    <Compile Include="Models\ContactSiteModel.cs" />
     <Compile Include="Services\RequestServices\BasicRequest.cs" />
     <Compile Include="Common\DataHelper.cs" />
     <Compile Include="Controls\DBHelper.cs" />
@@ -116,11 +116,11 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\Contact.cs" />
+    <Compile Include="Models\ContactModel.cs" />
     <Compile Include="Common\CustomHandler.cs" />
-    <Compile Include="Models\ErrorLog.cs" />
-    <Compile Include="Models\Log.cs" />
-    <Compile Include="Models\Site.cs" />
+    <Compile Include="Models\ErrorLogModel.cs" />
+    <Compile Include="Models\LogModel.cs" />
+    <Compile Include="Models\SiteModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\RequestServices\SSHRequest.cs" />
     <Compile Include="Services\SettingsServices\SettingsService.cs" />

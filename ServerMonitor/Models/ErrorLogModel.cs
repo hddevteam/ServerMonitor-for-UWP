@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace ServerMonitor.Models
 {
     // 错误日志对象
-    public class ErrorLog
+    public class ErrorLogModel
     {        
         int id;
         // 异常类型

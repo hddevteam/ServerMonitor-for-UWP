@@ -139,8 +139,8 @@ namespace ServerMonitor.ViewModels
             Lengend = new ObservableCollection<ChartLengend>();
             Infos.Chart1CollectionCopy = new ObservableCollection<ObservableCollection<Chart1>>();
             Infos.SelectSites = new ObservableCollection<SelectSite>();
-            Infos.Sites = new List<Site>();
-            Infos.Logs = new List<Log>();
+            Infos.Sites = new List<SiteModel>();
+            Infos.Logs = new List<LogModel>();
             Infos.BarChart = new ObservableCollection<BarChartData>();
             Infos.GridChart = new ObservableCollection<BarChartData>();
             await Task.CompletedTask;
@@ -148,17 +148,17 @@ namespace ServerMonitor.ViewModels
         }
 
         //加载数据库数据
-        public async Task<List<Site>> LoadDbSiteAsync()
+        public async Task<List<SiteModel>> LoadDbSiteAsync()
         {
             var sites = DBHelper.GetAllSite();
 
             await Task.CompletedTask;
             return DBHelper.GetAllSite();
         }
-        public async Task<List<Log>> LoadDbLogAsync()
+        public async Task<List<LogModel>> LoadDbLogAsync()
         {
             await Task.CompletedTask;
-            List<Log> logs = new List<Log>();
+            List<LogModel> logs = new List<LogModel>();
             logs = DBHelper.GetAllLog();
             //数据排序，便于图表按序显示
             logs = logs.OrderBy(o => o.Create_time).ToList();
@@ -170,10 +170,10 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="sites"></param>
         /// <returns></returns>
-        public async Task<Tuple<ObservableCollection<SelectSite>,List<Site>>> SelectSitesAsync(List<Site> sites)
+        public async Task<Tuple<ObservableCollection<SelectSite>,List<SiteModel>>> SelectSitesAsync(List<SiteModel> sites)
         {
             var selectSites = new ObservableCollection<SelectSite>();
-            var Sites = new List<Site>();
+            var Sites = new List<SiteModel>();
             foreach (var item in sites)
             {
                 //初始时默认选中前五条
@@ -191,7 +191,7 @@ namespace ServerMonitor.ViewModels
                 }
             }
             await Task.CompletedTask;
-            return new Tuple<ObservableCollection<SelectSite>, List<Site>>(selectSites, Sites);
+            return new Tuple<ObservableCollection<SelectSite>, List<SiteModel>>(selectSites, Sites);
         }
 
         /// <summary>
@@ -223,7 +223,7 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="sites"></param>
         /// <returns></returns>
-        public async Task<ObservableCollection<ChartLengend>> ChartLengendAsync(List<Site> sites)
+        public async Task<ObservableCollection<ChartLengend>> ChartLengendAsync(List<SiteModel> sites)
         {
             int i = 0;
             foreach (var item in sites)
@@ -244,7 +244,7 @@ namespace ServerMonitor.ViewModels
         /// <param name="sites"></param>
         /// <param name="logs"></param>
         /// <returns></returns>
-        public async Task<Tuple<ObservableCollection<ObservableCollection<Chart1>>, int[,]>> CacuChartAsync(List<Site> sites,List<Log> logs)
+        public async Task<Tuple<ObservableCollection<ObservableCollection<Chart1>>, int[,]>> CacuChartAsync(List<SiteModel> sites,List<LogModel> logs)
         {
             var chart1Collection = new ObservableCollection<ObservableCollection<Chart1>>();
             //对每个站点进行统计
@@ -306,7 +306,7 @@ namespace ServerMonitor.ViewModels
         /// <param name="sites"></param>
         /// <param name="requestResults"></param>
         /// <returns></returns>
-        public Tuple<ObservableCollection<BarChartData>,ObservableCollection<BarChartData>> CacuBarChart(List<Site> sites, int[,] requestResults)
+        public Tuple<ObservableCollection<BarChartData>,ObservableCollection<BarChartData>> CacuBarChart(List<SiteModel> sites, int[,] requestResults)
         {
             int index = 0;
             foreach (var item in sites)
@@ -593,9 +593,9 @@ namespace ServerMonitor.ViewModels
             set { siteType = value; RaisePropertyChanged(() => SiteType); }
         }
 
-        private Site site;
+        private SiteModel site;
 
-        public Site Site
+        public SiteModel Site
         {
             get { return site; }
             set
@@ -719,11 +719,11 @@ namespace ServerMonitor.ViewModels
             =new Chart1DateTimeContinuousAxisProperties();
 
         //数据库日志
-        private List<Log> logs;
+        private List<LogModel> logs;
         //选择站点
         private ObservableCollection<SelectSite> selectSites;
         //获取被选中的站点
-        private List<Site> sites;
+        private List<SiteModel> sites;
         //柱形图数据
         private ObservableCollection<BarChartData> barChart;
         //图表1所有系列集合
@@ -758,7 +758,7 @@ namespace ServerMonitor.ViewModels
             set { state3 = value; RaisePropertyChanged(() => State3); }
         }
 
-        public List<Log> Logs
+        public List<LogModel> Logs
         {
             get => logs;
             set
@@ -768,7 +768,7 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        public List<Site> Sites
+        public List<SiteModel> Sites
         {
             get { return sites; }
             set { sites = value; RaisePropertyChanged(() => Sites); }

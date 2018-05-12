@@ -22,7 +22,7 @@ namespace ServerMonitor.ViewModels
 {
     class AllServerViewModel : Template10.Mvvm.ViewModelBase
     {
-        private List<Site> sites;
+        private List<SiteModel> sites;
         private ServerItem ServerContext;
         Grid rightFrame1;
         private int order = 1;  //1:id As 2:id De 3:Al As 4:Al De
@@ -247,7 +247,7 @@ namespace ServerMonitor.ViewModels
         {
             ServerItems.Clear();
             sites = DBHelper.GetAllSite();
-            List<Site> q = ProcessSite(sites);
+            List<SiteModel> q = ProcessSite(sites);
             string site_status;
 
             for (int i = 0; i < q.Count; i++)
@@ -291,9 +291,9 @@ namespace ServerMonitor.ViewModels
                 }
             }
         }
-        private List<Site> ProcessSite(List<Site> list)
+        private List<SiteModel> ProcessSite(List<SiteModel> list)
         {
-            List<Site> q;
+            List<SiteModel> q;
             if (filter == 2)  //0:Error  1:Normal  2:All Servers,
             {
                 q = (from t in sites

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.DAO
 {
-    interface Contact_SiteDao
+    interface IContact_SiteDao
     {
-        int InsertConnectInfo(Contact contact, Site site);
-        List<Contact_Site> GetConnectInfoBySiteId(int SiteId);
+        int InsertConnectInfo(ContactModel contact, SiteModel site);
+        List<ContactSiteModel> GetConnectInfoBySiteId(int SiteId);
         int DeleteConnect(int SiteId, int ConnectId);
         int DeletSiteAllConnect(int SiteId);
     }

@@ -83,7 +83,7 @@ namespace ServerMonitor
 			var _sitelist = DBHelper.GetAllSite();
 			var len = _sitelist.Count;//使用foreach会出现不在期望中的异常
 
-			Site _presite = new Site();
+			SiteModel _presite = new SiteModel();
 			_presite = DBHelper.GetSiteById(4);//这里是指定了precheck的id为4
 			var _precolor = _presite.Last_request_result;//如果percheck为错误 就不进行请求了
 			if (_precolor != 0)
@@ -121,7 +121,7 @@ namespace ServerMonitor
 						Dictionary<string, string> backData = new Dictionary<string, string>();
 
 						backData = Request.IcmpRequest(reIP);
-						Site upSite = new Site();
+						SiteModel upSite = new SiteModel();
 						upSite = DBHelper.GetSiteById(item.Id);
 						var color = DataHelper.GetColor(backData);
 						var dictionary = backData;
@@ -147,7 +147,7 @@ namespace ServerMonitor
 							var color = DataHelper.GetHttpColor(reback);
 							var time = DataHelper.GetHttpTime(reback);
 							var status = DataHelper.GetHttpStatus(reback);
-							Site upSite = new Site();
+							SiteModel upSite = new SiteModel();
 							upSite = DBHelper.GetSiteById(item.Id);
 							try
 							{

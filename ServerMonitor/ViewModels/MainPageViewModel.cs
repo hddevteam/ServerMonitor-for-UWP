@@ -22,13 +22,13 @@ namespace ServerMonitor.ViewModels
     public class MainPageViewModel : Template10.Mvvm.ViewModelBase
     {
         private int rightTapped_SiteId;  //右击站点id
-        List<Site> sites; //只在GetListSite()增加和删除其元素个数
+        List<SiteModel> sites; //只在GetListSite()增加和删除其元素个数
         int order = 1;  //1:id As 2:id De 3:Al As 4:Al De
         int filter = 2; //0:Error  1:Normal  2:All Servers,
 
         //MainPage 界面的弹出框
         ContentDialog termsOfUseContentDialog = null;
-        private Site preCheck;  //preCheck站点
+        private SiteModel preCheck;  //preCheck站点
         public MainPageViewModel()
         {
             T = 200;
@@ -155,7 +155,7 @@ namespace ServerMonitor.ViewModels
             //对google dns进行pre check (8.8.8.8)
             var _googleDnsBack = Request.IcmpRequest(IPAddress.Parse("8.8.8.8"));
             string _resultcolor = DataHelper.GetColor(_googleDnsBack);//得到返回值
-            Site _preCheckSite = DBHelper.GetSiteById(4);//初始化precheck记录，目前是ID 4 
+            SiteModel _preCheckSite = DBHelper.GetSiteById(4);//初始化precheck记录，目前是ID 4 
             _preCheckSite.Last_request_result = int.Parse(_resultcolor);//更新color
             _preCheckSite.Request_count = _preCheckSite.Request_count + 1;//更新请求次数
             DBHelper.UpdateSite(_preCheckSite);//更新站点
@@ -204,7 +204,7 @@ namespace ServerMonitor.ViewModels
                     Dictionary<string, string> backData = new Dictionary<string, string>();
 
                     backData = Request.IcmpRequest(reIP);
-                    Site upSite = new Site();
+                    SiteModel upSite = new SiteModel();
                     upSite = DBHelper.GetSiteById(item.Id);
                     var color = DataHelper.GetColor(backData);
                     var dictionary = backData;
@@ -231,7 +231,7 @@ namespace ServerMonitor.ViewModels
                         var color = DataHelper.GetHttpColor(reback);
                         var time = DataHelper.GetHttpTime(reback);
                         var status = DataHelper.GetHttpStatus(reback);
-                        Site upSite = new Site();
+                        SiteModel upSite = new SiteModel();
                         upSite = DBHelper.GetSiteById(item.Id);
                         try
                         {
@@ -339,7 +339,7 @@ namespace ServerMonitor.ViewModels
             var q1 = from t in sites
                      where t.Id == rightTapped_SiteId
                      select t;
-            Site site = CloneSite(q1.First());
+            SiteModel site = CloneSite(q1.First());
             site.Site_name = site.Site_name + " Copy";
             site.Last_request_result = 2;
             if (DBHelper.InsertOneSite(site) == 1)
@@ -427,7 +427,7 @@ namespace ServerMonitor.ViewModels
                 SiteResults[i].Number = 0;
             }
             sites = DBHelper.GetAllSite();
-            List<Site> q = ProcessSite(sites);
+            List<SiteModel> q = ProcessSite(sites);
             GetOutageSite(sites);
             GetSitePerformance(sites);
 
@@ -479,9 +479,9 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="list">站点列表</param>
         /// <returns>有序的站点列表</returns>
-        private List<Site> ProcessSite(List<Site> list) //不可测
+        private List<SiteModel> ProcessSite(List<SiteModel> list) //不可测
         {
-            List<Site> q;
+            List<SiteModel> q;
             if (filter == 2)  //0:Error  1:Normal  2:All Servers, 筛选
             {
                 q = (from t in list
@@ -545,12 +545,12 @@ namespace ServerMonitor.ViewModels
         /// 得到宕机的站点信息并按时间先后排序，显示在右上方 保存在OutageSites中
         /// </summary>
         /// <param name="list">站点列表</param>
-        private void GetOutageSite(List<Site> list) //不可测
+        private void GetOutageSite(List<SiteModel> list) //不可测
         {
             OutageSites.Clear();
 
             //排除不监听和precheck，再只留错误和超时的
-            List<Site> q = (from t in list
+            List<SiteModel> q = (from t in list
                             where t.Is_Monitor == true && t.Is_pre_check == false && (t.Last_request_result == 0 || t.Last_request_result == -1)
                             orderby t.Update_time descending
                             select t).ToList();
@@ -584,19 +584,19 @@ namespace ServerMonitor.ViewModels
         /// 得到站点性能信息并按性能排序，从log表中取数据分析 显示在右下方 保存在SitePerformanceList中
         /// </summary>
         /// <param name="list">站点列表</param>
-        private void GetSitePerformance(List<Site> list) //不可测
+        private void GetSitePerformance(List<SiteModel> list) //不可测
         {
             SitePerformanceList.Clear();
 
             //得到监听的站点信息（除pre_check）
-            List<Site> q = (from t in list
+            List<SiteModel> q = (from t in list
                             where t.Is_Monitor == true && t.Is_pre_check == false
                             select t).ToList();
             List<SitePerformance> container = new List<SitePerformance>();
             //循环计算并记录站点性能信息
             for (int i = 0; i < q.Count; i++)
             {
-                List<Log> logList = DBHelper.GetLogsBySiteId(q[i].Id);
+                List<LogModel> logList = DBHelper.GetLogsBySiteId(q[i].Id);
                 if (logList.Count == 0)
                 {
                     container.Add(new SitePerformance()
@@ -650,9 +650,9 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="site">站点</param>
         /// <returns>克隆站点</returns>
-        private Site CloneSite(Site site)   //可测
+        private SiteModel CloneSite(SiteModel site)   //可测
         {
-            Site cs = new Site()
+            SiteModel cs = new SiteModel()
             {
                 Site_name = site.Site_name,
                 Site_address = site.Site_address,
@@ -727,7 +727,7 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="site">站点</param>
         /// <returns>站点信息</returns>
-        private string GetSiteItemLastResult(Site site) //  能测 但有点复杂
+        private string GetSiteItemLastResult(SiteModel site) //  能测 但有点复杂
         {
             string result = "";
             if (site.Is_server)  //判断是不是服务器

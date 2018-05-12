@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.Models
 {
-    public class Contact_Site
+    public class ContactSiteModel
     {
         private int id;
         private int siteId;

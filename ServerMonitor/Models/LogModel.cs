@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace ServerMonitor.Models
 {
     // 对应数据库里的Log表
-    public class Log: ObservableObject
+    public class LogModel: ObservableObject
     {
         int id;
         int site_id;

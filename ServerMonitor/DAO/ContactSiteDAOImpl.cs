@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.DAOImpl
 {
-    class Contact_SiteDAOImpl : Contact_SiteDao
+    class Contact_SiteDAOImpl : IContact_SiteDao
     {
         public int DeleteConnect(int SiteId, int ConnectId)
         {
@@ -20,12 +20,12 @@ namespace ServerMonitor.DAOImpl
             throw new NotImplementedException();
         }
 
-        public List<Contact_Site> GetConnectInfoBySiteId(int SiteId)
+        public List<ContactSiteModel> GetConnectInfoBySiteId(int SiteId)
         {
             throw new NotImplementedException();
         }
 
-        public int InsertConnectInfo(Contact contact, Site site)
+        public int InsertConnectInfo(ContactModel contact, SiteModel site)
         {
             throw new NotImplementedException();
         }
