@@ -95,6 +95,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Services\RequestServices\IRequest.cs" />
     <Compile Include="Services\RequestServices\SSHRequest.cs" />
     <Compile Include="Services\RequestServices\BasicRequest.cs" />
     <Compile Include="Common\DataHelper.cs" />

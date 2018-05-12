@@ -1,21 +1,13 @@
-﻿using GalaSoft.MvvmLight.Threading;
-using Renci.SshNet;
+﻿using Renci.SshNet;
 using Renci.SshNet.Common;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using Windows.UI.Core;
-using Windows.UI.Xaml;
 
-namespace ServerMonitor.Controls
+namespace ServerMonitor.Services.RequestServices
 {
-    public class SSHRequest : BasicRequest
+    public class SSHRequest : BasicRequest,IRequest
     {
         /// <summary>
         /// Ssh端口
@@ -48,7 +40,7 @@ namespace ServerMonitor.Controls
             }
         }
         
-        public override async Task<bool> MakeRequest()
+        public async Task<bool> MakeRequest()
         {
             await Task.CompletedTask;
             // 赋值生成请求的时间

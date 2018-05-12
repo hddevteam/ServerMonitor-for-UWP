@@ -1,11 +1,7 @@
-﻿using Newtonsoft.Json;
-using ServerMonitor.Controls;
+﻿using ServerMonitor.Controls;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,7 +11,7 @@ namespace ServerMonitor.Services.RequestServices
      * Http 请求模块
      * 使用了单例模式 -- 完全延迟加载
      */
-    public class HTTPRequest : BasicRequest
+    public class HTTPRequest : BasicRequest, IRequest
     {
         // 继承的属性：CreateTime TimeCost OverTime Status Others ErrorException  
         /// <summary>
@@ -30,6 +26,10 @@ namespace ServerMonitor.Services.RequestServices
         /// 请求的路由地址
         /// </summary>
         private string uri = "";
+        /// <summary>
+        /// 请求的说明信息
+        /// </summary>
+        private string requestInfo = null;
         /// <summary>
         /// 线程安全的请求对象 --完全延迟加载
         /// </summary>
@@ -47,6 +47,7 @@ namespace ServerMonitor.Services.RequestServices
 
         public string Uri { set => uri = value; }
         public TransportProtocol ProtocolType { set => httpOrhttps = value; }
+        public string RequestInfo { get => requestInfo; }
 
         private HTTPRequest() { }
 
@@ -65,23 +66,26 @@ namespace ServerMonitor.Services.RequestServices
                     // 设置程序是否跟随重定向
                     AllowAutoRedirect = false
                 };
-                HttpClient client = new HttpClient(handler);
-                //设置标头
-                client.DefaultRequestHeaders.Referrer = new Uri(uri);
-                // 设置请求预期超时时间 TimeSpan的参数需要传递一个 long ticks ，并且传递的参数的单位为100毫微秒,即0.1毫秒
-                client.Timeout = new TimeSpan(OverTime * 10);
-                // 加入请求任务超时控制
-                CancellationTokenSource ctx = new CancellationTokenSource();
-                ctx.CancelAfter(TimeSpan.FromSeconds(OverTime));//5s放弃请求
-                DateTime start_time = DateTime.Now;
-                HttpResponseMessage message = await client.GetAsync(uri, ctx.Token);
+                // 自动释放链接资源
+                using (HttpClient client = new HttpClient(handler))
+                {
+                    //设置标头
+                    client.DefaultRequestHeaders.Referrer = new Uri(uri);
+                    // 设置请求预期超时时间 
+                    client.Timeout = TimeSpan.FromSeconds(OverTime);
+                    // 加入请求任务超时控制
+                    CancellationTokenSource ctx = new CancellationTokenSource();
+                    ctx.CancelAfter(TimeSpan.FromSeconds(OverTime));//5s放弃请求
+                    DateTime start_time = DateTime.Now;
+                    HttpResponseMessage message = await client.GetAsync(uri, ctx.Token);
 
-                //请求失败计算时间
-                DateTime end_time = DateTime.Now;
-                TimeSpan timeSpan = end_time - start_time;
-                TimeCost = (short)timeSpan.TotalMilliseconds;
-                //请求失败状态码
-                Status = Enum.Parse(typeof(System.Net.HttpStatusCode), message.StatusCode.ToString()).ToString();//状态码strign to num
+                    //请求失败计算时间
+                    DateTime end_time = DateTime.Now;
+                    TimeSpan timeSpan = end_time - start_time;
+                    TimeCost = (short)timeSpan.TotalMilliseconds;
+                    //请求失败状态码
+                    Status = ((int)Enum.Parse(typeof(System.Net.HttpStatusCode), message.StatusCode.ToString())).ToString();//状态码strign to num                    
+                }
                 return true;
             }
             catch (TaskCanceledException e)
@@ -91,6 +95,16 @@ namespace ServerMonitor.Services.RequestServices
                 TimeCost = OverTime;
                 Status = "1002";
                 ErrorException = e;
+                requestInfo = "Request OverTime !";
+                return false;
+            }
+            catch (OperationCanceledException e)
+            {
+                Debug.WriteLine("请求失败" + e.Message);
+                DBHelper.InsertErrorLog(e);
+                TimeCost = -1;
+                ErrorException = e;
+                requestInfo = e.Message;
                 return false;
             }
             catch (Exception e)
@@ -99,6 +113,7 @@ namespace ServerMonitor.Services.RequestServices
                 DBHelper.InsertErrorLog(e);
                 TimeCost = -1;
                 ErrorException = e;
+                requestInfo = e.Message;
                 return false;
             }
         }
@@ -107,9 +122,9 @@ namespace ServerMonitor.Services.RequestServices
         /// http请求方法
         /// </summary>
         /// <returns></returns>
-        public async override Task<bool> MakeRequest()
+        public async Task<bool> MakeRequest()
         {
-            bool result =  false;
+            bool result = false;
             switch (httpOrhttps)
             {
                 case TransportProtocol.http:
@@ -148,5 +163,5 @@ namespace ServerMonitor.Services.RequestServices
         https
     };
 
-    
+
 }

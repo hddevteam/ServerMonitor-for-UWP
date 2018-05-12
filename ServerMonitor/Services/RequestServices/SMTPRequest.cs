@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 
-namespace ServerMonitor.Controls
+namespace ServerMonitor.Services.RequestServices
 {
-    class SMTPRequest : BasicRequest
+    class SMTPRequest : BasicRequest,IRequest
     {
         Encoding ASCII = Encoding.ASCII;  //用来转码
         Byte[] ByteCommand;  //待发送命令
@@ -40,7 +37,7 @@ namespace ServerMonitor.Controls
         /// SMTP请求
         /// </summary>
         /// <returns>是否请求成功</returns>
-        public override async Task<bool> MakeRequest()
+        public async Task<bool> MakeRequest()
         {
             CreateTime = DateTime.Now;// 赋值生成请求的时间
             bool outTime = false; //true 为超时
