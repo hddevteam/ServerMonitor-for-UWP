@@ -1,12 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ServerMonitor.Controls;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+using ServerMonitor.Services.RequestServices;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TestServerMonitor.TestRequest
 {
@@ -59,7 +53,7 @@ namespace TestServerMonitor.TestRequest
         [TestMethod]
         [Owner("Bin")]
         [Priority(3)]
-        [Timeout(5000)]
+        //[Timeout(5000)]
         public void TestMakeRequest_ServerNotFTP()
         {           
             request.FtpServer = IPAddress.Parse("8.8.8.8");
@@ -86,6 +80,20 @@ namespace TestServerMonitor.TestRequest
         public void TestMakeRequest_UsernameOrPassError()
         {            
             request.Identification.Username = "123";
+            request.Identification.Password = "free";
+            result = request.MakeRequest().Result;
+
+            Assert.IsFalse(result, "用户名与密码不正确 用例 请求异常！");
+            Assert.IsNotNull(request.ProtocalInfo, "用户名与密码不正确 用例 请求协议内容为空！");
+        }
+
+        [TestMethod]
+        [Owner("Bin")]
+        [Priority(2)]
+        [Timeout(5000)]
+        public void TestMakeRequest_UsernameOrPassNull()
+        {
+            request.Identification.Username = null;
             request.Identification.Password = "free";
             result = request.MakeRequest().Result;
 

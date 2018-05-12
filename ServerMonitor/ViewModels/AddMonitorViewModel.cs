@@ -18,7 +18,7 @@ namespace ServerMonitor.ViewModels
     public class AddMonitorViewModel : Template10.Mvvm.ViewModelBase
     {
         private ListView monitorlist;
-        private List<Site> sites;  //与绑定数据MonitorItems一一对应（第一个对应第一个）,只能在GetListMonitor（）增删操作
+        private List<SiteModel> sites;  //与绑定数据MonitorItems一一对应（第一个对应第一个）,只能在GetListMonitor（）增删操作
         public AddMonitorViewModel()
         {
             //GetListMonitor();

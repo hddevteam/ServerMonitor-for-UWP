@@ -42,7 +42,7 @@ namespace ServerMonitor.ViewModels
             //得到id值
             if (!Value.Equals("0"))
             {
-               Site _mysite =  DBHelper.GetSiteById(int.Parse(Value));//如果是修改站点或者服务器， 这里查询到服务器或站点的信息
+               SiteModel _mysite =  DBHelper.GetSiteById(int.Parse(Value));//如果是修改站点或者服务器， 这里查询到服务器或站点的信息
                 if (_mysite.Is_server == true)
                 {
                     //判断是服务器还是站点    true代表是服务器
@@ -352,7 +352,7 @@ namespace ServerMonitor.ViewModels
             //添加服务器 //Value是0代表是新增，否则value代表修改项的id
             if (Value.Equals("0"))
             {
-                Site _site = new Site();
+                SiteModel _site = new SiteModel();
                 _site.Is_server = true;
                 _site.Monitor_interval = 5;
                 _site.Is_Monitor = true;
@@ -391,7 +391,7 @@ namespace ServerMonitor.ViewModels
             }
             else
             {
-                Site _site = new Site();
+                SiteModel _site = new SiteModel();
                 try
                 {
                     _site.Id = int.Parse(Value);
@@ -440,7 +440,7 @@ namespace ServerMonitor.ViewModels
             //添加website  // Value 为0是新增，Value 不为0 则代表修改的id
             if (Value.Equals("0"))
             {
-                Site _site = new Site();
+                SiteModel _site = new SiteModel();
                 _site.Is_server = false;
                 _site.Monitor_interval = 5;
                 _site.Is_Monitor = true;
@@ -475,7 +475,7 @@ namespace ServerMonitor.ViewModels
             }
             else
             {
-                Site _site = new Site();
+                SiteModel _site = new SiteModel();
                 _site.Is_server = false;
                 _site.Monitor_interval = 5;
                 _site.Is_Monitor = true;

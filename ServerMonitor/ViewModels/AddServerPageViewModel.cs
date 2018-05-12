@@ -139,11 +139,11 @@ namespace ServerMonitor.ViewModels
         }
         #endregion
 
-        private ObservableCollection<Contact> contacts = new ObservableCollection<Contact>(); //所有联系人，在本界面只添加一次数据
-        public ObservableCollection<Contact> Contacts { get => contacts; set => contacts = value; }
+        private ObservableCollection<ContactModel> contacts = new ObservableCollection<ContactModel>(); //所有联系人，在本界面只添加一次数据
+        public ObservableCollection<ContactModel> Contacts { get => contacts; set => contacts = value; }
 
-        private ObservableCollection<Contact> selectedContacts = new ObservableCollection<Contact>();  //选中的绑定联系人
-        public ObservableCollection<Contact> SelectedContacts { get => selectedContacts; set => selectedContacts = value; }
+        private ObservableCollection<ContactModel> selectedContacts = new ObservableCollection<ContactModel>();  //选中的绑定联系人
+        public ObservableCollection<ContactModel> SelectedContacts { get => selectedContacts; set => selectedContacts = value; }
 
         private int protocolType = 0;
         public int ProtocolType
@@ -315,7 +315,7 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public void Contactlist_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var item = (Contact)e.ClickedItem;
+            var item = (ContactModel)e.ClickedItem;
             tempVs[item.Id] = !tempVs[item.Id];
         }
 
@@ -333,10 +333,10 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public void Save()
         {
-            Site site;
+            SiteModel site;
             if (siteId == -1)  //新建Site
             {
-                site = new Site()
+                site = new SiteModel()
                 {
                     Is_server = true,
                     Monitor_interval = 5,
@@ -416,7 +416,7 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         private void GetListContact()  //不可测
         {
-            List<Contact> list = DBHelper.GetAllContact();
+            List<ContactModel> list = DBHelper.GetAllContact();
             //Contacts.Clear();
             for (int i = 0; i < list.Count; i++)
             {
@@ -484,7 +484,7 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         private void GetEditSite()
         {
-            Site site = DBHelper.GetSiteById(siteId);
+            SiteModel site = DBHelper.GetSiteById(siteId);
             ProtocolType = GetProtocolType(site.Protocol_type);
             SiteAddress = site.Site_address;
             SiteName = site.Site_name;

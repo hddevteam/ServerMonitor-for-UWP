@@ -1,28 +1,20 @@
-﻿using GalaSoft.MvvmLight.Threading;
-using Renci.SshNet;
+﻿using Renci.SshNet;
 using Renci.SshNet.Common;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using Windows.UI.Core;
-using Windows.UI.Xaml;
 
-namespace ServerMonitor.Controls
+namespace ServerMonitor.Services.RequestServices
 {
-    public class SSHRequest : BasicRequest
+    public class SSHRequest : BasicRequest,IRequest
     {
         /// <summary>
         /// Ssh端口
         /// </summary>
         private static short port = 22;
 
-        public string iPAddress { get; set; }
+        public string IPAddress { get; set; }
 
         /// <summary>
         /// Ssh登入类型（匿名|身份验证）
@@ -38,7 +30,7 @@ namespace ServerMonitor.Controls
 
         public SSHRequest(string ipAddress,SshLoginType type)
         {
-            this.iPAddress = ipAddress;
+            this.IPAddress = ipAddress;
             identifyType = type;
             // 选择匿名登入的时候默认设置用户名，密码为anonymous
             if (SshLoginType.Anonymous.Equals(type))
@@ -48,12 +40,12 @@ namespace ServerMonitor.Controls
             }
         }
         
-        public override async Task<bool> MakeRequest()
+        public async Task<bool> MakeRequest()
         {
             await Task.CompletedTask;
             // 赋值生成请求的时间
             CreateTime = DateTime.Now;
-            var cSSH = new SshClient(iPAddress, port, Identification.Username, Identification.Password);
+            var cSSH = new SshClient(IPAddress, port, Identification.Username, Identification.Password);
 
             // 记录请求耗时
             Stopwatch stopwatch = new Stopwatch();

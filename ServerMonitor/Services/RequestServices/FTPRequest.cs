@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -8,14 +7,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ServerMonitor.Controls
+namespace ServerMonitor.Services.RequestServices
 {
     /**
      * Ftp 请求模块
      * 
      * 没有做成单例模式的是因为考虑到有场景会需要多个request对象
      */
-    public class FTPRequest : BasicRequest
+    public class FTPRequest : BasicRequest,IRequest
     {
         // 继承的属性：CreateTime TimeCost OverTime Status Others ErrorException               
         /// <summary>
@@ -78,7 +77,7 @@ namespace ServerMonitor.Controls
         /// 对指定的IPAddress发起登入请求
         /// </summary>
         /// <returns>true:成功|false:失败</returns>
-        public override async Task<bool> MakeRequest()
+        public async Task<bool> MakeRequest()
         {
             // 定义用于存放ftp指令的byte数组
             byte[] PASSBytes = null;

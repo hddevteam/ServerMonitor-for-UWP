@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServerMonitor.Models.DAO
+namespace ServerMonitor.Services.RequestServices
 {
-    public interface IContactDao
+    public interface IRequest
     {
-        int AddContact(Contact contact);        
+        Task<bool> MakeRequest();
     }
 }

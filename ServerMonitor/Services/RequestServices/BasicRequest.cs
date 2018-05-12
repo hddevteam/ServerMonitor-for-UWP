@@ -1,11 +1,6 @@
-﻿using ServerMonitor.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
-namespace ServerMonitor.Controls
+namespace ServerMonitor.Services.RequestServices
 {
     public abstract class BasicRequest
     {
@@ -41,6 +36,5 @@ namespace ServerMonitor.Controls
         public string Others { get => others; set => others = value; }
         public Exception ErrorException { get => errorException; set => errorException = value; }
         
-        public abstract Task<bool> MakeRequest();
     }
 }

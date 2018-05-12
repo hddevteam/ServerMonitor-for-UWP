@@ -16,7 +16,7 @@ namespace ServerMonitor.ViewModels
 {
     public class ContactPageViewModel : Template10.Mvvm.ViewModelBase
     {
-        private Contact selectedContact; //点击或右击对应的联系人
+        private ContactModel selectedContact; //点击或右击对应的联系人
         Grid rightFrame2, rightFrame1;  //右方隐藏控件 RightFrame1:联系人详细信息;  RightFrame2:编辑联系人，新建联系人
         int isAddContact = 0; //1:添加联系人 2：编辑联系人 0：什么都不做
         public ContactPageViewModel()
@@ -25,12 +25,12 @@ namespace ServerMonitor.ViewModels
         }
         #region 绑定数据
         //联系人列表
-        private ObservableCollection<Contact> contacts = new ObservableCollection<Contact>();
-        public ObservableCollection<Contact> Contacts { get => contacts; set => contacts = value; }
+        private ObservableCollection<ContactModel> contacts = new ObservableCollection<ContactModel>();
+        public ObservableCollection<ContactModel> Contacts { get => contacts; set => contacts = value; }
 
         //用于编辑联系人，新建联系人的绑定联系人
-        public Contact RightContact { get => rightContact; set => rightContact = value; }
-        private Contact rightContact = new Contact();
+        public ContactModel RightContact { get => rightContact; set => rightContact = value; }
+        private ContactModel rightContact = new ContactModel();
 
         //RightFrame2的标题
         private string rightFrame2Title = "New Contact";
@@ -76,15 +76,15 @@ namespace ServerMonitor.ViewModels
             //根据点击的事件源 取对应的联系人信息
             if (x is Rectangle)
             {
-                selectedContact = (Contact)(((Rectangle)(e.OriginalSource)).DataContext);
+                selectedContact = (ContactModel)(((Rectangle)(e.OriginalSource)).DataContext);
             }
             else if (x is TextBlock)
             {
-                selectedContact = (Contact)(((TextBlock)(e.OriginalSource)).DataContext);
+                selectedContact = (ContactModel)(((TextBlock)(e.OriginalSource)).DataContext);
             }
             else if(x is Image)
             {
-                selectedContact = (Contact)(((Image)(e.OriginalSource)).DataContext);
+                selectedContact = (ContactModel)(((Image)(e.OriginalSource)).DataContext);
             }
             return true;
         }
@@ -99,7 +99,7 @@ namespace ServerMonitor.ViewModels
             int x = (sender as ListBox).SelectedIndex;
             if (x >= 0)
             {
-                selectedContact = (Contact)((sender as ListBox).Items[x]);
+                selectedContact = (ContactModel)((sender as ListBox).Items[x]);
                 rightFrame1.Visibility = Visibility.Visible; //让联系人详情rightFrame1显示
                 rightFrame2.Visibility = Visibility.Collapsed;
             }
@@ -208,7 +208,7 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         private void GetListContact()  //不可测
         {
-            List<Contact> list = DBHelper.GetAllContact();
+            List<ContactModel> list = DBHelper.GetAllContact();
             Contacts.Clear();
             for (int i = 0; i < list.Count; i++)
             {
@@ -228,9 +228,9 @@ namespace ServerMonitor.ViewModels
         /// <summary>
         /// 深度克隆联系人Contact 
         /// </summary>
-        private Contact CloneContact(Contact contact)  //可测
+        private ContactModel CloneContact(ContactModel contact)  //可测
         {
-            Contact ct = new Contact()
+            ContactModel ct = new ContactModel()
             {
                 Id = contact.Id,
                 Contact_name = contact.Contact_name+"1",
@@ -243,7 +243,7 @@ namespace ServerMonitor.ViewModels
         /// <summary>
         /// 判断新建，编辑时输入是否合法
         /// </summary>
-        private string JudgeInput(Contact contact) //可测
+        private string JudgeInput(ContactModel contact) //可测
         {
             string str = "";
             //手机号码

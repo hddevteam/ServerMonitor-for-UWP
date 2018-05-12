@@ -12,7 +12,7 @@ namespace ServerMonitor.Models
 {
     // 对应的Site表
     [Table("Site")]
-    public class Site : ObservableObject, INotifyPropertyChanged
+    public class SiteModel : ObservableObject, INotifyPropertyChanged
     {
         int id;
         string site_name;
