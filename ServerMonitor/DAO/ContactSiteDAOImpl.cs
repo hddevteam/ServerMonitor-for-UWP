@@ -12,10 +12,25 @@ using System.Threading.Tasks;
 namespace ServerMonitor.DAOImpl
 {
     /// <summary>
-    /// Author:
+    /// Author:xb
     /// </summary>
-    class Contact_SiteDAOImpl : IContactSiteDao
+    public class ContactSiteDAOImpl : IContactSiteDao
     {
+        /// <summary>
+        /// 延迟加载实例
+        /// </summary>
+        public static ContactSiteDAOImpl Instance
+        {
+            get {
+                return Nested.instance;
+            }
+        }
+
+        /// <summary>
+        /// 禁止直接生成实例
+        /// </summary>
+        private ContactSiteDAOImpl() { }
+
         /// <summary>
         /// 根据单个站点ID删除此站点与指定ID联系人的记录
         /// </summary>
@@ -25,7 +40,7 @@ namespace ServerMonitor.DAOImpl
         public int DeleteConnect(int SiteId, int ContactId)
         {
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
             {
                 result = conn.Execute("delete from ContactSiteModel where SiteId = ? and ContactId = ?", SiteId, ContactId);
             }
@@ -40,7 +55,7 @@ namespace ServerMonitor.DAOImpl
         public int DeletSiteAllConnect(int SiteId)
         {
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
             {
                 result = conn.Execute("delete from ContactSiteModel where SiteId = ?", SiteId);
             }
@@ -55,7 +70,7 @@ namespace ServerMonitor.DAOImpl
         public List<ContactSiteModel> GetConnectsBySiteId(int SiteId)
         {
             List<ContactSiteModel> resultList;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
             {
                 resultList = conn.Table<ContactSiteModel>().ToList();
             }
@@ -70,7 +85,7 @@ namespace ServerMonitor.DAOImpl
         public int InsertConnect(ContactModel contact)
         {
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
             {
                 result = conn.Insert(contact);
             }
@@ -85,11 +100,23 @@ namespace ServerMonitor.DAOImpl
         public int InsertListConnects(List<ContactSiteModel> connects)
         {
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
             {
                 result = conn.InsertAll(connects);
             }
             return result;
+        }
+
+        /// <summary>
+        /// 用于延迟加载的实例
+        /// </summary>
+        class Nested
+        {
+            static Nested()
+            {
+
+            }
+            internal static readonly ContactSiteDAOImpl instance = new ContactSiteDAOImpl();
         }
     }
 }
