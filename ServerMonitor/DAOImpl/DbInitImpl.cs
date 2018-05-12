@@ -49,6 +49,7 @@ namespace ServerMonitor.SiteDb
                     conn.CreateTable<Log>();
                     conn.CreateTable<ErrorLog>();
                     conn.CreateTable<Contact>();
+                    conn.CreateTable<Contact_Site>();
                     List<Site> l_site = new List<Site>
                     {
                         // 插入默认的五条数据

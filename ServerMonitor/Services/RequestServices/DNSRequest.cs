@@ -70,11 +70,13 @@ namespace ServerMonitor.Services.RequestServices
                 return false;
             }
             // 赋值生成请求的时间
-            CreateTime = DateTime.Now;            
+            CreateTime = DateTime.Now;
             // 创建解析使用的Dns服务器
-            var resolver = new Resolver(DnsServer, 53);
-            // 设置请求过程的超时控制
-            resolver.Timeout = TimeSpan.FromSeconds(OverTime);
+            var resolver = new Resolver(DnsServer, 53)
+            {
+                // 设置请求过程的超时控制
+                Timeout = TimeSpan.FromSeconds(OverTime)
+            };
             Response response = null;
 
             // 超时控制
