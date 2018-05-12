@@ -1,5 +1,8 @@
 ﻿using ServerMonitor.DAO;
 using ServerMonitor.Models;
+using ServerMonitor.SiteDb;
+using SQLite.Net;
+using SQLite.Net.Platform.WinRT;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,26 +11,85 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.DAOImpl
 {
-    class Contact_SiteDAOImpl : IContact_SiteDao
+    /// <summary>
+    /// Author:
+    /// </summary>
+    class Contact_SiteDAOImpl : IContactSiteDao
     {
-        public int DeleteConnect(int SiteId, int ConnectId)
+        /// <summary>
+        /// 根据单个站点ID删除此站点与指定ID联系人的记录
+        /// </summary>
+        /// <param name="SiteId">特定的站点ID</param>
+        /// <param name="ConnectId">联系人ID</param>
+        /// <returns>此操作影响的数据行数</returns>
+        public int DeleteConnect(int SiteId, int ContactId)
         {
-            throw new NotImplementedException();
+            int result = -1;
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
+            {
+                result = conn.Execute("delete from ContactSiteModel where SiteId = ? and ContactId = ?", SiteId, ContactId);
+            }
+            return result;
         }
 
+        /// <summary>
+        /// 删除指定ID的站点的全部绑定记录
+        /// </summary>
+        /// <param name="SiteId">指定站点的ID</param>
+        /// <returns>此操作影响的数据行数</returns>
         public int DeletSiteAllConnect(int SiteId)
         {
-            throw new NotImplementedException();
+            int result = -1;
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
+            {
+                result = conn.Execute("delete from ContactSiteModel where SiteId = ?", SiteId);
+            }
+            return result;
         }
 
-        public List<ContactSiteModel> GetConnectInfoBySiteId(int SiteId)
+        /// <summary>
+        /// 通过指定的站点ID获取所有该站点的绑定记录
+        /// </summary>
+        /// <param name="SiteId">指定站点的ID</param>
+        /// <returns>指定ID的站点的绑定记录的集合</returns>
+        public List<ContactSiteModel> GetConnectsBySiteId(int SiteId)
         {
-            throw new NotImplementedException();
+            List<ContactSiteModel> resultList;
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
+            {
+                resultList = conn.Table<ContactSiteModel>().ToList();
+            }
+            return resultList;
         }
 
-        public int InsertConnectInfo(ContactModel contact, SiteModel site)
+        /// <summary>
+        /// 插入一条绑定记录
+        /// </summary>
+        /// <param name="contact">待插入的绑定记录</param>
+        /// <returns>此次操作影响的数据行数</returns>
+        public int InsertConnect(ContactModel contact)
         {
-            throw new NotImplementedException();
+            int result = -1;
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
+            {
+                result = conn.Insert(contact);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 插入一个绑定记录的集合
+        /// </summary>
+        /// <param name="connects">绑定记录集合</param>
+        /// <returns>此次操作影响的数据行数</returns>
+        public int InsertListConnects(List<ContactSiteModel> connects)
+        {
+            int result = -1;
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
+            {
+                result = conn.InsertAll(connects);
+            }
+            return result;
         }
     }
 }

@@ -98,7 +98,7 @@
     <Compile Include="DAO\ContactSiteDAOImpl.cs" />
     <Compile Include="DAO\DataBaseControlImpl.cs" />
     <Compile Include="DAO\SiteDAOImpl.cs" />
-    <Compile Include="DAO\IContact_SiteDao.cs" />
+    <Compile Include="DAO\IContactSiteDao.cs" />
     <Compile Include="DAO\IDatbaBaseControl.cs" />
     <Compile Include="DAO\ISiteDAO.cs" />
     <Compile Include="Models\ContactSiteModel.cs" />
