@@ -3,27 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Template10.Mvvm;
-using System.Threading;
 using Windows.UI.Xaml;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using ServerMonitor.Models;
 using GalaSoft.MvvmLight;
 using ServerMonitor.Controls;
 using Windows.UI.Xaml.Media;
-using System.Diagnostics;
-using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using ServerMonitor.Views;
-using Windows.UI.Xaml.Data;
-using System.Globalization;
-using Telerik.UI.Xaml.Controls.Chart;
-using Windows.UI;
-using Windows.ApplicationModel.Core;
-using Windows.UI.Core;
-using Windows.UI.ViewManagement;
-using GalaSoft.MvvmLight.Threading;
 using Telerik.Charting;
 
 namespace ServerMonitor.ViewModels
@@ -136,7 +122,7 @@ namespace ServerMonitor.ViewModels
         public async Task<bool> InitAsync()
         {
             Lengend = new ObservableCollection<ChartLengend>();
-            ChartDao = new ChartManger();
+            ChartDao = new ChartDaoImpl();
             Chart1Collection = new ObservableCollection<ObservableCollection<Chart1>>();
             Infos.Chart1CollectionCopy = new ObservableCollection<ObservableCollection<Chart1>>();
             Infos.SelectSites = new ObservableCollection<SelectSite>();

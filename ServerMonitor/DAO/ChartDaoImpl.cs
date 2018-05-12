@@ -9,7 +9,7 @@ using Telerik.UI.Xaml.Controls.Chart;
 
 namespace ServerMonitor.ViewModels
 {
-    public class ChartManger : IChartDao
+    public class ChartDaoImpl : IChartDao
     {
         public ChartPalette DefaultPalette{ get{ return ChartPalettes.DefaultLight;} }
 
@@ -19,7 +19,7 @@ namespace ServerMonitor.ViewModels
 
         public ObservableCollection<BarChartData> GridChart { get; set; }
 
-        public ChartManger()
+        public ChartDaoImpl()
         {
             Lengend = new ObservableCollection<ChartLengend>();
             BarChart = new ObservableCollection<BarChartData>();
