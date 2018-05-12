@@ -21,10 +21,10 @@ namespace ServerMonitor.Views
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class Contact : Page
+    public sealed partial class ContactPage : Page
     {
-        ContactViewModel model;
-        public Contact()
+        ContactPageViewModel model;
+        public ContactPage()
         {
             this.InitializeComponent();
             this.Loaded += Contact_Loaded;
@@ -32,7 +32,7 @@ namespace ServerMonitor.Views
 
         private void Contact_Loaded(object sender, RoutedEventArgs e)
         {
-            model = this.ViewModel as ContactViewModel;
+            model = this.ViewModel as ContactPageViewModel;
             model.SetFrame(this.RightFrame1,this.RightFrame2);
         }
 
@@ -40,7 +40,7 @@ namespace ServerMonitor.Views
         {
             if(model==null)
             {
-                model = this.ViewModel as ContactViewModel;
+                model = this.ViewModel as ContactPageViewModel;
             }
             if (model.ContactList_RightTapped(sender, e))  //交由ViewModel中的对应的方法处理
             {

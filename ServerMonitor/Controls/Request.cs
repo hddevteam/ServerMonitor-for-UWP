@@ -45,8 +45,10 @@ namespace ServerMonitor.Controls
                     {
                         //exception.Text = "报文出现问题";
                         //backData.Add("报文出现问题", "-1");
-                        IcmpReturn information = new IcmpReturn();
-                        information.Color = "0";//错误
+                        IcmpReturn information = new IcmpReturn
+                        {
+                            Color = "0"//错误
+                        };
                         string backJson = JsonConvert.SerializeObject(information);
                         backData.Add("1", backJson);
                         return backData;
@@ -70,8 +72,10 @@ namespace ServerMonitor.Controls
                     {
                         //exception.Text = "报文出错2";
                         //backData.Add("报文出现问题", "0");
-                        IcmpReturn information = new IcmpReturn();
-                        information.Color = "0";//错误
+                        IcmpReturn information = new IcmpReturn
+                        {
+                            Color = "0"//错误
+                        };
                         string backJson = JsonConvert.SerializeObject(information);
                         backData.Add("1", backJson);
                         return backData;
@@ -88,8 +92,10 @@ namespace ServerMonitor.Controls
                         {
                             //exception.Text = "无法传送";
                             //backData.Add("访问被拒绝", "403");
-                            IcmpReturn information = new IcmpReturn();
-                            information.Color = "0";//错误
+                            IcmpReturn information = new IcmpReturn
+                            {
+                                Color = "0"//错误
+                            };
                             string backJson = JsonConvert.SerializeObject(information);
                             backData.Add(i.ToString(), backJson);
                             return backData;
@@ -119,8 +125,10 @@ namespace ServerMonitor.Controls
                             {
                                 //exception.Text = "主机未响应";
                                 //backData.Add("主机未响应", "404");
-                                IcmpReturn information = new IcmpReturn();
-                                information.Color = "0";//错误
+                                IcmpReturn information = new IcmpReturn
+                                {
+                                    Color = "0"//错误
+                                };
                                 string backJson = JsonConvert.SerializeObject(information);
                                 backData.Add(i.ToString(), backJson);
                                 //return backData;
@@ -131,11 +139,13 @@ namespace ServerMonitor.Controls
                                 timeconsume = System.Environment.TickCount - starttime;
                                 //得到与发送间隔时间
                                 //exception.Text += "reply from: " + hostep4.ToString() + "  In " + timeconsume + "ms:  bytes Received" + Nbytes + "\r\n";
-                                IcmpReturn information = new IcmpReturn();
-                                information.Time = timeconsume.ToString();
-                                information.TTL = socket.Ttl.ToString();
-                                information.Bytes = Nbytes.ToString();
-                                information.Color = "1";
+                                IcmpReturn information = new IcmpReturn
+                                {
+                                    Time = timeconsume.ToString(),
+                                    TTL = socket.Ttl.ToString(),
+                                    Bytes = Nbytes.ToString(),
+                                    Color = "1"
+                                };
                                 string backJson = JsonConvert.SerializeObject(information);
                                 backData.Add(i.ToString(), backJson);
                                 break;
@@ -145,8 +155,10 @@ namespace ServerMonitor.Controls
                             {
                                 //exception.Text = "time out";
                                 //backData.Add("超时", "404");
-                                IcmpReturn information = new IcmpReturn();
-                                information.Color = "-1";//超时
+                                IcmpReturn information = new IcmpReturn
+                                {
+                                    Color = "-1"//超时
+                                };
                                 string backJson = JsonConvert.SerializeObject(information);
                                 backData.Add(i.ToString(), backJson);
                                 //return backData;
@@ -158,8 +170,10 @@ namespace ServerMonitor.Controls
                     catch (Exception ex)
                     {
                         string s = ex.Message;
-                        IcmpReturn information = new IcmpReturn();
-                        information.Color = "0";//超时
+                        IcmpReturn information = new IcmpReturn
+                        {
+                            Color = "0"//超时
+                        };
                         string backJson = JsonConvert.SerializeObject(information);
                         backData.Add(i.ToString(), backJson);
                         return backData;
@@ -170,8 +184,10 @@ namespace ServerMonitor.Controls
             else
             {
                 //backData.Add("ip地址不规范", "-1");
-                IcmpReturn information = new IcmpReturn();
-                information.Color = "0";//错误
+                IcmpReturn information = new IcmpReturn
+                {
+                    Color = "0"//错误
+                };
                 string backJson = JsonConvert.SerializeObject(information);
                 backData.Add("1", backJson);
                 return backData;
@@ -297,12 +313,16 @@ namespace ServerMonitor.Controls
             try
             {
                 // 生成默认请求的处理帮助器
-                HttpClientHandler handler = new HttpClientHandler();
-                // 设置程序是否跟随重定向
-                handler.AllowAutoRedirect = false;
+                HttpClientHandler handler = new HttpClientHandler
+                {
+                    // 设置程序是否跟随重定向
+                    AllowAutoRedirect = false
+                };
                 // 生成自定义的请求处理器
-                CustomHandler cu = new CustomHandler();
-                cu.InnerHandler = handler;
+                CustomHandler cu = new CustomHandler
+                {
+                    InnerHandler = handler
+                };
                 HttpClient client = new HttpClient(cu);
                 //设置标头
                 client.DefaultRequestHeaders.Referrer = new Uri(uri);

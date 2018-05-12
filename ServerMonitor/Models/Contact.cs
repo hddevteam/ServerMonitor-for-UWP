@@ -47,7 +47,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Contact_email);
             }
         }
-        public DateTime Create_time /*{ get => create_time; set => create_time = value; }*/
+        public DateTime Create_time
         {
             get => create_time;
             set
@@ -56,7 +56,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Create_time);
             }
         }
-        public DateTime Update_time /*{ get => update_time; set => update_time = value; }*/
+        public DateTime Update_time
         {
             get => update_time;
             set
@@ -65,7 +65,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Update_time);
             }
         }
-        public string Others /*{ get => others; set => others = value; }*/
+        public string Others
         {
             get => others;
             set
@@ -74,7 +74,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Others);
             }
         }
-        public string Telephone /*{ get => telephone; set => telephone = value; }*/
+        public string Telephone
         {
             get => telephone;
             set

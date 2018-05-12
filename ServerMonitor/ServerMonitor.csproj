@@ -95,22 +95,27 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\BasicRequest.cs" />
-    <Compile Include="Controls\DataHelper.cs" />
+    <Compile Include="DAOImpl\DbInitImpl.cs" />
+    <Compile Include="DAOImpl\SiteDaoImpl.cs" />
+    <Compile Include="DAO\DBInit.cs" />
+    <Compile Include="DAO\SiteDAO.cs" />
+    <Compile Include="Services\RequestServices\BasicRequest.cs" />
+    <Compile Include="Common\DataHelper.cs" />
     <Compile Include="Controls\DBHelper.cs" />
-    <Compile Include="Controls\DnsRequest.cs" />
-    <Compile Include="Controls\FtpRequest.cs" />
-    <Compile Include="Controls\IcmpPacket.cs" />
+    <Compile Include="Services\RequestServices\DNSRequest.cs" />
+    <Compile Include="Services\RequestServices\FTPRequest.cs" />
+    <Compile Include="Common\IcmpPacket.cs" />
     <Compile Include="Controls\Request.cs" />
-    <Compile Include="Controls\SMTPRequest.cs" />
-    <Compile Include="Controls\SSHRequest.cs" />
-    <Compile Include="Controls\UnitTest.cs" />
+    <Compile Include="Services\RequestServices\HTTPRequest.cs" />
+    <Compile Include="Services\RequestServices\SMTPRequest.cs" />
     <Compile Include="CustomConverter.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\Contact.cs" />
-    <Compile Include="Models\CustomHandler.cs" />
+    <Compile Include="Common\CustomHandler.cs" />
+    <Compile Include="DAO\ContactDao.cs" />
+    <Compile Include="DAO\IDAO\IContactDao.cs" />
     <Compile Include="Models\ErrorLog.cs" />
     <Compile Include="Models\Log.cs" />
     <Compile Include="Models\Site.cs" />
@@ -123,6 +128,7 @@
     <Compile Include="ViewModels\AllServer_addserverViewModel.cs" />
     <Compile Include="ViewModels\Manger\ChartManger.cs" />
     <Compile Include="ViewModels\ChartPageViewModel.cs" />
+    <Compile Include="ViewModels\ContactPageViewModel.cs" />
     <Compile Include="ViewModels\ContactViewModel.cs" />
     <Compile Include="ViewModels\Dao\IChartDao.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
@@ -153,8 +159,8 @@
     <Compile Include="Views\Chart.xaml.cs">
       <DependentUpon>Chart.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Contact.xaml.cs">
-      <DependentUpon>Contact.xaml</DependentUpon>
+    <Compile Include="Views\ContactPage.xaml.cs">
+      <DependentUpon>ContactPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\DetailPage.xaml.cs">
       <DependentUpon>DetailPage.xaml</DependentUpon>
@@ -189,37 +195,25 @@
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
     <Content Include="Common\Config.xml" />
-    <Content Include="Common\example-xmal.xml" />
-    <Content Include="Common\README.txt" />
+    <Content Include="Images\addcontact.png" />
     <Content Include="Images\addphone.png" />
     <Content Include="Images\adduser.png" />
-    <Content Include="Images\appbar.add.png" />
-    <Content Include="Images\appbar.back.png" />
-    <Content Include="Images\appbar.cancel.png" />
-    <Content Include="Images\appbar.check.png" />
-    <Content Include="Images\appbar.delete.png" />
-    <Content Include="Images\appbar.eventlist.png" />
-    <Content Include="Images\appbar.home.png" />
-    <Content Include="Images\appbar.move.png" />
-    <Content Include="Images\appbar.refresh.png" />
-    <Content Include="Images\appbar.seeall.png" />
-    <Content Include="Images\appbar.settings.png" />
+    <Content Include="Images\cancel.png" />
+    <Content Include="Images\commit.png" />
+    <Content Include="Images\delete.png" />
+    <Content Include="Images\e-mail.png" />
     <Content Include="Images\error.png" />
     <Content Include="Images\head.png" />
-    <Content Include="Images\ic.app.png" />
-    <Content Include="Images\ic.edit.png" />
-    <Content Include="Images\ic.email.png" />
-    <Content Include="Images\ic.filter.png" />
-    <Content Include="Images\ic.phone.png" />
-    <Content Include="Images\ic.server.png" />
     <Content Include="Images\ic_website.png" />
     <Content Include="Images\ic_precheck.png" />
     <Content Include="Images\ic_server.png" />
     <Content Include="Images\iconfont_add.png" />
+    <Content Include="Images\phone.png" />
     <Content Include="Images\radio02.png" />
     <Content Include="Images\ServerMonitor_icon.png" />
     <Content Include="Images\Server_Ico.jpg" />
     <Content Include="Images\splash-sdk.png" />
+    <Content Include="Images\test.png" />
     <Content Include="Images\valley.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="README.txt" />
@@ -272,7 +266,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Contact.xaml">
+    <Page Include="Views\ContactPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -326,9 +320,6 @@
     <PackageReference Include="SQLitePCL">
       <Version>3.8.7.2</Version>
     </PackageReference>
-    <PackageReference Include="SSH.NET">
-      <Version>2016.1.0</Version>
-    </PackageReference>
     <PackageReference Include="System.Net.Ping">
       <Version>4.3.0</Version>
     </PackageReference>
@@ -357,8 +348,7 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Controls\RequestClass\" />
-    <Folder Include="Models\DDL\" />
+    <Folder Include="Util\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

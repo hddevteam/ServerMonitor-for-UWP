@@ -14,12 +14,12 @@ using System.Text.RegularExpressions;
 
 namespace ServerMonitor.ViewModels
 {
-    public class ContactViewModel : Template10.Mvvm.ViewModelBase
+    public class ContactPageViewModel : Template10.Mvvm.ViewModelBase
     {
         private Contact selectedContact; //点击或右击对应的联系人
         Grid rightFrame2, rightFrame1;  //右方隐藏控件 RightFrame1:联系人详细信息;  RightFrame2:编辑联系人，新建联系人
         int isAddContact = 0; //1:添加联系人 2：编辑联系人 0：什么都不做
-        public ContactViewModel()
+        public ContactPageViewModel()
         {
 
         }
