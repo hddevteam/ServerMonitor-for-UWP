@@ -1,4 +1,5 @@
 ﻿using ServerMonitor.Controls;
+using ServerMonitor.DAOImpl;
 using ServerMonitor.Models;
 using SQLite.Net;
 using SQLite.Net.Platform.WinRT;
@@ -21,16 +22,27 @@ namespace ServerMonitor.SiteDb
         /// <summary>
         /// 数据库名称
         /// </summary>
-        private static string DbFilename;
+        private static string dbFileName;
         /// <summary>
         /// 数据库路径，通过私有方法生成
         /// </summary>
-        private static string DBPath;
-        public static string DbFilename1 { get => DbFilename; set => DbFilename = value; }
+        private static string dBPath;
+        /// <summary>
+        /// 延迟加载对象
+        /// </summary>
+        private DbInitImpl Instance {
+            get {
+                return Nested.instance;
+            }
+        }
+        public static string DbFileName { get => dbFileName; set => dbFileName = value; }
         /// <summary>
         /// 数据库路径由私有方法生成，所以设为只读变量
         /// </summary>
-        public static string DBPath1 { get => DBPath; }
+        public static string DBPath { get => dBPath; }
+
+        private DbInitImpl() { }
+
         /// <summary>
         /// 初始化数据库
         /// </summary>
@@ -40,10 +52,10 @@ namespace ServerMonitor.SiteDb
             SetDBFilename(DBFilename);
             siteDao = new SiteDaoImpl();
             // ApplicationData.Current.LocalFolder.Path balabala的指的是这个位置 ->C:\Users\xiao22805378\AppData\Local\Packages\92211ab1-5481-4a1a-9111-a3dd87b81b72_8zmgqd0netmce\LocalState\
-            if (!File.Exists(DBPath))//判断数据库文件是否存在
+            if (!File.Exists(dBPath))//判断数据库文件是否存在
             {
                 // ApplicationData.Current.LocalFolder.Path balabala的指的是这个位置 ->C:\Users\xiao22805378\AppData\Local\Packages\92211ab1-5481-4a1a-9111-a3dd87b81b72_8zmgqd0netmce\LocalState\
-                using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
+                using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), dBPath))
                 {
                     conn.CreateTable<SiteModel>();
                     conn.CreateTable<LogModel>();
@@ -214,9 +226,15 @@ namespace ServerMonitor.SiteDb
             }
             else
             {
-                DbFilename1 = Filename;
-                DBPath = Path.Combine(ApplicationData.Current.LocalFolder.Path, DbFilename1);
+                DbFileName = Filename;
+                dBPath = Path.Combine(ApplicationData.Current.LocalFolder.Path, DbFileName);
             }
+        }
+
+        class Nested {
+            static Nested(){}
+            internal static readonly DbInitImpl instance = new DbInitImpl();
+            
         }
     }
 }
