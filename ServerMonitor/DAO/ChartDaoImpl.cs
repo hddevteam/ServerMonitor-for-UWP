@@ -156,7 +156,6 @@ namespace ServerMonitor.ViewModels
             int index = 0;
             foreach (var item in sites)
             {
-                //添加图片
                 string type;
                 if (item.Is_server)
                 {

@@ -107,7 +107,7 @@ namespace TestServerMonitor.TestViewModel
                 ObservableCollection<BarChartData> data2 = new ObservableCollection<BarChartData>();
                 return new Tuple<ObservableCollection<BarChartData>, ObservableCollection<BarChartData>>(data1, data2);
             }, Times.Twice);
-
+            viewModel.Type = "All";
             //less
             Assert.IsTrue(viewModel.AcceptClickAsync().Result);
             //equal

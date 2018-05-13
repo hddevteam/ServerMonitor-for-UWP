@@ -132,31 +132,20 @@ namespace ServerMonitor.ViewModels
             return true;
         }
 
-        #region 读取数据库数据（暂时为假数据，未使用数据库操作）
         public async Task<List<SiteModel>> LoadDbSiteAsync()
         {
             await Task.CompletedTask;
-            List<SiteModel> site = new List<SiteModel>();
-            site.Add(new SiteModel() { Id = 1, Is_server = true, Site_name = "server" });
-            return site;
-            //return DBHelper.GetAllSite();
+            return DBHelper.GetAllSite();
         }
         public async Task<List<LogModel>> LoadDbLogAsync()
         {
             await Task.CompletedTask;
             List<LogModel> logs = new List<LogModel>();
-            logs.Add(new LogModel() { Site_id = 1, Request_time = 200, Is_error = false, Create_time = DateTime.Now, Status_code = "1002" });
-            logs.Add(new LogModel() { Site_id = 1, Request_time = 500, Is_error = true, Create_time = DateTime.Now.AddHours(-12) });
-            logs.Add(new LogModel() { Site_id = 1, Request_time = 2600, Is_error = false, Create_time = DateTime.Now.AddHours(-6), Status_code = "1002" });
-            logs.Add(new LogModel() { Site_id = 1, Request_time = 100, Is_error = false, Create_time = DateTime.Now.AddHours(-23) });
-            logs.Add(new LogModel() { Site_id = 1, Request_time = 3000, Is_error = false, Create_time = DateTime.Now.AddHours(-35) });
-            logs.Add(new LogModel() { Site_id = 1, Request_time = 7000, Is_error = true, Create_time = DateTime.Now.AddHours(-2), Status_code = "1002" });
-            //logs = DBHelper.GetAllLog();
+            logs = DBHelper.GetAllLog();
             //数据排序，便于图表按序显示
             logs = logs.OrderBy(o => o.Create_time).ToList();
             return logs;
         }
-        #endregion
 
         #endregion
 
