@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServerMonitor.DAO
+namespace ServerMonitor.SiteDb
 {
     interface DBInit
     {
