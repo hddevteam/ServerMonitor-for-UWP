@@ -108,7 +108,8 @@ namespace ServerMonitor.ViewModels
                     if (log.Site_id == site.Id)
                     {
                         //该条记录结果统计
-                        string result = ""; Double responseTime = 0;
+                        string result = "";
+                        Double responseTime = 0;
                         //判断并记录该条log是成功，失败，还是超时
                         if (!log.Is_error)
                         {

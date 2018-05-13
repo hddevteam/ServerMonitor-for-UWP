@@ -21,9 +21,9 @@ namespace ServerMonitor.ViewModels
     public class ChartPageViewModel : Template10.Mvvm.ViewModelBase
     {
         #region 变量
-
         const int MAX_NUMBER_OF_SITE = 5;
         const int ERROR_CODE = 4;
+
         public IChartDao ChartDao { get; set; }
 
         private SiteRequestCountInfo infos;
@@ -62,7 +62,6 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        public List<string> PivotSource { get; set; }
         private int pivotIndex;
         public int PivotIndex
         {
@@ -90,7 +89,6 @@ namespace ServerMonitor.ViewModels
         public ChartPageViewModel()
         {
             RequestResult = new List<string> {"All", "Success", "Error", "OverTime" };
-            PivotSource = new List<string> { "Today", "Three Days", "Senven Days" };
             PivotIndex = 0;
             Infos = new SiteRequestCountInfo();
         }
@@ -103,16 +101,15 @@ namespace ServerMonitor.ViewModels
             //加载数据库数据
             var log = await LoadDbLogAsync();
             var site = await LoadDbSiteAsync();
-
             var selectResult = await ChartDao.SelectSitesAsync(site);
-
             Infos.Sites =  selectResult.Item2;
             Infos.Logs = log;
             Infos.SelectSites = selectResult.Item1;
 
             //计算图表数据
             await ChartAsync(Infos.Sites, Infos.Logs);
-            Type = "All";//默认显示全部
+            //默认显示全部
+            Type = "All";
             //图表加载完毕后切换加载状态
             Infos.State3 = Visibility.Collapsed;
             Infos.State1 = Visibility.Visible;
@@ -135,12 +132,12 @@ namespace ServerMonitor.ViewModels
             return true;
         }
 
-        //加载数据库数据
+        #region 读取数据库数据（暂时为假数据，未使用数据库操作）
         public async Task<List<SiteModel>> LoadDbSiteAsync()
         {
             await Task.CompletedTask;
             List<SiteModel> site = new List<SiteModel>();
-            site.Add(new SiteModel() { Id = 1, Is_server = true,Site_name="server" });
+            site.Add(new SiteModel() { Id = 1, Is_server = true, Site_name = "server" });
             return site;
             //return DBHelper.GetAllSite();
         }
@@ -148,7 +145,7 @@ namespace ServerMonitor.ViewModels
         {
             await Task.CompletedTask;
             List<LogModel> logs = new List<LogModel>();
-            logs.Add(new LogModel() { Site_id = 1, Request_time = 200, Is_error = false, Create_time = DateTime.Now, Status_code="1002" });
+            logs.Add(new LogModel() { Site_id = 1, Request_time = 200, Is_error = false, Create_time = DateTime.Now, Status_code = "1002" });
             logs.Add(new LogModel() { Site_id = 1, Request_time = 500, Is_error = true, Create_time = DateTime.Now.AddHours(-12) });
             logs.Add(new LogModel() { Site_id = 1, Request_time = 2600, Is_error = false, Create_time = DateTime.Now.AddHours(-6), Status_code = "1002" });
             logs.Add(new LogModel() { Site_id = 1, Request_time = 100, Is_error = false, Create_time = DateTime.Now.AddHours(-23) });
@@ -159,6 +156,7 @@ namespace ServerMonitor.ViewModels
             logs = logs.OrderBy(o => o.Create_time).ToList();
             return logs;
         }
+        #endregion
 
         #endregion
 
@@ -216,9 +214,9 @@ namespace ServerMonitor.ViewModels
         }
 
         /// <summary>
-        /// 选择站点
+        /// 切换至选择站点页面
         /// </summary>
-        public void ChartFliter_Click()
+        public void ChartFliterClick()
         {
             Infos.State1 = Visibility.Collapsed;
             Infos.State2 = Visibility.Visible;
@@ -270,8 +268,7 @@ namespace ServerMonitor.ViewModels
         /// <summary>
         /// Pivot 切换时间区间时触发（当天，近三天，近一周）
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <returns>返回SelectedIndex</returns>
         public int PivotSelectionChanged()
         {
             int _selectedIndex = PivotIndex;
@@ -359,7 +356,7 @@ namespace ServerMonitor.ViewModels
         private DateTime maxnumDateTime = DateTime.Now;
         //图表1 坐标轴时间线起始值
         private DateTime minnumDateTime = DateTime.Now.Date;
-        private string chartTitle = "Today's request results";
+        private string chartTitle;
 
         public string ChartTitle
         {

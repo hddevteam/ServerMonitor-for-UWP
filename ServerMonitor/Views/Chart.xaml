@@ -52,7 +52,7 @@
                              RelativePanel.AlignTopWithPanel="True"
                              Text="Charts" >
             <controls:PageHeader.PrimaryCommands>
-                <AppBarButton Icon="Filter" Foreground="White" Visibility="{x:Bind ViewModel.Infos.State1,Mode=TwoWay}" Click="{x:Bind ViewModel.ChartFliter_Click}"></AppBarButton>
+                <AppBarButton Icon="Filter" Foreground="White" Visibility="{x:Bind ViewModel.Infos.State1,Mode=TwoWay}" Click="{x:Bind ViewModel.ChartFliterClick}"></AppBarButton>
                 <AppBarButton Icon="Accept" Foreground="White" Visibility="{x:Bind ViewModel.Infos.State2,Mode=TwoWay}" Click="{x:Bind ViewModel.AcceptClickAsync}"></AppBarButton>
             </controls:PageHeader.PrimaryCommands>
         </controls:PageHeader>
