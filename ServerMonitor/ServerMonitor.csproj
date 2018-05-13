@@ -100,7 +100,7 @@
     <Compile Include="DAO\ILogDAO.cs" />
     <Compile Include="DAO\LogDAOImpl.cs" />
     <Compile Include="DAO\SiteDAOImpl.cs" />
-    <Compile Include="DAO\IContact_SiteDao.cs" />
+    <Compile Include="DAO\IContactSiteDao.cs" />
     <Compile Include="DAO\IDatbaBaseControl.cs" />
     <Compile Include="DAO\ISiteDAO.cs" />
     <Compile Include="Models\ContactSiteModel.cs" />
