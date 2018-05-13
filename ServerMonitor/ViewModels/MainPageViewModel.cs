@@ -16,6 +16,7 @@ using System.Net;
 using System.Net.Sockets;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ServerMonitor.Util;
 
 namespace ServerMonitor.ViewModels
 {
@@ -152,12 +153,18 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public static void Pre_Check()
         {
+			MessageRemind toast = new MessageRemind();
             //对google dns进行pre check (8.8.8.8)
             var _googleDnsBack = Request.IcmpRequest(IPAddress.Parse("8.8.8.8"));
             string _resultcolor = DataHelper.GetColor(_googleDnsBack);//得到返回值
             SiteModel _preCheckSite = DBHelper.GetSiteById(4);//初始化precheck记录，目前是ID 4 
             _preCheckSite.Last_request_result = int.Parse(_resultcolor);//更新color
             _preCheckSite.Request_count = _preCheckSite.Request_count + 1;//更新请求次数
+			if ("0".Equals(_resultcolor))
+			{
+				//如果站点发生错误，发送消息提醒
+				toast.ShowToast(_preCheckSite);
+			}
             DBHelper.UpdateSite(_preCheckSite);//更新站点
             MainPageViewModel _getlist = new MainPageViewModel();
             _getlist.GetListSite();//更新ui
@@ -170,6 +177,7 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public async void RequestAll_Click(object sender, RoutedEventArgs e)
         {
+			MessageRemind toast = new MessageRemind();
             var sitelist = SiteItems;//获取sitelist
             int leng = sitelist.Count;
             for (int i = 0; i < leng; i++)
@@ -205,15 +213,21 @@ namespace ServerMonitor.ViewModels
 
                     backData = Request.IcmpRequest(reIP);
                     SiteModel upSite = new SiteModel();
-                    upSite = DBHelper.GetSiteById(item.Id);
-                    var color = DataHelper.GetColor(backData);
+                    upSite = DBHelper.GetSiteById(item.Id);//找出请求的站点id
+                    var color = DataHelper.GetColor(backData);//站点请求状态
                     var dictionary = backData;
-                    var time = DataHelper.GetTime(backData);
+                    var time = DataHelper.GetTime(backData);//请求时间
+
 
                     try
                     {
                         upSite.Last_request_result = int.Parse(color);
                         upSite.Request_interval = int.Parse(time);
+						if ("0".Equals(color))
+						{
+							//站点发生错误
+							toast.ShowToast(upSite);
+						}
                         DBHelper.UpdateSite(upSite);
                     }
                     catch { }
@@ -238,7 +252,12 @@ namespace ServerMonitor.ViewModels
                             upSite.Last_request_result = int.Parse(color);
                             upSite.Status_code = status;
                             upSite.Request_interval = int.Parse(time);
-                            DBHelper.UpdateSite(upSite);
+							if ("0".Equals(color))
+							{
+								//站点发生错误
+								toast.ShowToast(upSite);
+							}
+							DBHelper.UpdateSite(upSite);
                         }
                         catch { }
                         GetListSite();
