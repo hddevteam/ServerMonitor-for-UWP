@@ -35,6 +35,7 @@ namespace ServerMonitor.Views
             this.InitializeComponent();
             NavigationCacheMode = NavigationCacheMode.Disabled;
         }
+
         
     }
 }

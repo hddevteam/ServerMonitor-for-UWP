@@ -30,10 +30,10 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="sites"></param>
         /// <returns></returns>
-        public async Task<Tuple<ObservableCollection<SelectSite>, List<Site>>> SelectSitesAsync(List<Site> sites)
+        public async Task<Tuple<ObservableCollection<SelectSite>, List<SiteModel>>> SelectSitesAsync(List<SiteModel> sites)
         {
             var selectSites = new ObservableCollection<SelectSite>();
-            var Sites = new List<Site>();
+            var Sites = new List<SiteModel>();
             foreach (var item in sites.Where(i => i.Is_pre_check == false).Select(i => i))
             {
                 //初始时默认选中前五条
@@ -62,7 +62,7 @@ namespace ServerMonitor.ViewModels
                 }
             }
             await Task.CompletedTask;
-            return new Tuple<ObservableCollection<SelectSite>, List<Site>>(selectSites, Sites);
+            return new Tuple<ObservableCollection<SelectSite>, List<SiteModel>>(selectSites, Sites);
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="sites"></param>
         /// <returns></returns>
-        public async Task<ObservableCollection<ChartLengend>> ChartLengendAsync(List<Site> sites)
+        public async Task<ObservableCollection<ChartLengend>> ChartLengendAsync(List<SiteModel> sites)
         {
             int i = 0;
             foreach (var item in sites)
@@ -88,7 +88,7 @@ namespace ServerMonitor.ViewModels
         /// <param name="sites"></param>
         /// <param name="logs"></param>
         /// <returns></returns>
-        public async Task<Tuple<ObservableCollection<ObservableCollection<Chart1>>, int[,]>> CacuChartAsync(List<Site> sites, List<Log> logs)
+        public async Task<Tuple<ObservableCollection<ObservableCollection<Chart1>>, int[,]>> CacuChartAsync(List<SiteModel> sites, List<LogModel> logs)
         {
             var chart1Collection = new ObservableCollection<ObservableCollection<Chart1>>();
             //对每个站点进行统计
@@ -114,13 +114,13 @@ namespace ServerMonitor.ViewModels
                         {
                             //成功
                             successCount++; result = "Success";
-                            responseTime = Math.Log10(log.Request_time);
+                            responseTime = log.Request_time;
                         }
                         else if (log.Status_code == "1002") //状态码为1002时表示请求超时
                         {
                             //超时
                             overtimeCount++; result = "OverTime";
-                            responseTime = Math.Log10(log.Request_time);
+                            responseTime = log.Request_time;
                         }
                         else
                         {
@@ -150,7 +150,7 @@ namespace ServerMonitor.ViewModels
         /// <param name="sites"></param>
         /// <param name="requestResults"></param>
         /// <returns></returns>
-        public Tuple<ObservableCollection<BarChartData>, ObservableCollection<BarChartData>> CacuBarChart(List<Site> sites, int[,] requestResults)
+        public Tuple<ObservableCollection<BarChartData>, ObservableCollection<BarChartData>> CacuBarChart(List<SiteModel> sites, int[,] requestResults)
         {
             int index = 0;
             foreach (var item in sites)

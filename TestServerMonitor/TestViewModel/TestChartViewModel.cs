@@ -19,19 +19,19 @@ namespace TestServerMonitor.TestViewModel
         private ChartPageViewModel viewModel;
 
         public ChartPalette DefaultPalette { get { return ChartPalettes.DefaultLight; } }
-        public List<Site> Sites { get; set; }
-        public List<Log> Logs { get; set; }
+        public List<SiteModel> Sites { get; set; }
+        public List<LogModel> Logs { get; set; }
 
         [TestInitialize]
         public void Initialize()
         {
             viewModel = new ChartPageViewModel();
-            Sites = new List<Site>();
-            Logs = new List<Log>();
+            Sites = new List<SiteModel>();
+            Logs = new List<LogModel>();
             for (int i = 1; i <= 5; i++)
             {
-                Logs.Add(new Log() { Site_id = i, Is_error = true });
-                Sites.Add(new Site() { Id = i, Site_name = "Site" + i, Is_server = true });
+                Logs.Add(new LogModel() { Site_id = i, Is_error = true });
+                Sites.Add(new SiteModel() { Id = i, Site_name = "Site" + i, Is_server = true });
             }
         }
 
@@ -40,7 +40,7 @@ namespace TestServerMonitor.TestViewModel
         /// 用例说明：测试方法正常调用，返回true，返回正确值
         /// </summary>
         [TestMethod]
-        public void TestChartAsync_ShouldReturnTrueWhenNormallyExcuted()
+        public void TestChartAsync_NormallyExcuted_ShouldReturnTrue()
         {
             var stub = new StubIChartDao(MockBehavior.Strict);
             viewModel.ChartDao = stub;
@@ -79,7 +79,7 @@ namespace TestServerMonitor.TestViewModel
         /// 用例说明：测试选择站点数目小于等于5，返回true,大于5，返回false
         /// </summary>
         [TestMethod]
-        public void TestAccept_ClickAsync_ShouldReturnTrueWhenNumberOfSitesLE5()
+        public void TestAccept_ClickAsync_NumberOfSiteLEOrGT_5_ShouldReturnTrue()
         {
             Assert.IsTrue(viewModel.InitAsync().Result);
             var stub = new StubIChartDao(MockBehavior.Strict);
@@ -93,7 +93,7 @@ namespace TestServerMonitor.TestViewModel
                 ObservableCollection<ChartLengend> s = new ObservableCollection<ChartLengend>();
                 await Task.CompletedTask;
                 return s;
-            }, Times.Once);
+            }, Times.Twice);
             stub.CacuChartAsync(async (sites, logs) =>
             {
                 ObservableCollection<ObservableCollection<Chart1>> data = new ObservableCollection<ObservableCollection<Chart1>>();
@@ -106,7 +106,7 @@ namespace TestServerMonitor.TestViewModel
                 ObservableCollection<BarChartData> data1 = new ObservableCollection<BarChartData>();
                 ObservableCollection<BarChartData> data2 = new ObservableCollection<BarChartData>();
                 return new Tuple<ObservableCollection<BarChartData>, ObservableCollection<BarChartData>>(data1, data2);
-            }, Times.Once);
+            }, Times.Twice);
 
             //less
             Assert.IsTrue(viewModel.Accept_ClickAsync().Result);
@@ -124,7 +124,7 @@ namespace TestServerMonitor.TestViewModel
         /// 用例说明：测试方法正确计算,返回true
         /// </summary>
         [TestMethod]
-        public void TestTypeChanged_ShouldReturnTrueWhenCalculationCorrect()
+        public void TestTypeChanged_CalculationCorrect_ShouldReturnTrue()
         {
             Assert.IsTrue(viewModel.InitAsync().Result);
             

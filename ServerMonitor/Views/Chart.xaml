@@ -85,17 +85,22 @@
                 </Grid.ColumnDefinitions>
                 <!--区间切换-->
                 <Pivot x:Name="period" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-                       >
-                    
+                       SelectedIndex="{Binding PivotIndex,Mode=TwoWay}" SelectionChanged="{x:Bind ViewModel.Pivot_SelectionChanged}">
+                    <PivotItem Header="Today">
+                    </PivotItem>
+                    <PivotItem Header="Three Days">
+                    </PivotItem>
+                    <PivotItem Header="Seven Days">
+                    </PivotItem>
                 </Pivot>
                 <!--选择类型--> 
                 <ComboBox x:Name="selectionTypeCombo" Grid.Row="1" Grid.Column="0" Width="225"
-                          HorizontalAlignment="Left" Height="40" Grid.ColumnSpan="2" SelectedIndex="0"
+                          HorizontalAlignment="Left" Height="40" Grid.ColumnSpan="2" 
                           ItemsSource="{Binding RequestResult}" Margin="10" SelectedItem="{x:Bind ViewModel.Type,Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Selection type： "/>
+                                <TextBlock Text="Selection Type： "/>
                                 <TextBlock Text="{Binding}"/>
                             </StackPanel>
                         </DataTemplate>
@@ -106,7 +111,11 @@
                     <!--线形图-->
                     <telerik:RadCartesianChart PaletteName="DefaultLight" Height="300" x:Name="RequestTimeLineChar" >
                         <telerik:RadCartesianChart.VerticalAxis>
-                            <telerik:LinearAxis Title="RequestTime" FontWeight="Medium"/>
+                            <telerik:LogarithmicAxis x:Name="logarithmicAxis" LogarithmBase="10" Title="RequestTime" FontWeight="Medium">
+                                <telerik:LogarithmicAxis.LabelFormatter>
+                                    <vm1:CustomLogarithmicAxisLabelFormatter/>
+                                </telerik:LogarithmicAxis.LabelFormatter>
+                            </telerik:LogarithmicAxis>
                         </telerik:RadCartesianChart.VerticalAxis>
                         <telerik:RadCartesianChart.HorizontalAxis>
                             <telerik:DateTimeContinuousAxis x:Name="axis" Title="{x:Bind ViewModel.Infos.HAxisProperties.ChartTitle,Mode=OneWay}"
@@ -114,8 +123,10 @@
                                                             Minimum="{x:Bind ViewModel.Infos.HAxisProperties.MinnumDateTime,Mode=OneWay}"
                                                             MajorStep="{x:Bind ViewModel.Infos.HAxisProperties.MajorStep,Mode=OneWay}"
                                                             MajorStepUnit="{x:Bind ViewModel.Infos.HAxisProperties.MajorStepUnit,Mode=OneWay}"
-                                                            LabelFormat="{}{0,0:MM-dd HH:mm}"
                                                             FontWeight="Medium">
+                                <telerik:DateTimeContinuousAxis.LabelFormatter>
+                                    <vm1:CustomDateTimeAxisLabelFormatter/>
+                                </telerik:DateTimeContinuousAxis.LabelFormatter>
                             </telerik:DateTimeContinuousAxis>
                         </telerik:RadCartesianChart.HorizontalAxis>
                         <telerik:RadCartesianChart.Grid>

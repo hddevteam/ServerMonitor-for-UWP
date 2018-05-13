@@ -132,7 +132,7 @@
     <Compile Include="DAO\ChartDaoImpl.cs" />
     <Compile Include="ViewModels\ChartPageViewModel.cs" />
     <Compile Include="ViewModels\ContactPageViewModel.cs" />
-    <Compile Include="DAO\IDAO\IChartDao.cs" />
+    <Compile Include="DAO\IChartDao.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
     <Compile Include="ViewModels\DetailPageViewModel.cs" />
     <Compile Include="ViewModels\SettingsPageViewModel.cs" />

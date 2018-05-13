@@ -11,6 +11,7 @@ using ServerMonitor.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Telerik.Charting;
+using Telerik.UI.Xaml.Controls.Chart;
 
 namespace ServerMonitor.ViewModels
 {
@@ -137,16 +138,23 @@ namespace ServerMonitor.ViewModels
         //加载数据库数据
         public async Task<List<SiteModel>> LoadDbSiteAsync()
         {
-            var sites = DBHelper.GetAllSite();
-
             await Task.CompletedTask;
-            return DBHelper.GetAllSite();
+            List<SiteModel> site = new List<SiteModel>();
+            site.Add(new SiteModel() { Id = 1, Is_server = true,Site_name="srever" });
+            return site;
+            //return DBHelper.GetAllSite();
         }
         public async Task<List<LogModel>> LoadDbLogAsync()
         {
             await Task.CompletedTask;
             List<LogModel> logs = new List<LogModel>();
-            logs = DBHelper.GetAllLog();
+            logs.Add(new LogModel() { Site_id = 1, Request_time = 200, Is_error = false, Create_time = DateTime.Now, Status_code="1002" });
+            logs.Add(new LogModel() { Site_id = 1, Request_time = 500, Is_error = true, Create_time = DateTime.Now.AddHours(-12) });
+            logs.Add(new LogModel() { Site_id = 1, Request_time = 2600, Is_error = false, Create_time = DateTime.Now.AddHours(-6), Status_code = "1002" });
+            logs.Add(new LogModel() { Site_id = 1, Request_time = 100, Is_error = false, Create_time = DateTime.Now.AddHours(-23) });
+            logs.Add(new LogModel() { Site_id = 1, Request_time = 3000, Is_error = false, Create_time = DateTime.Now.AddHours(-35) });
+            logs.Add(new LogModel() { Site_id = 1, Request_time = 7000, Is_error = true, Create_time = DateTime.Now.AddHours(-2), Status_code = "1002" });
+            //logs = DBHelper.GetAllLog();
             //数据排序，便于图表按序显示
             logs = logs.OrderBy(o => o.Create_time).ToList();
             return logs;
@@ -160,7 +168,7 @@ namespace ServerMonitor.ViewModels
         /// <param name="sites">数据库站点</param>
         /// <param name="logs">站点日志</param>
         /// <returns></returns>
-        public async Task<bool> ChartAsync(List<Site> sites,List<Log> logs)
+        public async Task<bool> ChartAsync(List<SiteModel> sites,List<LogModel> logs)
         {
             var getResult = await Task.Run(() => ChartDao.CacuChartAsync(sites, logs));
             Chart1Collection = getResult.Item1;
@@ -266,7 +274,7 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public void Pivot_SelectionChanged()
         {
-            int _selectedIndex = PivotIndex;
+         int _selectedIndex = PivotIndex;
             switch (_selectedIndex)
             {
                 case 0:
@@ -293,12 +301,53 @@ namespace ServerMonitor.ViewModels
                 default:
                     break;
             }
-            //TypeChanged(Type);
+            TypeChanged(Type);
         }
 
         #endregion
 
     }
+
+    //对数轴标签格式化
+    public class CustomLogarithmicAxisLabelFormatter : IContentFormatter
+    {
+        public object Format(object owner, object content)
+        {
+            // The owner parameter is the Axis instance which labels are currently formatted
+            var axis = owner as Axis;
+            var con = Convert.ToInt32(content == null ? "" : content.ToString());
+            if (con >= 1000) {
+                content = con / 1000 + "s";
+            }
+            else
+            {
+                content = con + "ms";
+            }
+            return content.ToString();
+        }
+    }
+    //时间轴标签格式化
+    public class CustomDateTimeAxisLabelFormatter : IContentFormatter
+    {
+        public object Format(object owner, object content)
+        {
+            // The owner parameter is the Axis instance which labels are currently formatted
+            var axis = owner as DateTimeContinuousAxis;
+            var con = Convert.ToDateTime(content);
+            
+            if (axis.MajorStepUnit != TimeInterval.Hour) //当时间间隔为天时，格式化显示天
+            {
+                var con_str = String.Format("{0:MM:dd HH:mm}",con);
+                return con_str;
+            }
+            else //否则只显示小时
+            {
+                var con_str = String.Format("{0:HH:mm}", con);
+                return con_str;
+            }
+        }
+    }
+
     #region 图表页面各项数据类
 
     /// <summary>
