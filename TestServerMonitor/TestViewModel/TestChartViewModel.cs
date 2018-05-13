@@ -37,7 +37,7 @@ namespace TestServerMonitor.TestViewModel
 
         /// <summary>
         /// 测试ChartAsync方法
-        /// 用例说明：测试方法正常调用，返回true，返回正确值
+        /// 用例说明：测试方法正常调用，返回true
         /// </summary>
         [TestMethod]
         public void TestChartAsync_NormallyExcuted_ShouldReturnTrue()
@@ -75,11 +75,11 @@ namespace TestServerMonitor.TestViewModel
         }
 
         /// <summary>
-        /// 测试Accept_ClickAsync方法
+        /// 测试AcceptClickAsync方法
         /// 用例说明：测试选择站点数目小于等于5，返回true,大于5，返回false
         /// </summary>
         [TestMethod]
-        public void TestAccept_ClickAsync_NumberOfSiteLEOrGT_5_ShouldReturnTrue()
+        public void TestAcceptClickAsync_NumberOfSiteLEOrGT_5_ShouldReturnTrue()
         {
             Assert.IsTrue(viewModel.InitAsync().Result);
             var stub = new StubIChartDao(MockBehavior.Strict);
@@ -109,19 +109,20 @@ namespace TestServerMonitor.TestViewModel
             }, Times.Twice);
 
             //less
-            Assert.IsTrue(viewModel.Accept_ClickAsync().Result);
+            Assert.IsTrue(viewModel.AcceptClickAsync().Result);
             //equal
             viewModel.Infos.SelectSites.Add(new SelectSite() { IsSelected = true });
-            Assert.IsTrue(viewModel.Accept_ClickAsync().Result);
+            Assert.IsTrue(viewModel.AcceptClickAsync().Result);
 
             //greater
             viewModel.Infos.SelectSites.Add(new SelectSite() { IsSelected = true });
-            Assert.IsFalse(viewModel.Accept_ClickAsync().Result);
+            Assert.IsFalse(viewModel.AcceptClickAsync().Result);
         }
 
         /// <summary>
-        /// 测试TypeChanged_Data方法
-        /// 用例说明：测试方法正确计算,返回true
+        /// 测试TypeChanged方法
+        /// 用例说明：测试方法是否执行,返回true
+        ///           测试方法计算是否正确，返回期待值
         /// </summary>
         [TestMethod]
         public void TestTypeChanged_CalculationCorrect_ShouldReturnTrue()
@@ -149,6 +150,19 @@ namespace TestServerMonitor.TestViewModel
             Assert.AreEqual(1, viewModel.Infos.Chart1CollectionCopy[0].Count);
         }
 
-
+        /// <summary>
+        /// 测试PivotSelectionChanged方法
+        /// 用例说明：测试方法对输入值大于2是否做出正确响应，返回ERROR_CODE=4
+        ///           其他情况下输入==输出
+        /// </summary>
+        [TestMethod]
+        public void TestPivotSelectionChanged_ExcuteNormal_ShouldReturnInputPara()
+        {
+            viewModel.PivotIndex = 2;
+            Assert.AreEqual(viewModel.PivotIndex, viewModel.PivotSelectionChanged());
+            
+            viewModel.PivotIndex = 3;
+            Assert.AreEqual(4, viewModel.PivotSelectionChanged());
+        }
     }
 }

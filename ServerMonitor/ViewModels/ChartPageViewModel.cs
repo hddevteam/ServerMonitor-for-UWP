@@ -23,6 +23,7 @@ namespace ServerMonitor.ViewModels
         #region 变量
 
         const int MAX_NUMBER_OF_SITE = 5;
+        const int ERROR_CODE = 4;
         public IChartDao ChartDao { get; set; }
 
         private SiteRequestCountInfo infos;
@@ -90,7 +91,6 @@ namespace ServerMonitor.ViewModels
         {
             RequestResult = new List<string> {"All", "Success", "Error", "OverTime" };
             PivotSource = new List<string> { "Today", "Three Days", "Senven Days" };
-            Type = "All";
             PivotIndex = 0;
             Infos = new SiteRequestCountInfo();
         }
@@ -112,7 +112,7 @@ namespace ServerMonitor.ViewModels
 
             //计算图表数据
             await ChartAsync(Infos.Sites, Infos.Logs);
-
+            Type = "All";//默认显示全部
             //图表加载完毕后切换加载状态
             Infos.State3 = Visibility.Collapsed;
             Infos.State1 = Visibility.Visible;
@@ -140,7 +140,7 @@ namespace ServerMonitor.ViewModels
         {
             await Task.CompletedTask;
             List<SiteModel> site = new List<SiteModel>();
-            site.Add(new SiteModel() { Id = 1, Is_server = true,Site_name="srever" });
+            site.Add(new SiteModel() { Id = 1, Is_server = true,Site_name="server" });
             return site;
             //return DBHelper.GetAllSite();
         }
@@ -227,7 +227,7 @@ namespace ServerMonitor.ViewModels
         /// <summary>
         /// 确定站点并切换页面
         /// </summary>
-        public async Task<bool> Accept_ClickAsync()
+        public async Task<bool> AcceptClickAsync()
         {
             //清空数据，重新统计
             Infos.Sites.Clear();
@@ -272,9 +272,9 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void Pivot_SelectionChanged()
+        public int PivotSelectionChanged()
         {
-         int _selectedIndex = PivotIndex;
+            int _selectedIndex = PivotIndex;
             switch (_selectedIndex)
             {
                 case 0:
@@ -283,29 +283,27 @@ namespace ServerMonitor.ViewModels
                     Infos.HAxisProperties.ChartTitle = "Results within the last 24 hours";
                     Infos.HAxisProperties.MajorStep = 6;
                     Infos.HAxisProperties.MajorStepUnit = TimeInterval.Hour;
-                    break;
+                    return _selectedIndex;
                 case 1:
                     Infos.HAxisProperties.MaxnumDateTime = DateTime.Now;
                     Infos.HAxisProperties.MinnumDateTime = DateTime.Now.AddDays(-2);
                     Infos.HAxisProperties.ChartTitle = "Nearly three days of request results";
                     Infos.HAxisProperties.MajorStep = 1;
                     Infos.HAxisProperties.MajorStepUnit = TimeInterval.Day;
-                    break;
+                    return _selectedIndex;
                 case 2:
                     Infos.HAxisProperties.MaxnumDateTime = DateTime.Now;
                     Infos.HAxisProperties.MinnumDateTime = DateTime.Now.AddDays(-6);
                     Infos.HAxisProperties.ChartTitle = "Nearly a week of request results";
                     Infos.HAxisProperties.MajorStep = 1;
                     Infos.HAxisProperties.MajorStepUnit = TimeInterval.Day;
-                    break;
+                    return _selectedIndex;
                 default:
                     break;
             }
-            TypeChanged(Type);
+            return ERROR_CODE;
         }
-
         #endregion
-
     }
 
     //对数轴标签格式化
@@ -337,7 +335,7 @@ namespace ServerMonitor.ViewModels
             
             if (axis.MajorStepUnit != TimeInterval.Hour) //当时间间隔为天时，格式化显示天
             {
-                var con_str = String.Format("{0:MM:dd HH:mm}",con);
+                var con_str = String.Format("{0:MM-dd HH:mm}",con);
                 return con_str;
             }
             else //否则只显示小时

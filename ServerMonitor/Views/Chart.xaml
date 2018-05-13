@@ -22,7 +22,7 @@
     <RelativePanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="AdaptiveVisualStateGroup">
-                <VisualState x:Name="VisualStateNarrow">
+                <VisualState x:Name="VisualStateNormal">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="521" />
                     </VisualState.StateTriggers>
@@ -32,7 +32,7 @@
                         <Setter Target="grid2.Margin" Value="48" />
                     </VisualState.Setters>
                 </VisualState>
-                <VisualState x:Name="VisualStateCommon">
+                <VisualState x:Name="VisualStateWide">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="850" />
                     </VisualState.StateTriggers>
@@ -53,7 +53,7 @@
                              Text="Charts" >
             <controls:PageHeader.PrimaryCommands>
                 <AppBarButton Icon="Filter" Foreground="White" Visibility="{x:Bind ViewModel.Infos.State1,Mode=TwoWay}" Click="{x:Bind ViewModel.ChartFliter_Click}"></AppBarButton>
-                <AppBarButton Icon="Accept" Foreground="White" Visibility="{x:Bind ViewModel.Infos.State2,Mode=TwoWay}" Click="{x:Bind ViewModel.Accept_ClickAsync}"></AppBarButton>
+                <AppBarButton Icon="Accept" Foreground="White" Visibility="{x:Bind ViewModel.Infos.State2,Mode=TwoWay}" Click="{x:Bind ViewModel.AcceptClickAsync}"></AppBarButton>
             </controls:PageHeader.PrimaryCommands>
         </controls:PageHeader>
         <!--加载中状态-->
@@ -85,7 +85,7 @@
                 </Grid.ColumnDefinitions>
                 <!--区间切换-->
                 <Pivot x:Name="period" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-                       SelectedIndex="{Binding PivotIndex,Mode=TwoWay}" SelectionChanged="{x:Bind ViewModel.Pivot_SelectionChanged}">
+                       SelectedIndex="{Binding PivotIndex,Mode=TwoWay}" SelectionChanged="{x:Bind ViewModel.PivotSelectionChanged}">
                     <PivotItem Header="Today">
                     </PivotItem>
                     <PivotItem Header="Three Days">

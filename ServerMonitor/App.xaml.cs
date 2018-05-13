@@ -63,9 +63,6 @@ namespace ServerMonitor
             XElement root = document.Root;
             // 加载数据库名称
             XElement dbName = root.Element("DBFilename");
-            DBHelper.InitDB(dbName.Value);
-            DbInitImpl db = new DbInitImpl();
-            db.InitDB(dbName.Value);
             #endregion
             await NavigationService.NavigateAsync(typeof(Views.MainPage));
         }
