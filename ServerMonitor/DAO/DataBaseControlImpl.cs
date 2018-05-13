@@ -9,8 +9,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
+using ServerMonitor.SiteDb;
+using ServerMonitor.LogDb;
 
-namespace ServerMonitor.SiteDb
+namespace ServerMonitor.DAO
 {
     public class DbInitImpl : DBInit
     {
@@ -18,6 +20,10 @@ namespace ServerMonitor.SiteDb
         /// 持有SiteDAO对象实现对Site的操作
         /// </summary>
         private SiteDAO siteDao;
+        /// <summary>
+        /// 持有LogDAO对象实现对log的操作
+        /// </summary>
+        private LogDAO logDao;
         /// <summary>
         /// 数据库名称
         /// </summary>
