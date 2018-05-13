@@ -1,6 +1,7 @@
 ﻿using ServerMonitor.Controls;
 using ServerMonitor.DAOImpl;
 using ServerMonitor.Models;
+using ServerMonitor.SiteDb;
 using SQLite.Net;
 using SQLite.Net.Platform.WinRT;
 using System;
@@ -11,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 
-namespace ServerMonitor.SiteDb
+namespace ServerMonitor.DAO
 {
     public class DbInitImpl : DBInit
     {
