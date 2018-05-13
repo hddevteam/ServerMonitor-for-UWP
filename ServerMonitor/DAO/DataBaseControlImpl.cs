@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Windows.Storage;
 
 namespace ServerMonitor.SiteDb
@@ -40,6 +41,15 @@ namespace ServerMonitor.SiteDb
         /// </summary>
         public static string DBPath { get => dBPath; }
 
+        static DbInitImpl() {
+            // 加载XML文件
+            XDocument document = XDocument.Load("Common/Config.xml");
+            // 获取XML的根元素进行操作
+            XElement root = document.Root;
+            // 加载数据库名称
+            XElement dbName = root.Element("DBFilename");
+            dBPath = Path.Combine(ApplicationData.Current.LocalFolder.Path, dbName.Value);
+        }
         private DbInitImpl() { }
 
         /// <summary>
@@ -226,7 +236,7 @@ namespace ServerMonitor.SiteDb
             else
             {
                 DbFileName = Filename;
-                dBPath = Path.Combine(ApplicationData.Current.LocalFolder.Path, DbFileName);
+                dBPath = Path.Combine(ApplicationData.Current.LocalFolder.Path, Filename);
             }
         }
 
