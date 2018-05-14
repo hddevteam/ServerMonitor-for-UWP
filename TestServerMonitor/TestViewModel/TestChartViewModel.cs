@@ -44,7 +44,7 @@ namespace TestServerMonitor.TestViewModel
         {
             var stub = new StubIChartDao(MockBehavior.Strict);
             viewModel.ChartDao = stub;
-            int except1 = 0, except2 = 0, except3 = 0;
+            int except1 = 0, except2 = 0;
             stub.ChartLengendAsync(async (sites) =>
             {
                 ObservableCollection<ChartLengend> s = new ObservableCollection<ChartLengend>();
@@ -54,32 +54,24 @@ namespace TestServerMonitor.TestViewModel
             }, Times.Once);
             stub.CacuChartAsync(async (sites, logs) => 
             {
-                ObservableCollection<ObservableCollection<Chart1>> data = new ObservableCollection<ObservableCollection<Chart1>>();
-                except2 = sites.Count+logs.Count;
-                int[,] array = new int[sites.Count,3];
-                await Task.CompletedTask;
-                return new Tuple<ObservableCollection<ObservableCollection<Chart1>>, int[,]>(data, array);
-            }, Times.Once);
-            stub.CacuBarChart((sites, array) =>
-            {
-                ObservableCollection<BarChartData> data1 = new ObservableCollection<BarChartData>();
+                ObservableCollection<ObservableCollection<Chart1>> data1 = new ObservableCollection<ObservableCollection<Chart1>>();
                 ObservableCollection<BarChartData> data2 = new ObservableCollection<BarChartData>();
-                except3 = sites.Count;
-                return new Tuple<ObservableCollection<BarChartData>, ObservableCollection<BarChartData>>(data1, data2);
+                except2 = sites.Count+logs.Count;
+                await Task.CompletedTask;
+                return new Tuple<ObservableCollection<ObservableCollection<Chart1>>, ObservableCollection<BarChartData>>(data1, data2);
             }, Times.Once);
 
             Assert.IsTrue(viewModel.ChartAsync(Sites, Logs).Result);
             Assert.AreEqual(5, except1);
             Assert.AreEqual(10, except2);
-            Assert.AreEqual(5, except3);
         }
 
         /// <summary>
         /// 测试AcceptClickAsync方法
-        /// 用例说明：测试选择站点数目小于等于5，返回true,大于5，返回false
+        /// 用例说明：测试选择站点数目小于等于5，返回true
         /// </summary>
         [TestMethod]
-        public void TestAcceptClickAsync_NumberOfSiteLEOrGT_5_ShouldReturnTrue()
+        public void TestAcceptClickAsync_NumberOfSiteLE5_ShouldReturnTrue()
         {
             Assert.IsTrue(viewModel.InitAsync().Result);
             var stub = new StubIChartDao(MockBehavior.Strict);
@@ -96,16 +88,10 @@ namespace TestServerMonitor.TestViewModel
             }, Times.Twice);
             stub.CacuChartAsync(async (sites, logs) =>
             {
-                ObservableCollection<ObservableCollection<Chart1>> data = new ObservableCollection<ObservableCollection<Chart1>>();
-                int[,] array = new int[sites.Count, 3];
-                await Task.CompletedTask;
-                return new Tuple<ObservableCollection<ObservableCollection<Chart1>>, int[,]>(data, array);
-            }, Times.Twice);
-            stub.CacuBarChart((sites, array) =>
-            {
-                ObservableCollection<BarChartData> data1 = new ObservableCollection<BarChartData>();
+                ObservableCollection<ObservableCollection<Chart1>> data1 = new ObservableCollection<ObservableCollection<Chart1>>();
                 ObservableCollection<BarChartData> data2 = new ObservableCollection<BarChartData>();
-                return new Tuple<ObservableCollection<BarChartData>, ObservableCollection<BarChartData>>(data1, data2);
+                await Task.CompletedTask;
+                return new Tuple<ObservableCollection<ObservableCollection<Chart1>>, ObservableCollection<BarChartData>>(data1, data2);
             }, Times.Twice);
             viewModel.Type = "All";
             //less
@@ -113,10 +99,29 @@ namespace TestServerMonitor.TestViewModel
             //equal
             viewModel.Infos.SelectSites.Add(new SelectSite() { IsSelected = true });
             Assert.IsTrue(viewModel.AcceptClickAsync().Result);
+        }
 
-            //greater
-            viewModel.Infos.SelectSites.Add(new SelectSite() { IsSelected = true });
-            Assert.IsFalse(viewModel.AcceptClickAsync().Result);
+        /// <summary>
+        /// 测试AcceptClickAsync方法
+        /// 用例说明：测试选择站点数目大于5，抛出异常
+        /// </summary>
+        [TestMethod]
+        public void TestAcceptClickAsync_NumberOfSiteGT5_ShouldThrowAggregateException()
+        {
+            Assert.IsTrue(viewModel.InitAsync().Result);
+            for (int i = 0; i < 7; i++)
+            {
+                viewModel.Infos.SelectSites.Add(new SelectSite() { IsSelected = true });
+            }
+            try
+            {
+                var res = viewModel.AcceptClickAsync().Result;
+                Assert.Fail();
+            }
+            catch (AggregateException)
+            {
+
+            }
         }
 
         /// <summary>

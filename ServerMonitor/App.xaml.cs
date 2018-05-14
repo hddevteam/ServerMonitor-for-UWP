@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using ServerMonitor.Models;
 using ServerMonitor.DAO;
 using ServerMonitor.SiteDb;
+using GalaSoft.MvvmLight.Threading;
 
 namespace ServerMonitor
 {
@@ -73,13 +74,14 @@ namespace ServerMonitor
             return base.OnInitializeAsync(args);
         }
 
-		protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
+        protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
 		{
 			base.OnBackgroundActivated(args);
 			IBackgroundTaskInstance taskInstance = args.TaskInstance;
 			BackGroundRequestTask(taskInstance);
 		}
 
+        
 		private async void BackGroundRequestTask(IBackgroundTaskInstance taskInstance)
 		{
 			var _sitelist = DBHelper.GetAllSite();

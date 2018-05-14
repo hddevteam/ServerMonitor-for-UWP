@@ -196,7 +196,11 @@
                     </telerikPrimitives:RadLegendControl>
                     <telerik:RadCartesianChart x:Name="barchart" PaletteName="DefaultLight" Height="300">
                         <telerik:RadCartesianChart.HorizontalAxis>
-                            <telerik:CategoricalAxis FontWeight="Medium"/>
+                            <telerik:CategoricalAxis FontWeight="Medium">
+                                <telerik:CategoricalAxis.LabelFormatter>
+                                    <vm1:CustomCategoricalAxisLabelFormatter/>
+                                </telerik:CategoricalAxis.LabelFormatter>
+                            </telerik:CategoricalAxis>
                         </telerik:RadCartesianChart.HorizontalAxis>
                         <telerik:RadCartesianChart.VerticalAxis>
                             <telerik:LinearAxis Title="RequestTimes" FontWeight="Medium"/>
@@ -209,7 +213,7 @@
                                 <telerik:PropertyNameDataPointBinding PropertyName="Success"/>
                             </telerik:BarSeries.ValueBinding>
                             <telerik:BarSeries.CategoryBinding>
-                                <telerik:PropertyNameDataPointBinding PropertyName="SiteName"/>
+                                <telerik:PropertyNameDataPointBinding PropertyName="SiteId"/>
                             </telerik:BarSeries.CategoryBinding>
                         </telerik:BarSeries>
                         <telerik:BarSeries ItemsSource="{Binding Infos.BarChart}" CombineMode="Stack100">
@@ -217,7 +221,7 @@
                                 <telerik:PropertyNameDataPointBinding PropertyName="Overtime"/>
                             </telerik:BarSeries.ValueBinding>
                             <telerik:BarSeries.CategoryBinding>
-                                <telerik:PropertyNameDataPointBinding PropertyName="SiteName"/>
+                                <telerik:PropertyNameDataPointBinding PropertyName="SiteId"/>
                             </telerik:BarSeries.CategoryBinding>
                         </telerik:BarSeries>
                         <telerik:BarSeries ItemsSource="{Binding Infos.BarChart}" CombineMode="Stack100">
@@ -225,14 +229,14 @@
                                 <telerik:PropertyNameDataPointBinding PropertyName="Error"/>
                             </telerik:BarSeries.ValueBinding>
                             <telerik:BarSeries.CategoryBinding>
-                                <telerik:PropertyNameDataPointBinding PropertyName="SiteName"/>
+                                <telerik:PropertyNameDataPointBinding PropertyName="SiteId"/>
                             </telerik:BarSeries.CategoryBinding>
                         </telerik:BarSeries>
                     </telerik:RadCartesianChart>
                 </StackPanel>
                 <!--表格-->
                 <StackPanel Grid.Row="4" Grid.ColumnSpan="3" Padding="24">
-                    <telerikGrid:RadDataGrid x:Name="grid1" ItemsSource="{x:Bind ViewModel.Infos.GridChart}"
+                    <telerikGrid:RadDataGrid x:Name="grid1" ItemsSource="{x:Bind ViewModel.Infos.BarChart}"
                                          AutoGenerateColumns="False" VerticalAlignment="Center" HorizontalAlignment="Center" 
                                          IsTabStop="True" IsHitTestVisible="True" UserGroupMode="Disabled">
                         <telerikGrid:RadDataGrid.Columns>

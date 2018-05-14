@@ -17,14 +17,10 @@ namespace ServerMonitor.ViewModels
 
         ObservableCollection<BarChartData> BarChart { get; set; }
 
-        ObservableCollection<BarChartData> GridChart { get; set; }
-
         Task<Tuple<ObservableCollection<SelectSite>, List<SiteModel>>> SelectSitesAsync(List<SiteModel> sites);
 
         Task<ObservableCollection<ChartLengend>> ChartLengendAsync(List<SiteModel> sites);
 
-        Task<Tuple<ObservableCollection<ObservableCollection<Chart1>>, int[,]>> CacuChartAsync(List<SiteModel> sites, List<LogModel> logs);
-
-        Tuple<ObservableCollection<BarChartData>, ObservableCollection<BarChartData>> CacuBarChart(List<SiteModel> sites, int[,] requestResults);
+        Task<Tuple<ObservableCollection<ObservableCollection<Chart1>>, ObservableCollection<BarChartData>>> CacuChartAsync(List<SiteModel> sites, List<LogModel> logs);
     }
 }

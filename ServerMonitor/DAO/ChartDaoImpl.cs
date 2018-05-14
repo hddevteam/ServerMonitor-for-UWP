@@ -17,13 +17,10 @@ namespace ServerMonitor.ViewModels
 
         public ObservableCollection<BarChartData> BarChart { get; set; }
 
-        public ObservableCollection<BarChartData> GridChart { get; set; }
-
         public ChartDaoImpl()
         {
             Lengend = new ObservableCollection<ChartLengend>();
             BarChart = new ObservableCollection<BarChartData>();
-            GridChart = new ObservableCollection<BarChartData>();
         }
         /// <summary>
         /// 对从数据库获取的site做初始处理，初始化统计站点，初始化站点选中状态
@@ -40,25 +37,22 @@ namespace ServerMonitor.ViewModels
                 if (selectSites.Count < 5)
                 {
                     Sites.Add(item);
-                    if (item.Is_server)
+                    selectSites.Add(new SelectSite()
                     {
-                        selectSites.Add(new SelectSite() { Site = item, IsSelected = true, ImagePath = "../images/ic_server.png", SiteType = "SERVER" });
-                    }
-                    else
-                    {
-                        selectSites.Add(new SelectSite() { Site = item, IsSelected = true, ImagePath = "../images/ic_website.png", SiteType = "WEBSITE" });
-                    }
+                        Site = item,IsSelected=true,
+                        ImagePath = item.Is_server ? "../images/ic_server.png" : "../images/ic_website.png",
+                        SiteType = item.Is_server ? "SERVER" : "WEBSITE"
+                    });
                 }
                 else
                 {
-                    if (item.Is_server)
+                    selectSites.Add(new SelectSite()
                     {
-                        selectSites.Add(new SelectSite() { Site = item, IsSelected = false, ImagePath = "../images/ic_server.png", SiteType = "SERVER" });
-                    }
-                    else
-                    {
-                        selectSites.Add(new SelectSite() { Site = item, IsSelected = false, ImagePath = "../images/ic_website.png", SiteType = "WEBSITE" });
-                    }
+                        Site = item,
+                        IsSelected = true,
+                        ImagePath = item.Is_server ? "../images/ic_server.png" : "../images/ic_website.png",
+                        SiteType = item.Is_server ? "SERVER" : "WEBSITE"
+                    });
                 }
             }
             await Task.CompletedTask;
@@ -88,14 +82,13 @@ namespace ServerMonitor.ViewModels
         /// <param name="sites"></param>
         /// <param name="logs"></param>
         /// <returns></returns>
-        public async Task<Tuple<ObservableCollection<ObservableCollection<Chart1>>, int[,]>> CacuChartAsync(List<SiteModel> sites, List<LogModel> logs)
+        public async Task<Tuple<ObservableCollection<ObservableCollection<Chart1>>, ObservableCollection<BarChartData>>> 
+            CacuChartAsync(List<SiteModel> sites, List<LogModel> logs)
         {
             var chart1Collection = new ObservableCollection<ObservableCollection<Chart1>>();
             //对每个站点进行统计
             DateTime time = DateTime.Now;
-            var count = sites.Count;
-            int[,] siteResultCount = new int[count, 3];
-            int index = 0;//二维数组的行序
+            
             foreach (var site in sites)
             {
                 //该站点的数据序列,若站点序列只有一条数据，线性表表现为不显示
@@ -135,62 +128,19 @@ namespace ServerMonitor.ViewModels
                 }
                 //将统计好的结果加入到序列集合
                 chart1Collection.Add(chart1Series);
-
-                siteResultCount[index, 0] = successCount;
-                siteResultCount[index, 1] = errorCount;
-                siteResultCount[index, 2] = overtimeCount;
-                index++;
+                BarChart.Add(new BarChartData()
+                {
+                    SiteId = site.Id.ToString(),
+                    SiteName = site.Site_name,
+                    Success = successCount,
+                    Error = errorCount,
+                    Overtime = overtimeCount,
+                    Type = site.Is_server ? "SERVER" : "WEBSITE"
+                });
+               
             }
             await Task.CompletedTask;
-            return new Tuple<ObservableCollection<ObservableCollection<Chart1>>, int[,]>(chart1Collection, siteResultCount);
-        }
-
-        /// <summary>
-        /// 计算柱状图结果，列表数据同
-        /// </summary>
-        /// <param name="sites"></param>
-        /// <param name="requestResults"></param>
-        /// <returns></returns>
-        public Tuple<ObservableCollection<BarChartData>, ObservableCollection<BarChartData>> CacuBarChart(List<SiteModel> sites, int[,] requestResults)
-        {
-            int index = 0;
-            foreach (var item in sites)
-            {
-                string type;
-                if (item.Is_server)
-                {
-                    type = "SERVER"; //+(SERVER)区分不同站点类型同名情况
-                    BarChart.Add(new BarChartData()
-                    {
-                        SiteName = item.Site_name + "(SERVER)",
-                        Success = requestResults[index, 0],
-                        Error = requestResults[index, 1],
-                        Overtime = requestResults[index, 2]
-                    });
-                }
-                else
-                {
-                    type = "WEBSITE";
-                    BarChart.Add(new BarChartData()
-                    {
-                        SiteName = item.Site_name,
-                        Success = requestResults[index, 0],
-                        Error = requestResults[index, 1],
-                        Overtime = requestResults[index, 2]
-                    });
-                }
-                //第三个图表（grid1）数据
-                GridChart.Add(new BarChartData()
-                {
-                    SiteName = item.Site_name,
-                    Success = requestResults[index, 0],
-                    Error = requestResults[index, 1],
-                    Overtime = requestResults[index, 2],
-                    Type = type
-                });
-                index++;
-            }
-            return new Tuple<ObservableCollection<BarChartData>, ObservableCollection<BarChartData>>(BarChart, GridChart);
+            return new Tuple<ObservableCollection<ObservableCollection<Chart1>>, ObservableCollection<BarChartData>>(chart1Collection, BarChart);
         }
     }
 }

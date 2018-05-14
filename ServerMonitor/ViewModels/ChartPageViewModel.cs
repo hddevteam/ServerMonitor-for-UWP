@@ -12,12 +12,16 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Telerik.Charting;
 using Telerik.UI.Xaml.Controls.Chart;
+using GalaSoft.MvvmLight.Threading;
 
 namespace ServerMonitor.ViewModels
 {
     /// <summary>
     /// Created by fjl
     /// </summary>
+    /// 
+
+
     public class ChartPageViewModel : Template10.Mvvm.ViewModelBase
     {
         #region 变量
@@ -25,6 +29,9 @@ namespace ServerMonitor.ViewModels
         const int ERROR_CODE = 4;
 
         public IChartDao ChartDao { get; set; }
+
+        //为柱状图绑定的站点ID提供显示的站点名
+        public static List<SiteModel> siteModels = new List<SiteModel>();
 
         private SiteRequestCountInfo infos;
 
@@ -127,7 +134,6 @@ namespace ServerMonitor.ViewModels
             Infos.Sites = new List<SiteModel>();
             Infos.Logs = new List<LogModel>();
             Infos.BarChart = new ObservableCollection<BarChartData>();
-            Infos.GridChart = new ObservableCollection<BarChartData>();
             await Task.CompletedTask;
             return true;
         }
@@ -135,7 +141,8 @@ namespace ServerMonitor.ViewModels
         public async Task<List<SiteModel>> LoadDbSiteAsync()
         {
             await Task.CompletedTask;
-            return DBHelper.GetAllSite();
+            siteModels = DBHelper.GetAllSite();
+            return siteModels;
         }
         public async Task<List<LogModel>> LoadDbLogAsync()
         {
@@ -159,9 +166,8 @@ namespace ServerMonitor.ViewModels
         {
             var getResult = await Task.Run(() => ChartDao.CacuChartAsync(sites, logs));
             Chart1Collection = getResult.Item1;
-            var barAndGridData = ChartDao.CacuBarChart(sites, getResult.Item2);
-            Infos.BarChart = barAndGridData.Item1;
-            Infos.GridChart = barAndGridData.Item2;
+            Infos.BarChart = getResult.Item2;
+            
             Lengend = await ChartDao.ChartLengendAsync(sites);
             return true;
         }
@@ -220,7 +226,6 @@ namespace ServerMonitor.ViewModels
             Infos.Sites.Clear();
             Lengend.Clear();
             Chart1Collection.Clear();
-            Infos.GridChart.Clear();
             Infos.BarChart.Clear();
             foreach (var item in Infos.SelectSites.Where(i => i.IsSelected == true).Select(i => i.Site))
             {
@@ -230,7 +235,9 @@ namespace ServerMonitor.ViewModels
             //选择站点数量大于上限进行提示
             if (Infos.Sites.Count > MAX_NUMBER_OF_SITE)
             {
-                return await ShowMessageDialog();  
+                var msgDialog = new Windows.UI.Popups.MessageDialog("站点最多选择五个！！") { Title = "错误提示" };
+                await msgDialog.ShowAsync();
+                return false;
             }
             else
             {
@@ -244,14 +251,6 @@ namespace ServerMonitor.ViewModels
                 TypeChanged(Type);
                 return true;
             }
-        }
-
-        //选择站点上限提示对话框
-        private async Task<bool> ShowMessageDialog()
-        {
-            var msgDialog = new Windows.UI.Popups.MessageDialog("站点最多选择五个！！") { Title = "错误提示" };
-            await msgDialog.ShowAsync();
-            return false;
         }
 
         /// <summary>
@@ -292,6 +291,7 @@ namespace ServerMonitor.ViewModels
         #endregion
     }
 
+    #region 图表标签格式化类
     //对数轴标签格式化
     public class CustomLogarithmicAxisLabelFormatter : IContentFormatter
     {
@@ -300,7 +300,8 @@ namespace ServerMonitor.ViewModels
             // The owner parameter is the Axis instance which labels are currently formatted
             var axis = owner as Axis;
             var con = Convert.ToInt32(content == null ? "" : content.ToString());
-            if (con >= 1000) {
+            if (con >= 1000)
+            {
                 content = con / 1000 + "s";
             }
             else
@@ -318,10 +319,10 @@ namespace ServerMonitor.ViewModels
             // The owner parameter is the Axis instance which labels are currently formatted
             var axis = owner as DateTimeContinuousAxis;
             var con = Convert.ToDateTime(content);
-            
+
             if (axis.MajorStepUnit != TimeInterval.Hour) //当时间间隔为天时，格式化显示天
             {
-                var con_str = String.Format("{0:MM-dd HH:mm}",con);
+                var con_str = String.Format("{0:MM-dd HH:mm}", con);
                 return con_str;
             }
             else //否则只显示小时
@@ -331,9 +332,24 @@ namespace ServerMonitor.ViewModels
             }
         }
     }
+    //分类轴标签格式化（柱状图）
+    public class CustomCategoricalAxisLabelFormatter : IContentFormatter
+    {
+        public object Format(object owner, object content)
+        {
+            // The owner parameter is the Axis instance which labels are currently formatted
+            var axis = owner as DateTimeContinuousAxis;
+            var siteId = Convert.ToInt32(content == null ? "" : content.ToString());
+            foreach (var item in ChartPageViewModel.siteModels.Where(i => i.Id == siteId).Select(i => i))
+            {
+                return item.Site_name;
+            }
+            return "UnknownID" + content.ToString();
+        }
+    }
+    #endregion
 
     #region 图表页面各项数据类
-
     /// <summary>
     /// 封装图表1 DateTimeContinuousAxis坐标轴使用的属性
     /// </summary>
@@ -501,6 +517,19 @@ namespace ServerMonitor.ViewModels
             get { return type; }
             set { type = value; RaisePropertyChanged(() => Type); }
         }
+        //站点id
+        private string siteId;
+
+        public string SiteId
+        {
+            get { return siteId; }
+            set
+            {
+                siteId = value;
+                RaisePropertyChanged(() => SiteId);
+            }
+        }
+
         //站点名
         private string siteName;
 
@@ -571,17 +600,9 @@ namespace ServerMonitor.ViewModels
         private ObservableCollection<BarChartData> barChart;
         //图表1所有系列集合
         ObservableCollection<ObservableCollection<Chart1>> chart1CollectionCopy;
-        //页面1表格数据
-        private ObservableCollection<BarChartData> gridChart;
         #endregion
 
         #region 属性
-
-        public ObservableCollection<BarChartData> GridChart
-        {
-            get { return gridChart; }
-            set { gridChart = value; RaisePropertyChanged(() => GridChart); }
-        }
 
         public Visibility State1
         {
