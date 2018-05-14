@@ -15,6 +15,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Collections.Generic;
 using ServerMonitor.Models;
+using ServerMonitor.Util;
 
 namespace ServerMonitor
 {
@@ -80,9 +81,9 @@ namespace ServerMonitor
 
 		private async void BackGroundRequestTask(IBackgroundTaskInstance taskInstance)
 		{
+			MessageRemind toast = new MessageRemind();//初始化消息提醒
 			var _sitelist = DBHelper.GetAllSite();
 			var len = _sitelist.Count;//使用foreach会出现不在期望中的异常
-
 			SiteModel _presite = new SiteModel();
 			_presite = DBHelper.GetSiteById(4);//这里是指定了precheck的id为4
 			var _precolor = _presite.Last_request_result;//如果percheck为错误 就不进行请求了
@@ -118,8 +119,7 @@ namespace ServerMonitor
 								}
 							}
 						}
-						Dictionary<string, string> backData = new Dictionary<string, string>();
-
+						Dictionary<string, string> backData = new Dictionary<string, string>();//构建返回数据的字典
 						backData = Request.IcmpRequest(reIP);
 						SiteModel upSite = new SiteModel();
 						upSite = DBHelper.GetSiteById(item.Id);
@@ -131,6 +131,11 @@ namespace ServerMonitor
 						{
 							upSite.Last_request_result = int.Parse(color);
 							upSite.Request_interval = int.Parse(time);
+							if ("0".Equals(color))
+							{
+								//如果站点发生错误，发送消息提醒
+								toast.ShowToast(upSite);
+							}
 							DBHelper.UpdateSite(upSite);
 						}
 						catch { }
@@ -154,12 +159,22 @@ namespace ServerMonitor
 								upSite.Last_request_result = int.Parse(color);
 								upSite.Status_code = status;
 								upSite.Request_interval = int.Parse(time);
+								if ("0".Equals(color))
+								{
+									//如果站点发生错误，发送消息提醒
+									toast.ShowToast(upSite);
+								}
 								DBHelper.UpdateSite(upSite);
 							}
 							catch { }
 						}
 					}
 				}
+			}
+			else
+			{
+				//如果precheck为错误 提醒
+				toast.ShowToast(_presite);
 			}
 		}
 	}
