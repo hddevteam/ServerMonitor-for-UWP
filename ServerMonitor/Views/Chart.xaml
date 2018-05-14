@@ -22,7 +22,7 @@
     <RelativePanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="AdaptiveVisualStateGroup">
-                <VisualState x:Name="VisualStateNarrow">
+                <VisualState x:Name="VisualStateNormal">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="521" />
                     </VisualState.StateTriggers>
@@ -32,7 +32,7 @@
                         <Setter Target="grid2.Margin" Value="48" />
                     </VisualState.Setters>
                 </VisualState>
-                <VisualState x:Name="VisualStateCommon">
+                <VisualState x:Name="VisualStateWide">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="850" />
                     </VisualState.StateTriggers>
@@ -52,8 +52,8 @@
                              RelativePanel.AlignTopWithPanel="True"
                              Text="Charts" >
             <controls:PageHeader.PrimaryCommands>
-                <AppBarButton Icon="Filter" Foreground="White" Visibility="{x:Bind ViewModel.Infos.State1,Mode=TwoWay}" Click="{x:Bind ViewModel.ChartFliter_Click}"></AppBarButton>
-                <AppBarButton Icon="Accept" Foreground="White" Visibility="{x:Bind ViewModel.Infos.State2,Mode=TwoWay}" Click="{x:Bind ViewModel.Accept_ClickAsync}"></AppBarButton>
+                <AppBarButton Icon="Filter" Foreground="White" Visibility="{x:Bind ViewModel.Infos.State1,Mode=TwoWay}" Click="{x:Bind ViewModel.ChartFliterClick}"></AppBarButton>
+                <AppBarButton Icon="Accept" Foreground="White" Visibility="{x:Bind ViewModel.Infos.State2,Mode=TwoWay}" Click="{x:Bind ViewModel.AcceptClickAsync}"></AppBarButton>
             </controls:PageHeader.PrimaryCommands>
         </controls:PageHeader>
         <!--加载中状态-->
@@ -84,9 +84,9 @@
                     <ColumnDefinition Width="1*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <!--区间切换-->
-                <Pivot x:Name="period" Grid.Row="0" Grid.Column="0" SelectedIndex="0" Grid.ColumnSpan="2"
-                       SelectionChanged="{x:Bind ViewModel.Pivot_SelectionChanged}">
-                    <PivotItem Header="Today" >
+                <Pivot x:Name="period" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                       SelectedIndex="{Binding PivotIndex,Mode=TwoWay}" SelectionChanged="{x:Bind ViewModel.PivotSelectionChanged}">
+                    <PivotItem Header="Today">
                     </PivotItem>
                     <PivotItem Header="Three Days">
                     </PivotItem>
@@ -95,12 +95,12 @@
                 </Pivot>
                 <!--选择类型--> 
                 <ComboBox x:Name="selectionTypeCombo" Grid.Row="1" Grid.Column="0" Width="225"
-                          HorizontalAlignment="Left" Height="40" Grid.ColumnSpan="2"
-                          ItemsSource="{Binding RequestResult}" SelectedItem="{x:Bind ViewModel.Type,Mode=TwoWay}" Margin="10">
+                          HorizontalAlignment="Left" Height="40" Grid.ColumnSpan="2" 
+                          ItemsSource="{Binding RequestResult}" Margin="10" SelectedItem="{x:Bind ViewModel.Type,Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Selection type： "/>
+                                <TextBlock Text="Selection Type： "/>
                                 <TextBlock Text="{Binding}"/>
                             </StackPanel>
                         </DataTemplate>
@@ -111,52 +111,27 @@
                     <!--线形图-->
                     <telerik:RadCartesianChart PaletteName="DefaultLight" Height="300" x:Name="RequestTimeLineChar" >
                         <telerik:RadCartesianChart.VerticalAxis>
-                            <telerik:LinearAxis Title="RequestTime" FontWeight="Medium"/>
+                            <telerik:LogarithmicAxis x:Name="logarithmicAxis" LogarithmBase="10" Title="RequestTime" FontWeight="Medium">
+                                <telerik:LogarithmicAxis.LabelFormatter>
+                                    <vm1:CustomLogarithmicAxisLabelFormatter/>
+                                </telerik:LogarithmicAxis.LabelFormatter>
+                            </telerik:LogarithmicAxis>
                         </telerik:RadCartesianChart.VerticalAxis>
                         <telerik:RadCartesianChart.HorizontalAxis>
-                            <telerik:DateTimeContinuousAxis x:Name="axis" Title="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.ChartTitle,Mode=OneWay}"
-                                                            Maximum="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.MaxnumDateTime,Mode=OneWay}"
-                                                            Minimum="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.MinnumDateTime,Mode=OneWay}"
-                                                            MajorStep="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.MajorStep,Mode=OneWay}"
-                                                            MajorStepUnit="{x:Bind ViewModel.Infos.DateTimeContinuousAxisProperties.MajorStepUnit,Mode=OneWay}"
-                                                            LabelFormat="{}{0,0:MM-dd HH:mm}"
+                            <telerik:DateTimeContinuousAxis x:Name="axis" Title="{x:Bind ViewModel.Infos.HAxisProperties.ChartTitle,Mode=OneWay}"
+                                                            Maximum="{x:Bind ViewModel.Infos.HAxisProperties.MaxnumDateTime,Mode=OneWay}"
+                                                            Minimum="{x:Bind ViewModel.Infos.HAxisProperties.MinnumDateTime,Mode=OneWay}"
+                                                            MajorStep="{x:Bind ViewModel.Infos.HAxisProperties.MajorStep,Mode=OneWay}"
+                                                            MajorStepUnit="{x:Bind ViewModel.Infos.HAxisProperties.MajorStepUnit,Mode=OneWay}"
                                                             FontWeight="Medium">
+                                <telerik:DateTimeContinuousAxis.LabelFormatter>
+                                    <vm1:CustomDateTimeAxisLabelFormatter/>
+                                </telerik:DateTimeContinuousAxis.LabelFormatter>
                             </telerik:DateTimeContinuousAxis>
                         </telerik:RadCartesianChart.HorizontalAxis>
                         <telerik:RadCartesianChart.Grid>
                             <telerik:CartesianChartGrid MajorLinesVisibility="Y"/>
                         </telerik:RadCartesianChart.Grid>
-
-                        <!--  引入一个类似自定义过滤器概念的资源(在数据绑定的传递数据过程中对数据进行pre-handle) -->
-                        <telerik:RadCartesianChart.Resources>
-                            <local1:CustomConverter x:Key="Converter"/>
-                           
-                        </telerik:RadCartesianChart.Resources>
-                        
-                        <!-- 字面上理解是设置图表的一些基本特性（行为）-->
-                        <telerik:RadCartesianChart.Behaviors>
-                            <!-- 哎这个是设置图表的帮助理解的提示框,就是鼠标悬停在图表上，会有提示信息 -->
-                            <telerik:ChartTooltipBehavior>
-                                <!-- 如果要用到数据绑定通常都要使用到xxx template->DataTemplate -->
-                                <telerik:ChartTooltipBehavior.ContentTemplate>
-                                    <!-- 数据绑定模块  -->
-                                    <DataTemplate>
-                                        <!-- 以下的是每个数据显示使用的模板 -->
-                                        <Border BorderBrush="#80D6F4" BorderThickness="1">
-                                            <StackPanel Background="white">
-                                                <TextBlock Text="{Binding DataPoint.Value,Converter={StaticResource Converter}, ConverterParameter=Value}" Foreground="#99441D"/>
-                                                <TextBlock Text="{Binding DataPoint.Category, Converter={StaticResource Converter}, ConverterParameter=Category}" Foreground="#506005"/>
-                                            </StackPanel>
-                                        </Border>
-                                        <!-- end -->
-                                    </DataTemplate>
-                                    <!--end-->
-                                </telerik:ChartTooltipBehavior.ContentTemplate>
-                                <!--end-->
-                            </telerik:ChartTooltipBehavior>
-                            <!--end-->
-                        </telerik:RadCartesianChart.Behaviors>
-                        <!--end-->
 
                         <telerik:RadCartesianChart.SeriesProvider >
                             <telerik:ChartSeriesProvider x:Name="provider" Source="{x:Bind ViewModel.Infos.Chart1CollectionCopy,Mode=TwoWay}">
@@ -221,7 +196,11 @@
                     </telerikPrimitives:RadLegendControl>
                     <telerik:RadCartesianChart x:Name="barchart" PaletteName="DefaultLight" Height="300">
                         <telerik:RadCartesianChart.HorizontalAxis>
-                            <telerik:CategoricalAxis FontWeight="Medium"/>
+                            <telerik:CategoricalAxis FontWeight="Medium">
+                                <telerik:CategoricalAxis.LabelFormatter>
+                                    <vm1:CustomCategoricalAxisLabelFormatter/>
+                                </telerik:CategoricalAxis.LabelFormatter>
+                            </telerik:CategoricalAxis>
                         </telerik:RadCartesianChart.HorizontalAxis>
                         <telerik:RadCartesianChart.VerticalAxis>
                             <telerik:LinearAxis Title="RequestTimes" FontWeight="Medium"/>
@@ -234,7 +213,7 @@
                                 <telerik:PropertyNameDataPointBinding PropertyName="Success"/>
                             </telerik:BarSeries.ValueBinding>
                             <telerik:BarSeries.CategoryBinding>
-                                <telerik:PropertyNameDataPointBinding PropertyName="SiteName"/>
+                                <telerik:PropertyNameDataPointBinding PropertyName="SiteId"/>
                             </telerik:BarSeries.CategoryBinding>
                         </telerik:BarSeries>
                         <telerik:BarSeries ItemsSource="{Binding Infos.BarChart}" CombineMode="Stack100">
@@ -242,7 +221,7 @@
                                 <telerik:PropertyNameDataPointBinding PropertyName="Overtime"/>
                             </telerik:BarSeries.ValueBinding>
                             <telerik:BarSeries.CategoryBinding>
-                                <telerik:PropertyNameDataPointBinding PropertyName="SiteName"/>
+                                <telerik:PropertyNameDataPointBinding PropertyName="SiteId"/>
                             </telerik:BarSeries.CategoryBinding>
                         </telerik:BarSeries>
                         <telerik:BarSeries ItemsSource="{Binding Infos.BarChart}" CombineMode="Stack100">
@@ -250,14 +229,14 @@
                                 <telerik:PropertyNameDataPointBinding PropertyName="Error"/>
                             </telerik:BarSeries.ValueBinding>
                             <telerik:BarSeries.CategoryBinding>
-                                <telerik:PropertyNameDataPointBinding PropertyName="SiteName"/>
+                                <telerik:PropertyNameDataPointBinding PropertyName="SiteId"/>
                             </telerik:BarSeries.CategoryBinding>
                         </telerik:BarSeries>
                     </telerik:RadCartesianChart>
                 </StackPanel>
                 <!--表格-->
                 <StackPanel Grid.Row="4" Grid.ColumnSpan="3" Padding="24">
-                    <telerikGrid:RadDataGrid x:Name="grid1" ItemsSource="{x:Bind ViewModel.Infos.GridChart}"
+                    <telerikGrid:RadDataGrid x:Name="grid1" ItemsSource="{x:Bind ViewModel.Infos.BarChart}"
                                          AutoGenerateColumns="False" VerticalAlignment="Center" HorizontalAlignment="Center" 
                                          IsTabStop="True" IsHitTestVisible="True" UserGroupMode="Disabled">
                         <telerikGrid:RadDataGrid.Columns>

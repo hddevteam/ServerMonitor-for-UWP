@@ -271,6 +271,8 @@
                                     <telerik:PropertyNameDataPointBinding PropertyName="RequestStatus"/>
                                 </telerik:BarSeries.CategoryBinding>
                             </telerik:BarSeries>
+                            
+                            
                         </telerik:RadCartesianChart>
 
                         <StackPanel Orientation="Vertical"

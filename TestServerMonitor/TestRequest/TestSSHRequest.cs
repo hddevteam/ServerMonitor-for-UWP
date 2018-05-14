@@ -24,9 +24,10 @@ namespace TestServerMonitor.TestRequest
         }
         /// <summary>
         /// 测试MakeRequest
+        /// 用例说明：测试IP/用户名/密码正确匹配，登录成功
         /// </summary>
         [TestMethod]
-        public void CompleteAndCorrectInfo_ShouldReturnTrueAndProtocolInfoIsNull()
+        public void TestMakeRequest_CorrectlyLogin_ShouldReturnTrueAndProtocolInfoIsNull()
         {
             sshRequest.Identification.Username = "root";
             sshRequest.Identification.Password = "Lucky.2011";
@@ -38,9 +39,10 @@ namespace TestServerMonitor.TestRequest
 
         /// <summary>
         /// 测试MakeRequest
+        /// 用例说明：测试用户名/密码匹配不正确，登录失败
         /// </summary>
         [TestMethod]
-        public void UsernameOrPassError_ShouldReturnFalseAndProtocolInfoNotNull()
+        public void TestMakeRequest_UsernameOrPassError_ShouldReturnFalseAndProtocolInfoNotNull()
         {
             sshRequest.Identification.Username = "error";
             sshRequest.Identification.Password = "Lucky.2011";
@@ -52,9 +54,10 @@ namespace TestServerMonitor.TestRequest
 
         /// <summary>
         /// 测试MakeRequest
+        /// 用例说明：测试输入IP为非FTP服务器的IP，登录失败
         /// </summary>
         [TestMethod]
-        public void ServerNotSsh_ShouldReturnFalseAndProtocolInfoNotNull()
+        public void TestMakeRequest_ServerNotSsh_ShouldReturnFalseAndProtocolInfoNotNull()
         {
             sshRequest.IPAddress = "8.8.8.8";
             sshRequest.Identification.Username = "root";
@@ -67,9 +70,10 @@ namespace TestServerMonitor.TestRequest
 
         /// <summary>
         /// 测试MakeRequest
+        /// 用例说明：测试输入IP不合法地址，登录失败
         /// </summary>
         [TestMethod]
-        public void ServerIsInvalid_ShouldReturnFalseAndProtocolInfoNotNull()
+        public void TestMakeRequest_ServerIsInvalid_ShouldReturnFalseAndProtocolInfoNotNull()
         {
             sshRequest.IPAddress = "111.2.3.4";
             sshRequest.Identification.Username = "root";
@@ -82,9 +86,10 @@ namespace TestServerMonitor.TestRequest
 
         /// <summary>
         /// 测试MakeRequest
+        /// 用例说明：测试输入IP为空，登录失败
         /// </summary>
         [TestMethod]
-        public void ServerIsEmpty_ShouldReturnFalseAndProtocolInfoNotNull()
+        public void TestMakeRequest_ServerIsEmpty_ShouldReturnFalseAndProtocolInfoNotNull()
         {
             sshRequest.IPAddress = "";
             sshRequest.Identification.Username = "root";
@@ -97,9 +102,10 @@ namespace TestServerMonitor.TestRequest
 
         /// <summary>
         /// 测试MakeRequest
+        /// 用例说明：测试输入用户名为空，抛出异常，登录失败
         /// </summary>
         [TestMethod]
-        public void UsernameIsEmpty_ShouldThrowAggregateException()
+        public void TestMakeRequest_UsernameIsEmpty_ShouldThrowAggregateException()
         {
             sshRequest.IPAddress = "172.31.0.244";
             sshRequest.Identification.Username = "";
@@ -117,9 +123,10 @@ namespace TestServerMonitor.TestRequest
 
         /// <summary>
         /// 测试MakeRequest
+        /// 用例说明：测试IP/用户名/密码为null，抛出异常，登录失败
         /// </summary>
         [TestMethod]
-        public void ShouldThrowAggregateExceptionWheniPAddressOrUsernameOrPassIsNull()
+        public void TestMakeRequest_iPAddressOrUsernameOrPassIsNull_ShouldThrowAggregateException()
         {
             sshRequest.IPAddress = "172.31.0.244";
             sshRequest.Identification.Username = "root";
