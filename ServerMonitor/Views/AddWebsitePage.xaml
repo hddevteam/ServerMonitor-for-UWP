@@ -1,127 +1,201 @@
-﻿<UserControl
+﻿<Page
     x:Class="ServerMonitor.Views.AddWebsitePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:ServerMonitor.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Template10.Controls"
     xmlns:vm1="using:ServerMonitor.ViewModels"
-    mc:Ignorable="d"
-    d:DesignHeight="500"
-    d:DesignWidth="450" Loaded="{x:Bind ViewModel.Updatedata}">
-    <UserControl.DataContext>
+    RequestedTheme ="Light"
+    mc:Ignorable="d">
+    <Page.DataContext>
         <vm1:AddWebsitePageViewModel x:Name="ViewModel"/>
-    </UserControl.DataContext>
-    <UserControl.Resources>
-        <vm1:ComboBoxBoolToIntConvert x:Key="comboBoxBoolToIntConvert"/>
-    </UserControl.Resources>
-    <ScrollViewer>
-        <Grid>
-            <Border x:Name="OutBorder" Background="#55000000" 
-                VerticalAlignment="Stretch" 
-                HorizontalAlignment="Stretch"/>
-            <StackPanel x:Name="ContentGrid" Background="White"
-              Orientation="Vertical"
-              VerticalAlignment="Center" Height="500" Width="450">
-                <!--<Grid Padding="20">
-                    <TextBlock x:Name="tbContent"
-                           Grid.Row="0" 
-                           TextWrapping="Wrap"  
-                           HorizontalAlignment="Center" />
-                </Grid>
-                <Grid Padding="15">
-                    <ToggleSwitch Grid.Row="1" Grid.Column="6"
-                               Grid.ColumnSpan="1"
-                              HorizontalAlignment="Center" 
-                              VerticalAlignment="Bottom"                              
-                              OffContent="Add Server" OnContent="Add Website"
-                              Height="63" 
-                              />
-                </Grid>-->
-                <Grid Padding="15,50,15,15">
-                    <TextBlock Text=" Website"/>
-                </Grid>
-                <Grid Padding="15">
-                    <StackPanel Orientation="Horizontal">
-                        <ComboBox BorderThickness="0.5" SelectedIndex="{Binding Protocol,Mode=TwoWay}">
-                            <ComboBoxItem Content="http://" IsSelected="{Binding Path=HTTP,Mode=TwoWay,Converter={StaticResource comboBoxBoolToIntConvert},ConverterParameter=1}" />
-                            <ComboBoxItem Content="https://" IsSelected="{Binding Path=HTTP,Mode=TwoWay,Converter={StaticResource comboBoxBoolToIntConvert},ConverterParameter=2}" />
-                        </ComboBox>
-                        <Grid>
-                            <TextBox Name="domain" Margin="10,0,0,0"  PlaceholderText="Domain name/IP   Required" MinWidth="200" LostFocus="Domain_LostFocus" Text="{Binding Domain,Mode=TwoWay}" BorderThickness="0.5"/>
-                            <Image Name="error" MaxHeight="25" Margin="0" HorizontalAlignment="Right" Visibility="Collapsed" MaxWidth="25" Source="ms-appx:///Images/error.png" />
-                        </Grid>
-                        <Button Margin="10,0,0,0"  Content="Test"
-                                Background="Gray"
-                                Foreground="BlanchedAlmond"
-                                BorderThickness="0" />
-                    </StackPanel>
-                </Grid>
-                <Grid Padding="15">
-                    <TextBlock Text="Name"  />
-                </Grid>
-                <Grid Padding="15">
-                    <TextBox BorderThickness="0.5" Text="{Binding Name,Mode=TwoWay}" PlaceholderText="If empty,domain name will be used."/>
-                </Grid>
-                <Grid Padding="15">
-                    <TextBlock Text="Status code" />
-                </Grid>
-                <Grid Padding="15">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2.8*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock x:Name="ID" Text="{Binding ID,Mode=TwoWay}" Visibility="Collapsed"></TextBlock>
-                    <TextBlock Text="{Binding Status,Mode=TwoWay}" Grid.Column="0" ></TextBlock>
-                    <TextBox Name="addCodeStatusText" TextChanged="AddCodeStatusText_TextChanged" Text="{Binding TypeCode,Mode=TwoWay}" Grid.Column="1" BorderThickness="0.5" />
-                    <Button Content="Add"  Margin="10,0,0,0" Grid.Column="2" HorizontalAlignment="Center" 
-                            Width="76" Name="addCodeBtn" 
-                            Background="Gray"
-                            Click="{x:Bind ViewModel.AddCode}"
-                            Foreground="BlanchedAlmond"
-                            BorderThickness="0" />
-                </Grid>
-                <Grid Padding="15">
-                    <StackPanel Orientation="Horizontal" >
-                        <TextBlock Text="Contact"  VerticalAlignment="Center" HorizontalAlignment="Right" />
-                        <Image Name="add_contact2" MaxHeight="25" MaxWidth="25"  Margin="30,0,0,0"  Source="ms-appx:///Images/adduser.png" />
-                    </StackPanel>
-                </Grid>
-                <Grid Padding="15">
-                    <StackPanel Orientation="Horizontal">
-                        <Button Grid.Column="0" x:Name="btnLeft" 
-                                Margin="10"
-                                Padding="15,5,15,5"
-                                Content="OK" 
-                                IsEnabled="False"
-                                HorizontalAlignment="Left"
-                                HorizontalContentAlignment="Center"
-                                VerticalAlignment="Center"
-                                VerticalContentAlignment="Center"
-                                BorderThickness="0" 
-                                Click="{x:Bind ViewModel.AddWebsite}"
-                                Background="#f90"
-                                Foreground="White"
-                                MaxWidth="150"/>
-                        <Button 
-                            Grid.Column="2" 
-                            Margin="10"
-                            Padding="15,5,15,5"
-                            x:Name="btnRight" 
-                            Content="Cancel" 
-                            Click="RightButton_Click"
-                            HorizontalAlignment="Left"
-                            HorizontalContentAlignment="Center"
-                            VerticalAlignment="Center"  
-                            VerticalContentAlignment="Center"
-                            BorderThickness="0"
-                            Background="Gray"
-                            Foreground="BlanchedAlmond"
-                            MaxWidth="150"/>
-                    </StackPanel>
-                </Grid>
-            </StackPanel>
+    </Page.DataContext>
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="AdaptiveVisualStateGroup">
+                <VisualState x:Name="VisualStateNarrow">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="600" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="RightFrame1.Width" Value="400" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <controls:PageHeader x:Name="pageHeader" RelativePanel.AlignLeftWithPanel="True"
+                             RelativePanel.AlignRightWithPanel="True"
+                             RelativePanel.AlignTopWithPanel="True"
+                             Text="Add Website" >
+        </controls:PageHeader>
+        <Grid Background="#F3F3F3" Grid.Row="1" Margin="24,16,24,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Background="{x:Null}" IsEnabled="{Binding IsEnabled}" Click="{x:Bind ViewModel.Save}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Images/commit.png" Width="16" Height="16"/>
+                    <TextBlock Text="Save" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="1" Background="{x:Null}" Click="{x:Bind ViewModel.CancelBack}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Images/cancel.png" Width="12" Height="12"/>
+                    <TextBlock Text="Cancel" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
+                </StackPanel>
+            </Button>
+
+            <Grid Grid.Column="2" Width="1" Background="DarkGray"/>
+            <Button Grid.Column="3" Background="{x:Null}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Images/test.png" Width="16" Height="16"/>
+                    <TextBlock Text="TEST" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
+                </StackPanel>
+            </Button>
+
+            <Grid Grid.Column="4" Width="1" Background="DarkGray"/>
+            <Button Grid.Column="5" Background="{x:Null}" Click="{x:Bind ViewModel.BindContact_Click}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Images/addcontact.png" Width="16" Height="16" HorizontalAlignment="Right"/>
+                    <TextBlock Text="Edit Contact" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
+                </StackPanel>
+            </Button>
         </Grid>
-    </ScrollViewer>
-</UserControl>
+        
+        <Grid HorizontalAlignment="Stretch" Grid.Row="2" Margin="24,0,24,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MaxWidth="700" MinWidth="400"/>
+            </Grid.ColumnDefinitions>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Orientation="Vertical"  Grid.Column="0">
+                    <!--SERVER-->
+                    <TextBlock Text="SERVER" Foreground="Black" FontWeight="SemiBold"/>
+                    <Grid Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <ComboBox SelectedIndex="{Binding ProtocolType, Mode=TwoWay}" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center">
+                            <ComboBoxItem Content="http://"/>
+                            <ComboBoxItem Content="https://"/>
+                        </ComboBox>
+                        <TextBox Grid.Column="1" Name="domain" PlaceholderText="Domain name/IP   This Field Is Required"
+                                 Text="{Binding SiteAddress, Mode=TwoWay}"
+                                 Height="30" TextChanged="{x:Bind ViewModel.Domain_TextChanged}"/>
+                    </Grid>
+                    <!--<TextBlock Text="NAME" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8"/>-->
+                    <TextBox Height="30" Margin="0,8,0,0"
+                             Text="{Binding SiteName, Mode=TwoWay}"
+                             PlaceholderText="Server name   If empty,domain name will be used."/>
+                    
+                    <!--PRIORITY-->
+                    <TextBlock Text="PRIORITY" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8"/>
+                    <ComboBox SelectedIndex="{Binding Priority, Mode=TwoWay}" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center">
+                        <ComboBoxItem Content="Low"/>
+                        <ComboBoxItem Content="Normal"/>
+                        <ComboBoxItem Content="High"/>
+                    </ComboBox>
+
+                    <!--CONTACTS-->
+                    <TextBlock Margin="0,24,0,8" Text="CONTACTS" Foreground="Black" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <ListView SelectionMode="None" Margin="-12,0,0,0"
+                             ItemsSource="{Binding SelectedContacts}" Foreground="White">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,8,8,8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="360"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Contact_name}" FontWeight="Bold"/>
+                                    <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                        <Image Source="/Images/e-mail.png" Width="16" Height="16" Margin="0,0,8,0"/>
+                                        <TextBlock Text="{Binding Contact_email}" Width="180"/>
+                                        <Image Source="/Images/phone.png" Width="16" Height="16" Margin="0,0,4,0"/>
+                                        <TextBlock Text="{Binding Telephone}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <!--联系人列表-->
+        <Grid Grid.Row="1" Name="RightFrame1"
+              Grid.RowSpan="2"  Background="White" 
+              BorderThickness="0.5" BorderBrush="LightGray"
+                      HorizontalAlignment="Right" Visibility="Visible">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <ListBox Grid.Row="0" Height="0"/>
+            <TextBlock Text="Contact" FontWeight="SemiBold" Foreground="Black"
+                       FontSize="20" Margin="12,24,0,16"/>
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
+                <ListView x:Name="contactList" SelectionMode="Multiple"
+                          ItemClick="{x:Bind ViewModel.Contactlist_ItemClick}"
+                          ItemsSource="{Binding Contacts}"
+                          Foreground="White" IsItemClickEnabled="True">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <!--<StackPanel Orientation="Vertical" Margin="8">
+                                <TextBlock Text="{Binding Contact_name}" FontWeight="Bold"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="/Images/e-mail.png" Width="16" Height="16" Margin="0,0,4,0"/>
+                                    <TextBlock Text="{Binding Contact_email}" Width="132"/>
+                                    <Image Source="/Images/phone.png" Width="16" Height="16" Margin="0,0,4,0"/>
+                                    <TextBlock Text="{Binding Telephone}"/>
+                                </StackPanel>
+                            </StackPanel>-->
+                            <Grid Margin="8">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="{Binding Contact_name}" FontWeight="Bold"/>
+                                <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                    <Image Source="/Images/e-mail.png" Width="16" Height="16" Margin="0,0,8,0"/>
+                                    <TextBlock Text="{Binding Contact_email}" Width="180"/>
+                                    <Image Source="/Images/phone.png" Width="16" Height="16" Margin="0,0,4,0"/>
+                                    <TextBlock Text="{Binding Telephone}"/>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </ScrollViewer>
+            <Grid Grid.Row="2" Margin="24,4,24,48">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <!--Click="{x:Bind ViewModel.Ok_Click}"-->
+                <Button Content="OK" Grid.Column="0" HorizontalAlignment="Stretch" Click="{x:Bind ViewModel.Ok_Click}"
+                        Background="#0063B1" Margin="0,0,8,0" Foreground="White"/>
+                <Button Content="CANCEL" Grid.Column="1" HorizontalAlignment="Stretch" Margin="8,0,0,0" Click="{x:Bind ViewModel.Cancel_Click}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>
+
