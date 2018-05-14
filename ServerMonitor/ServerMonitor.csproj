@@ -302,9 +302,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Etg.SimpleStubs">
-      <Version>2.4.6</Version>
-    </PackageReference>
     <PackageReference Include="Heijden.Dns.Portable">
       <Version>2.0.19</Version>
     </PackageReference>
