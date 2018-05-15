@@ -9,7 +9,7 @@ using Telerik.UI.Xaml.Controls.Chart;
 
 namespace ServerMonitor.ViewModels
 {
-    public interface IChartDao
+    public interface IChartUtil
     {
         ChartPalette DefaultPalette { get; }
 

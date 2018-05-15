@@ -11,13 +11,14 @@
     <AssemblyName>ServerMonitor</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
+    <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.14393.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
-    <PackageCertificateKeyFile>Minimal_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>ServerMonitor_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateThumbprint>B33ECE88E89244B5E6A08EB073EADFF75A871094</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
@@ -90,6 +91,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="Hamburger_TemporaryKey.pfx" />
+    <None Include="ServerMonitor_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
@@ -132,10 +134,12 @@
     <Compile Include="ViewModels\AddWebsitePageViewModel.cs" />
     <Compile Include="ViewModels\AllServerViewModel.cs" />
     <Compile Include="ViewModels\AllServer_addserverViewModel.cs" />
-    <Compile Include="DAO\ChartDaoImpl.cs" />
+    <Compile Include="ViewModels\BLL\ChartUtilImpl.cs" />
+    <Compile Include="ViewModels\BLL\IChartUtil.cs" />
+    <Compile Include="ViewModels\BLL\ISiteDetailUtil.cs" />
+    <Compile Include="ViewModels\BLL\SiteDetailUtilImpl.cs" />
     <Compile Include="ViewModels\ChartPageViewModel.cs" />
     <Compile Include="ViewModels\ContactPageViewModel.cs" />
-    <Compile Include="DAO\IChartDao.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
     <Compile Include="ViewModels\DetailPageViewModel.cs" />
     <Compile Include="ViewModels\SettingsPageViewModel.cs" />
@@ -179,8 +183,8 @@
     <Compile Include="Views\Shell.xaml.cs">
       <DependentUpon>Shell.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SiteDetail.xaml.cs">
-      <DependentUpon>SiteDetail.xaml</DependentUpon>
+    <Compile Include="Views\SiteDetailPage.xaml.cs">
+      <DependentUpon>SiteDetailPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Splash.xaml.cs">
       <DependentUpon>Splash.xaml</DependentUpon>
@@ -292,7 +296,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\SiteDetail.xaml">
+    <Page Include="Views\SiteDetailPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.Services.RequestServices
 {
-    public class DnsRequest : BasicRequest,IRequest
+    public class DNSRequest : BasicRequest,IRequest
     {
         // 继承的属性：CreateTime TimeCost OverTime Status Others ErrorException
         /// <summary>
@@ -32,7 +32,18 @@ namespace ServerMonitor.Services.RequestServices
         /// Dns服务器IP地址
         /// </summary>
         IPAddress dnsServer;
-        
+        /// <summary>
+        /// 线程安全的请求对象 --完全延迟加载
+        /// </summary>
+        public static DNSRequest Instance
+        {
+            get
+            {
+                return Nested.instance;
+            }
+        }
+
+        private DNSRequest() { }
 
         public QType RecordType { get => recordType; set => recordType = value; }
         public string DomainName { get => domainName; set => domainName = value; }
@@ -45,7 +56,7 @@ namespace ServerMonitor.Services.RequestServices
         /// </summary>
         /// <param name="DnsServer">用于解析域名的Dns服务器</param>
         /// <param name="DomainName">待解析的域名</param>
-        public DnsRequest(IPAddress DnsServer, string DomainName)
+        public DNSRequest(IPAddress DnsServer, string DomainName)
         {
             this.DnsServer = DnsServer;
             this.DomainName = DomainName;
@@ -168,13 +179,12 @@ namespace ServerMonitor.Services.RequestServices
                 // Dns服务器请求出现未捕获到的异常
                 Status = "1001";
                 // 收集捕获到的异常
-                ErrorException = e.InnerException;
+                ErrorException = e;
                 // 请求耗时设置为超时上限
                 TimeCost = OverTime;
                 requestInfos = e.Message;
                 return false;
             }
-
         }
 
         /// <summary>
@@ -211,5 +221,17 @@ namespace ServerMonitor.Services.RequestServices
          * QType q = (QType)Enum.Parse(typeof(QType), i.ToString());
          * 用来获取枚举值得下标
          */
+
+        /// <summary>
+        /// 用于控制线程安全的内部类
+        /// </summary>
+        private class Nested
+        {
+            static Nested()
+            {
+
+            }
+            internal static readonly DNSRequest instance = new DNSRequest();
+        }
     }
 }

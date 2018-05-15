@@ -28,7 +28,7 @@ namespace ServerMonitor.ViewModels
         const int MAX_NUMBER_OF_SITE = 5;
         const int ERROR_CODE = 4;
 
-        public IChartDao ChartDao { get; set; }
+        public IChartUtil ChartDao { get; set; }
 
         //为柱状图绑定的站点ID提供显示的站点名
         public static List<SiteModel> siteModels = new List<SiteModel>();
@@ -127,7 +127,7 @@ namespace ServerMonitor.ViewModels
         public async Task<bool> InitAsync()
         {
             Lengend = new ObservableCollection<ChartLengend>();
-            ChartDao = new ChartDaoImpl();
+            ChartDao = new ChartUtilImpl();
             Chart1Collection = new ObservableCollection<ObservableCollection<Chart1>>();
             Infos.Chart1CollectionCopy = new ObservableCollection<ObservableCollection<Chart1>>();
             Infos.SelectSites = new ObservableCollection<SelectSite>();
