@@ -42,7 +42,7 @@ namespace TestServerMonitor.TestViewModel
         [TestMethod]
         public void TestChartAsync_NormallyExcuted_ShouldReturnTrue()
         {
-            var stub = new StubIChartDao(MockBehavior.Strict);
+            var stub = new StubIChartUtil(MockBehavior.Strict);
             viewModel.ChartDao = stub;
             int except1 = 0, except2 = 0;
             stub.ChartLengendAsync(async (sites) =>
@@ -74,7 +74,7 @@ namespace TestServerMonitor.TestViewModel
         public void TestAcceptClickAsync_NumberOfSiteLE5_ShouldReturnTrue()
         {
             Assert.IsTrue(viewModel.InitAsync().Result);
-            var stub = new StubIChartDao(MockBehavior.Strict);
+            var stub = new StubIChartUtil(MockBehavior.Strict);
             viewModel.ChartDao = stub;
             for (int i = 0; i < 4; i++)
             {

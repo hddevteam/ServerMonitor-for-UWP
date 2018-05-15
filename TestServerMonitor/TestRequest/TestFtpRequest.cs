@@ -5,7 +5,7 @@ using System.Net;
 namespace TestServerMonitor.TestRequest
 {
     [TestClass]
-    public class TestFtpRequest
+    public class TestFTPRequest
     {
         private static FTPRequest request = new FTPRequest(LoginType.Identify);
         private const string TestFTPIP = "47.94.251.85";
