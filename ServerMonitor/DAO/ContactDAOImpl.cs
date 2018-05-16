@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ServerMonitor.Controls;
 using ServerMonitor.DAO;
 using ServerMonitor.Models;
+using ServerMonitor.SiteDb;
 using SQLite.Net;
 using SQLite.Net.Platform.WinRT;
 
@@ -21,7 +22,7 @@ namespace ServerMonitor.DAO
         public List<ContactModel> GetAllContact()
         {
             List<ContactModel> r;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 r = conn.Table<ContactModel>().ToList<ContactModel>();
             }
@@ -36,7 +37,7 @@ namespace ServerMonitor.DAO
         public List<ContactModel> GetContactBySiteId(int siteId)
         {
             List<ContactModel> contactList;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 try
                 {
@@ -58,7 +59,7 @@ namespace ServerMonitor.DAO
         public int InsertOneContact(ContactModel contact)
         {
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 result = conn.Insert(contact);
             }
@@ -73,7 +74,7 @@ namespace ServerMonitor.DAO
         public int DeleteOneContact(int contactId)
         {
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 result = conn.Execute("delete from Contact where Id = ?", contactId);
             }
@@ -89,7 +90,7 @@ namespace ServerMonitor.DAO
         {
             // result = -1 表示异常返回值，执行操作失败
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath1))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 try
                 {

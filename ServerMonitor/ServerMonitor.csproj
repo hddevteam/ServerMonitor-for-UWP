@@ -97,8 +97,10 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DAO\ContactDAOImpl.cs" />
     <Compile Include="DAO\ContactSiteDAOImpl.cs" />
     <Compile Include="DAO\DataBaseControlImpl.cs" />
+    <Compile Include="DAO\IContactDAO.cs" />
     <Compile Include="DAO\ILogDAO.cs" />
     <Compile Include="DAO\LogDAOImpl.cs" />
     <Compile Include="DAO\SiteDAOImpl.cs" />
