@@ -526,14 +526,7 @@ namespace ServerMonitor.ViewModels
             else if(ProtocolType == 4)
             {
                 JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
-                try
-                {
-                    RecordType = int.Parse(js["recordType"].ToString());
-                }
-                catch (Exception)
-                {
-                    RecordType = 0;//出错 默认选第一个
-                }
+                RecordType = GetRecordType(js["recordType"].ToString());
                 Lookup = js["lookup"].ToString();
                 ExpectedResults = js["expectedResults"].ToString();
             }
@@ -555,7 +548,10 @@ namespace ServerMonitor.ViewModels
             {
                 try
                 {
-                    Regex reg = new Regex(@"^((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]\d)|\d)(\.((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]\d)|\d)){3}$");
+                    Regex reg = new Regex(@"^(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|[1-9])\\."
+                                            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
+                                            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
+                                            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)$");
                     Boolean _domaincheck = reg.IsMatch(domain);
                     //Boolean _ipcheck = Regex.IsMatch(domain, "^(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|[1-9])\\."
                     //                        + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."

@@ -210,6 +210,7 @@
     <Content Include="Images\iconfont_add.png" />
     <Content Include="Images\phone.png" />
     <Content Include="Images\radio02.png" />
+    <Content Include="Images\reduce.png" />
     <Content Include="Images\ServerMonitor_icon.png" />
     <Content Include="Images\Server_Ico.jpg" />
     <Content Include="Images\splash-sdk.png" />

@@ -91,15 +91,27 @@
                             <ComboBoxItem Content="http://"/>
                             <ComboBoxItem Content="https://"/>
                         </ComboBox>
-                        <TextBox Grid.Column="1" Name="domain" PlaceholderText="Domain name/IP   This Field Is Required"
-                                 Text="{Binding SiteAddress, Mode=TwoWay}"
+                        <TextBox Grid.Column="1" Name="domain" Text="{Binding SiteAddress, Mode=TwoWay}"
+                                 PlaceholderText="Domain name/IP   This Field Is Required" Tag="1"
                                  Height="30" TextChanged="{x:Bind ViewModel.Domain_TextChanged}"/>
                     </Grid>
                     <!--<TextBlock Text="NAME" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8"/>-->
                     <TextBox Height="30" Margin="0,8,0,0"
                              Text="{Binding SiteName, Mode=TwoWay}"
                              PlaceholderText="Server name   If empty,domain name will be used."/>
-                    
+
+                    <!--STATUS CODES-->
+                    <TextBlock Text="STATUS CODES" Margin="0,24,0,8" Foreground="Black" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <Grid Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Text="200,"/>
+                        <TextBox Grid.Column="1" Text="{Binding StatusCodes, Mode=TwoWay}" PlaceholderText="The expected status codes,separated by comma(,)"
+                                 Tag="2" TextChanged="{x:Bind ViewModel.Domain_TextChanged}"/>
+                    </Grid>
+
                     <!--PRIORITY-->
                     <TextBlock Text="PRIORITY" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8"/>
                     <ComboBox SelectedIndex="{Binding Priority, Mode=TwoWay}" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center">

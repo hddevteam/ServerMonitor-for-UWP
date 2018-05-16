@@ -143,6 +143,16 @@ namespace ServerMonitor.ViewModels
             }
         }
         
+        private string statusCodes;
+        public string StatusCodes
+        {
+            get => statusCodes;
+            set
+            {
+                statusCodes = value;
+                RaisePropertyChanged(() => StatusCodes);
+            }
+        }
         //PRIORITY
         private int priority; //现在没用到
         public int Priority
@@ -218,8 +228,19 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public void Domain_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string domain = (sender as TextBox).Text.ToString();
-            IsEnabled = CheckDomain(domain);
+            bool flag = false;
+            var textBox = sender as TextBox;
+            if (textBox.Tag.Equals("1"))
+            {
+                string domain = textBox.Text.ToString();
+                flag = CheckDomain(domain);
+            }
+            else
+            {
+                string codes = textBox.Text.ToString();
+                flag = CheckCodes(codes);
+            }
+            IsEnabled = flag;
         }
 
         /// <summary>
@@ -252,6 +273,7 @@ namespace ServerMonitor.ViewModels
             //将界面数据保存下来
             site.Protocol_type = GetProtocolType(ProtocolType);
             site.Site_address = (ProtocolType == 0 ? "http://" : "https://") + SiteAddress;
+            site.Status_code = "200," + StatusCodes;
 
             if (SiteName == null || SiteName.Equals(""))
             {
@@ -348,6 +370,7 @@ namespace ServerMonitor.ViewModels
                 SiteAddress = site.Site_address.Substring(8);
             }
             SiteName = site.Site_name;
+            StatusCodes = site.Status_code.Substring(4);
         }
 
         /// <summary>
@@ -383,7 +406,28 @@ namespace ServerMonitor.ViewModels
                 }
             }
         }
-        
+
+        private bool CheckCodes(string codes)  //可测
+        {
+            if (codes.Equals("")||codes==null)
+            {
+                return true;
+            }
+            string[] arr = codes.Split(',');
+            for (int i = 0; i < arr.Count(); i++)
+            {
+                try
+                {
+                    int x = int.Parse(arr[i]);
+                }
+                catch (Exception)
+                {
+
+                    return false;
+                }
+            }
+            return true;
+        }
         /// <summary>
         /// 将int型的站点协议转换为string
         /// </summary>
