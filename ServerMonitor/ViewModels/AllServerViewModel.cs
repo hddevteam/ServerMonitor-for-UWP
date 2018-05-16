@@ -157,25 +157,12 @@ namespace ServerMonitor.ViewModels
         //add server点击事件
         public void Add_Server(object sender, RoutedEventArgs e)
         {
-            //ShowAddServerPage();
             NavigationService.Navigate(typeof(Views.AddServerPage), "2,-1"); //1MainPage, 2 AllServer; -1没有id是新建site
-            //AddServerPage.ShowWindow();
-        }
-        private void ShowAddServerPage()
-        {
-            //var msgPopup = new AddServerPage();
-            //AddServerPage.ShowWindow();
         }
         //add website点击事件
         public void Add_Website(object sender, RoutedEventArgs e)
         {
-            ShowAddWebsitePage();
-            //AddWebsitePage.ShowWindow();
-        }
-        private void ShowAddWebsitePage()
-        {
-            var msgPopup = new AddWebsitePage();
-            AddWebsitePage.ShowWindow();
+            NavigationService.Navigate(typeof(Views.AddWebsitePage), "2,-1"); //1MainPage, 2 AllServer; -1没有id是新建site
         }
 
 
@@ -191,15 +178,10 @@ namespace ServerMonitor.ViewModels
             if (site.Is_server)
             {
                 NavigationService.Navigate(typeof(Views.AddServerPage), "2,"+ ServerContext.Site_id); //1MainPage, 2 AllServer; -1没有id是新建site
-                //var msgPoput = new AddServerPage(ServerContext.Site_id.ToString());
-                ////msgPoput.ShowWindow();
-                //AddServerPage.ShowWindow();
             }
             else
             {
-                var msgPoput = new AddWebsitePage(ServerContext.Site_id.ToString());
-                //msgPoput.ShowWindow();
-                AddWebsitePage.ShowWindow();
+                NavigationService.Navigate(typeof(Views.AddWebsitePage), "2," + ServerContext.Site_id); //1MainPage, 2 AllServer; -1没有id是新建site
             }
             rightFrame1.Visibility = Visibility.Collapsed;
         }
