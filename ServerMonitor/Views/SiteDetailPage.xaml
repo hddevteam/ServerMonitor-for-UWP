@@ -89,7 +89,7 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <ProgressRing HorizontalAlignment="Left" Margin="0,0,100,0" IsActive="{x:Bind ViewModel.Infos.RequestAsyncStat,Mode=OneWay,Converter={StaticResource BoolRevertConvert}}" Width="50" Height="50"/>
                     <!-- 这是最上面的切换按钮 -->
-                    <ToggleSwitch x:Name="toggled" HorizontalAlignment="Right" IsOn="{x:Bind ViewModel.Infos.IsMonitor,Mode=TwoWay}" Toggled="{x:Bind ViewModel.test}">
+                    <ToggleSwitch x:Name="toggled" HorizontalAlignment="Right" IsOn="{x:Bind ViewModel.Infos.IsMonitor,Mode=TwoWay}" Toggled="{x:Bind ViewModel.ToggledChanged}">
                         <ToggleSwitch.OffContent>Unable Monitoring</ToggleSwitch.OffContent>
                         <ToggleSwitch.OnContent>Enable Monitoring</ToggleSwitch.OnContent>
                     </ToggleSwitch>
@@ -271,6 +271,8 @@
                                     <telerik:PropertyNameDataPointBinding PropertyName="RequestStatus"/>
                                 </telerik:BarSeries.CategoryBinding>
                             </telerik:BarSeries>
+                            
+                            
                         </telerik:RadCartesianChart>
 
                         <StackPanel Orientation="Vertical"

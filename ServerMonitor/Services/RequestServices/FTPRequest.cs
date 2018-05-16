@@ -55,6 +55,18 @@ namespace ServerMonitor.Services.RequestServices
         //public LoginType IdentifyType { get => identifyType; set => identifyType = value; }
         public IdentificationInfo Identification { get => identification; set => identification = value; }
         public IPAddress FtpServer { get => ftpServer; set => ftpServer = value; }
+        /// <summary>
+        /// 线程安全的请求对象 --完全延迟加载
+        /// </summary>
+        public static FTPRequest Instance
+        {
+            get
+            {
+                return Nested.instance;
+            }
+        }
+
+        private FTPRequest() { }
 
         /// <summary>
         /// 构造函数
@@ -308,6 +320,18 @@ namespace ServerMonitor.Services.RequestServices
             }
 
             return splitValues.All(r => byte.TryParse(r, out byte tempForParsing));
+        }
+
+        /// <summary>
+        /// 用于控制线程安全的内部类
+        /// </summary>
+        private class Nested
+        {
+            static Nested()
+            {
+
+            }
+            internal static readonly FTPRequest instance = new FTPRequest();
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿using ServerMonitor.Controls;
+using ServerMonitor.DAOImpl;
 using ServerMonitor.Models;
 using SQLite.Net;
 using SQLite.Net.Platform.WinRT;
@@ -13,7 +14,7 @@ using Windows.Storage;
 
 namespace ServerMonitor.SiteDb
 {
-    public class DbInitImpl : DBInit
+    public class DataBaseControlImpl : DBInit
     {
         /// <summary>
         /// 持有SiteDAO对象实现对Site的操作
@@ -30,7 +31,7 @@ namespace ServerMonitor.SiteDb
         /// <summary>
         /// 延迟加载对象
         /// </summary>
-        private DbInitImpl Instance {
+        public static DataBaseControlImpl Instance {
             get {
                 return Nested.instance;
             }
@@ -41,16 +42,9 @@ namespace ServerMonitor.SiteDb
         /// </summary>
         public static string DBPath { get => dBPath; }
 
-        static DbInitImpl() {
-            // 加载XML文件
-            XDocument document = XDocument.Load("Common/Config.xml");
-            // 获取XML的根元素进行操作
-            XElement root = document.Root;
-            // 加载数据库名称
-            XElement dbName = root.Element("DBFilename");
-            dBPath = Path.Combine(ApplicationData.Current.LocalFolder.Path, dbName.Value);
+        private DataBaseControlImpl() {
+
         }
-        private DbInitImpl() { }
 
         /// <summary>
         /// 初始化数据库
@@ -242,8 +236,7 @@ namespace ServerMonitor.SiteDb
 
         class Nested {
             static Nested(){}
-            internal static readonly DbInitImpl instance = new DbInitImpl();
-            
+            internal static readonly DataBaseControlImpl instance = new DataBaseControlImpl();           
         }
     }
 }

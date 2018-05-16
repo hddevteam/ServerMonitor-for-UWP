@@ -3,6 +3,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ServerMonitor.Controls;
 using ServerMonitor.Models;
+using ServerMonitor.Services.RequestServices;
+using ServerMonitor.ViewModels.BLL;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -43,6 +45,10 @@ namespace ServerMonitor.ViewModels
         public LogModel Refresh_log { get => refresh_log; set { Set(ref refresh_log, value); RaisePropertyChanged(() => Refresh_log); } }
         // 临时变量  站点id  ->  由字符串转换来的
         public int id = 0;
+        /// <summary>
+        /// 封装的SiteDetailViewModel使用的工具类
+        /// </summary>
+        private ISiteDetailUtil utilObject;
         #endregion
 
         // 构造函数
@@ -55,6 +61,8 @@ namespace ServerMonitor.ViewModels
                 Logs = new ObservableCollection<LogModel>(),
                 RequestTimeList = new ObservableCollection<LogModel>()
             };
+            // 初始化工具接口
+            utilObject = new SiteDetailUtilImpl();
 
             Debug.WriteLine("Construction function => SiteDetailViewModel();");
         }
@@ -124,12 +132,14 @@ namespace ServerMonitor.ViewModels
         /// <returns></returns>
         public ObservableCollection<RequestCountInfo> InitRadCartesianChartData()
         {
-            ObservableCollection<RequestCountInfo> r = new ObservableCollection<RequestCountInfo>();
-            r.Add(new RequestCountInfo() { RequestStatus = "1ms", Count = 0 });
-            r.Add(new RequestCountInfo() { RequestStatus = "30ms", Count = 0 });
-            r.Add(new RequestCountInfo() { RequestStatus = "100ms", Count = 0 });
-            r.Add(new RequestCountInfo() { RequestStatus = ">100ms", Count = 0 });
-            r.Add(new RequestCountInfo() { RequestStatus = "error", Count = 0 });
+            ObservableCollection<RequestCountInfo> r = new ObservableCollection<RequestCountInfo>
+            {
+                new RequestCountInfo() { RequestStatus = "1ms", Count = 0 },
+                new RequestCountInfo() { RequestStatus = "30ms", Count = 0 },
+                new RequestCountInfo() { RequestStatus = "100ms", Count = 0 },
+                new RequestCountInfo() { RequestStatus = ">100ms", Count = 0 },
+                new RequestCountInfo() { RequestStatus = "error", Count = 0 }
+            };
             return r;
         }
 
@@ -148,62 +158,6 @@ namespace ServerMonitor.ViewModels
             return pi;
         }
 
-        #region 快速排序
-        /// <summary>
-        /// 自己实现的快速排序主体
-        /// </summary>
-        /// <param name="sou">待排数组</param>
-        /// <returns>排好序的数组</returns>
-        public void QuickSort(ref double[] a, int low, int high)
-        {
-            // 加入这个low<high ，一个是确保数组的长度大于1，二是确定递归结束的条件，防止进入死循环，栈溢出
-            if (low < high)
-            {
-                // 每次获取中枢值的位置
-                int pivotloc = Partition(ref a, low, high);
-                // 利用中枢值将每遍排好序的数组分割成两份，接着从low到pivotkey-1 以及 pivotkey+1 到 high两个区域进行排序
-                // 这里加入比较两端的长度，旨在降低栈的最大深度（降低至logn）
-                if ((pivotloc - low) <= (high - pivotloc))
-                {
-                    QuickSort(ref a, low, pivotloc - 1);
-                    QuickSort(ref a, pivotloc + 1, high);
-                }
-                else
-                {
-                    QuickSort(ref a, pivotloc + 1, high);
-                    QuickSort(ref a, low, pivotloc - 1);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 一遍快速排序
-        /// </summary>
-        /// <param name="a">待排数组</param>
-        /// <param name="low">排序起始值</param>
-        /// <param name="high">排序最高值</param>
-        /// <returns></returns>
-        public int Partition(ref double[] a, int low, int high)
-        {
-            double pivotkey = a[low];
-            while (low < high)
-            {
-                while (low < high && a[high] >= pivotkey)
-                    high--;
-                a[low] += a[high];
-                a[high] = a[low] - a[high];
-                a[low] -= a[high];
-                while (low < high && a[low] <= pivotkey)
-                    low++;
-                a[low] += a[high];
-                a[high] = a[low] - a[high];
-                a[low] -= a[high];
-            }
-            a[low] = pivotkey;
-            return low;
-        }
-        #endregion
-
         /// <summary>
         /// 计算平均请求时间以及请求时间中位值
         /// </summary>
@@ -220,7 +174,7 @@ namespace ServerMonitor.ViewModels
                 request_array[logs.IndexOf(l)] = l.Request_time;
             }
             // 对数组进行排序
-            QuickSort(ref request_array, 0, request_array.Length - 1);
+            utilObject.QuickSort(ref request_array, 0, request_array.Length - 1);
 
             // 平均值
             double Average = request_array.Average();
@@ -246,7 +200,7 @@ namespace ServerMonitor.ViewModels
             Infos.Detail_Site = DBHelper.GetSiteById(id);
             Infos.ContactCollection = new ObservableCollection<ContactModel>();
             Infos.IsMonitor = Infos.Detail_Site.Is_Monitor;
-            Infos.IsWebSite = !Infos.Detail_Site.Is_server;            
+            Infos.IsWebSite = !Infos.Detail_Site.Is_server;
 
             // 初始化下面两个图表数据
             ClearSiteRequestCount();
@@ -278,9 +232,11 @@ namespace ServerMonitor.ViewModels
                 foreach (var log in l)
                 {
                     Infos.Logs.Add(log);
-                    var log_temp = new LogModel();
-                    log_temp.Create_time = log.Create_time;
-                    log_temp.Request_time = Math.Log10(log.Request_time);
+                    var log_temp = new LogModel
+                    {
+                        Create_time = log.Create_time,
+                        Request_time = Math.Log10(log.Request_time)
+                    };
                     Infos.RequestTimeList.Add(log_temp);
                 }
                 Infos.LastRequest = l.First<LogModel>();
@@ -339,40 +295,7 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        /// <summary>
-        /// 刷新按钮的点击事件
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public async void Refresh_Click(object sender, RoutedEventArgs e)
-        {
-            // P操作 禁用刷新按钮
-            Infos.RequestAsyncStat = false;
-            LogModel log = await MakeRequest();
-            // 确认返回的log有效
-            if (null != log)
-            {
-                AddNewLog(log);
-            }
-
-            // 更新绑定数据
-            if (Infos.Logs.Count != 0)
-            {
-                UpdateBindLine();
-                // 更新上次请求记录
-                Infos.LastRequest = Infos.Logs.Last();
-                Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.Request_time);
-            }
-            else
-            {
-                Infos.MedianValue = 0;
-                Infos.AverageValue = 0;
-                Infos.LastRequest = new LogModel();
-                Infos.LastRequestWords = "No Data!";
-            }
-            // V操作 启用刷新按钮
-            Infos.RequestAsyncStat = true;
-        }
+        
 
         /// <summary>
         /// 发起请求主体
@@ -383,13 +306,38 @@ namespace ServerMonitor.ViewModels
             LogModel log;
             if (Infos.IsWebSite)
             {
-                log = await RequestWebsite();
+                try
+                {
+                    log = await RequestWebsite();
+                }
+                catch (Exception ex)
+                {
+                    DBHelper.InsertErrorLog(ex);
+                    log = null;
+                }
             }
             else
             {
                 try
                 {
-                    log = await RequestDNSServer(infos.Detail_Site);
+                    switch (Infos.Detail_Site.Protocol_type)
+                    {
+                        case "DNS":
+                            log = utilObject.AccessDNSServer(infos.Detail_Site,DNSRequest.Instance).Result;
+                            break;
+                        case "FTP":
+
+                            break;
+                        case "SSH":
+                            break;
+                        case "SMTP":
+                            break;
+                        case "Socket":
+                            break;
+                        default:
+                            break;
+                    }
+                    log = null;
                 }
                 catch (Exception ex)
                 {
@@ -461,7 +409,7 @@ namespace ServerMonitor.ViewModels
         }
 
         /// <summary>
-        /// 请求服务器状态
+        /// 请求服务器状态  没有使用!
         /// </summary>
         /// <param name="serverProtocol"></param>
         /// <returns></returns>
@@ -471,7 +419,7 @@ namespace ServerMonitor.ViewModels
 
             if (null != site.Site_address && !("".Equals(site.Site_address)))
             {
-                IPAddress ip = await GetIPAddress(site.Site_address);
+                IPAddress ip = await utilObject.GetIPAddressAsync(site.Site_address);
                 if (null == ip)
                 {
                     try
@@ -582,14 +530,14 @@ namespace ServerMonitor.ViewModels
                 Infos.Detail_Site.Request_count++;
             }
             catch (JsonReaderException e)
-            {                
+            {
                 DBHelper.InsertErrorLog(e);
                 Debug.WriteLine(httpResult);
                 // 返回值为自定义的错误内容
                 CatchCustomReturned(httpResult);
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 DBHelper.InsertErrorLog(e);
                 Debug.WriteLine(httpResult);
@@ -700,19 +648,6 @@ namespace ServerMonitor.ViewModels
         }
 
         /// <summary>
-        /// 绑定界面的ToggleSwitch
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void test(object sender, RoutedEventArgs e)
-        {
-            ToggleSwitch t = sender as ToggleSwitch;
-
-            Infos.Detail_Site.Is_Monitor = t.IsOn;
-            DBHelper.UpdateSite(Infos.Detail_Site);
-        }
-
-        /// <summary>
         /// 界面数据添加一条新的记录
         /// </summary>
         /// <param name="log"></param>
@@ -782,68 +717,7 @@ namespace ServerMonitor.ViewModels
             }
             #endregion
         }
-
-        /// <summary>
-        /// 清空日志
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void ClearLog(object sender, RoutedEventArgs e)
-        {
-            // 删除数据库中记录
-            DBHelper.DeleteLogsBySite(Infos.Detail_Site.Id);
-            // 更新数据库站点的请求
-            Infos.Detail_Site.Request_count = 0;
-            DBHelper.UpdateSite(Infos.Detail_Site);
-            // 重新获取界面信息
-            Infos.Logs.Clear();
-            Infos.RequestTimeList.Clear();
-            #region 清空Re和PieInfo集合每一项的值
-            foreach (var item in Infos.Re)
-            {
-                item.Count = 0;
-            }
-            foreach (var item in Infos.Pieinfo)
-            {
-                item.Count = 0;
-            }
-            #endregion
-            Infos.MedianValue = 0;
-            Infos.AverageValue = 0;
-            InitChartData();
-        }
-
-        /// <summary>
-        /// Pivot 切换的时候触发的事件
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void Pivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-            Pivot _p = sender as Pivot;
-            int _selectedIndex = _p.SelectedIndex;
-            Debug.WriteLine("Pivot_SelectionChanged();");
-            switch (_selectedIndex)
-            {
-                case 0:
-                    Infos.MaxmumDatetime = DateTime.Now;
-                    Infos.MinmumDatetime = DateTime.Now.AddDays(-1);
-                    break;
-                case 1:
-                    Infos.MaxmumDatetime = DateTime.Now;
-                    Infos.MinmumDatetime = DateTime.Now.AddDays(-3);
-                    break;
-                case 2:
-                    Infos.MaxmumDatetime = DateTime.Now;
-                    Infos.MinmumDatetime = DateTime.Now.AddDays(-7);
-                    break;
-                default:
-                    break;
-            }
-            ChangeStepUnitStep(_selectedIndex);
-        }
-
+              
         /// <summary>
         /// 响应式修改第一个图表的属性
         /// </summary>
@@ -881,6 +755,8 @@ namespace ServerMonitor.ViewModels
             }
         }
 
+        #region UI交互 Method集
+
         /// <summary>
         /// 界面加载的方法
         /// </summary>
@@ -892,6 +768,113 @@ namespace ServerMonitor.ViewModels
             ChangeStepUnitStep(0);
             Debug.WriteLine("load_Loading() Excute!");
         }
+        /// <summary>
+        /// 绑定界面的ToggleSwitch
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void ToggledChanged(object sender, RoutedEventArgs e)
+        {
+            ToggleSwitch t = sender as ToggleSwitch;
+
+            Infos.Detail_Site.Is_Monitor = t.IsOn;
+            DBHelper.UpdateSite(Infos.Detail_Site);
+        }
+        /// <summary>
+        /// Pivot 切换的时候触发的事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void Pivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+            Pivot _p = sender as Pivot;
+            int _selectedIndex = _p.SelectedIndex;
+            Debug.WriteLine("Pivot_SelectionChanged();");
+            switch (_selectedIndex)
+            {
+                case 0:
+                    Infos.MaxmumDatetime = DateTime.Now;
+                    Infos.MinmumDatetime = DateTime.Now.AddDays(-1);
+                    break;
+                case 1:
+                    Infos.MaxmumDatetime = DateTime.Now;
+                    Infos.MinmumDatetime = DateTime.Now.AddDays(-3);
+                    break;
+                case 2:
+                    Infos.MaxmumDatetime = DateTime.Now;
+                    Infos.MinmumDatetime = DateTime.Now.AddDays(-7);
+                    break;
+                default:
+                    break;
+            }
+            ChangeStepUnitStep(_selectedIndex);
+        }
+        /// <summary>
+        /// 清空日志
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void ClearLog(object sender, RoutedEventArgs e)
+        {
+            // 删除数据库中记录
+            DBHelper.DeleteLogsBySite(Infos.Detail_Site.Id);
+            // 更新数据库站点的请求
+            Infos.Detail_Site.Request_count = 0;
+            DBHelper.UpdateSite(Infos.Detail_Site);
+            // 重新获取界面信息
+            Infos.Logs.Clear();
+            Infos.RequestTimeList.Clear();
+            #region 清空Re和PieInfo集合每一项的值
+            foreach (var item in Infos.Re)
+            {
+                item.Count = 0;
+            }
+            foreach (var item in Infos.Pieinfo)
+            {
+                item.Count = 0;
+            }
+            #endregion
+            Infos.MedianValue = 0;
+            Infos.AverageValue = 0;
+            InitChartData();
+        }
+        /// <summary>
+        /// 刷新按钮的点击事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public async void Refresh_Click(object sender, RoutedEventArgs e)
+        {
+            // P操作 禁用刷新按钮
+            Infos.RequestAsyncStat = false;
+            LogModel log = await MakeRequest();
+            // 确认返回的log有效
+            if (null != log)
+            {
+                AddNewLog(log);
+            }
+
+            // 更新绑定数据
+            if (Infos.Logs.Count != 0)
+            {
+                UpdateBindLine();
+                // 更新上次请求记录
+                Infos.LastRequest = Infos.Logs.Last();
+                Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.Request_time);
+            }
+            else
+            {
+                Infos.MedianValue = 0;
+                Infos.AverageValue = 0;
+                Infos.LastRequest = new LogModel();
+                Infos.LastRequestWords = "No Data!";
+            }
+            // V操作 启用刷新按钮
+            Infos.RequestAsyncStat = true;
+        }
+
+        #endregion
     }
 
     #region 封装信息
@@ -977,7 +960,7 @@ namespace ServerMonitor.ViewModels
         private ObservableCollection<LogModel> requestTimeList;
         private FirstChartAxisProperties firstChartAxisProperties;
         private ObservableCollection<ContactModel> contactCollection;
-        private bool loadAsyncStat =false;
+        private bool loadAsyncStat = false;
         private bool requestAsyncStat = true;
 
         // 对应界面上的toggledSwitch 按钮的值，表示此站点是否正在监测
@@ -1128,7 +1111,8 @@ namespace ServerMonitor.ViewModels
         /// <summary>
         /// 联系人集合
         /// </summary>
-        public ObservableCollection<ContactModel> ContactCollection {
+        public ObservableCollection<ContactModel> ContactCollection
+        {
             get => contactCollection;
             set
             {
@@ -1140,7 +1124,8 @@ namespace ServerMonitor.ViewModels
         /// <summary>
         /// 异步加载的状态
         /// </summary>
-        public bool LoadAsyncStat {
+        public bool LoadAsyncStat
+        {
             get => loadAsyncStat;
             set
             {
@@ -1152,7 +1137,8 @@ namespace ServerMonitor.ViewModels
         /// <summary>
         /// 异部请求状态
         /// </summary>
-        public bool RequestAsyncStat {
+        public bool RequestAsyncStat
+        {
             get => requestAsyncStat;
             set
             {
@@ -1285,7 +1271,7 @@ namespace ServerMonitor.ViewModels
     /// <summary>
     /// 联系人输出转换器
     /// </summary>
-    public class ContactFormatConvert:IValueConverter
+    public class ContactFormatConvert : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
@@ -1322,7 +1308,7 @@ namespace ServerMonitor.ViewModels
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            return ! bool.Parse(value.ToString());
+            return !bool.Parse(value.ToString());
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
