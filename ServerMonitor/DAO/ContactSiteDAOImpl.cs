@@ -40,7 +40,7 @@ namespace ServerMonitor.DAOImpl
         public int DeleteConnect(int SiteId, int ContactId)
         {
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 result = conn.Execute("delete from ContactSiteModel where SiteId = ? and ContactId = ?", SiteId, ContactId);
             }
@@ -55,7 +55,7 @@ namespace ServerMonitor.DAOImpl
         public int DeletSiteAllConnect(int SiteId)
         {
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 result = conn.Execute("delete from ContactSiteModel where SiteId = ?", SiteId);
             }
@@ -70,7 +70,7 @@ namespace ServerMonitor.DAOImpl
         public List<ContactSiteModel> GetConnectsBySiteId(int SiteId)
         {
             List<ContactSiteModel> resultList;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 resultList = conn.Table<ContactSiteModel>().ToList();
             }
@@ -85,7 +85,7 @@ namespace ServerMonitor.DAOImpl
         public int InsertConnect(ContactModel contact)
         {
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 result = conn.Insert(contact);
             }
@@ -100,7 +100,7 @@ namespace ServerMonitor.DAOImpl
         public int InsertListConnects(List<ContactSiteModel> connects)
         {
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 result = conn.InsertAll(connects);
             }
