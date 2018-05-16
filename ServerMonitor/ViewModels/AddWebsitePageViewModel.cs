@@ -230,12 +230,12 @@ namespace ServerMonitor.ViewModels
         {
             bool flag = false;
             var textBox = sender as TextBox;
-            if (textBox.Tag.Equals("1"))
+            if (textBox.Tag.Equals("1"))  //检查站点地址
             {
                 string domain = textBox.Text.ToString();
                 flag = CheckDomain(domain);
             }
-            else
+            else   //检查状态码
             {
                 string codes = textBox.Text.ToString();
                 flag = CheckCodes(codes);
@@ -407,6 +407,11 @@ namespace ServerMonitor.ViewModels
             }
         }
 
+        /// <summary>
+        /// 检验状态码是否合法
+        /// </summary>
+        /// <param name="codes">状态码字符串</param>
+        /// <returns>是否合法</returns>
         private bool CheckCodes(string codes)  //可测
         {
             if (codes.Equals("")||codes==null)
@@ -428,6 +433,7 @@ namespace ServerMonitor.ViewModels
             }
             return true;
         }
+
         /// <summary>
         /// 将int型的站点协议转换为string
         /// </summary>
