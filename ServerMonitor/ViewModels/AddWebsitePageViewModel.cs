@@ -370,7 +370,11 @@ namespace ServerMonitor.ViewModels
                 SiteAddress = site.Site_address.Substring(8);
             }
             SiteName = site.Site_name;
-            StatusCodes = site.Status_code.Substring(4);
+            if (site.Status_code.Length>=5)
+            {
+                StatusCodes = site.Status_code.Substring(4);
+
+            }
         }
 
         /// <summary>

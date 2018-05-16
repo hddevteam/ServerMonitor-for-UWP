@@ -42,6 +42,8 @@ namespace ServerMonitor.SiteDb
         /// </summary>
         public static string DBPath { get => dBPath; }
 
+        static DataBaseControlImpl(){}
+
         private DataBaseControlImpl() {
 
         }
