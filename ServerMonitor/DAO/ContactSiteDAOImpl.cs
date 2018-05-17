@@ -72,7 +72,8 @@ namespace ServerMonitor.DAOImpl
             List<ContactSiteModel> resultList;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
-                resultList = conn.Table<ContactSiteModel>().ToList();
+                resultList = conn.Table<ContactSiteModel>().Where(s=>s.SiteId == 
+                SiteId).ToList<ContactSiteModel>();
             }
             return resultList;
         }

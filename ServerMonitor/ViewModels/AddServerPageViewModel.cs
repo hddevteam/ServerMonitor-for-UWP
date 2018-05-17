@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ServerMonitor.Controls;
+using ServerMonitor.DAOImpl;
 using ServerMonitor.Models;
 using System;
 using System.Collections.Generic;
@@ -46,7 +47,7 @@ namespace ServerMonitor.ViewModels
         {
             Value = (suspensionState.ContainsKey(nameof(Value))) ? suspensionState[nameof(Value)]?.ToString() : parameter?.ToString();
             await Task.CompletedTask;
-            await Task.Run(()=> {    // OnNavigatedToAsync为异步方法，与OnLoaded谁先谁后不一定
+            await Task.Run(()=> {    // OnNavigatedToAsync为异步方法，与OnLoaded谁先谁后不一定 把数据从Value中解析出来
                 string[] arr = Value.Split(',');
                 try
                 {
@@ -61,8 +62,18 @@ namespace ServerMonitor.ViewModels
                 if (siteId != -1)
                 {
                     GetEditSite();  //需要id 放这里
+                    SetVS();
                 }
             });
+
+            //根据vs刷新选中联系人 相当于初始化SelectedContacts 放这才有vs为true的数据
+            for (int i = 0; i < Contacts.Count; i++)
+            {
+                if (vs[Contacts[i].Id])
+                {
+                    SelectedContacts.Add(Contacts[i]);
+                }
+            }
         }
 
         public override async Task OnNavigatedFromAsync(IDictionary<string, object> suspensionState, bool suspending)
@@ -276,7 +287,7 @@ namespace ServerMonitor.ViewModels
                 {
                     //在contactList的item里添加新控件时在这一步报错时，关闭vs，再打开看看
                     vss.IsSelected = vs[Contacts[i].Id];//根据vs设置contactList选中效果 
-                    tempVs[Contacts[i].Id] = vs[Contacts[i].Id];
+                    tempVs[Contacts[i].Id] = vs[Contacts[i].Id];  //vs->tempVs 在tempVs上更改数据
                 }
             }
         }
@@ -374,11 +385,24 @@ namespace ServerMonitor.ViewModels
                 site.ProtocolIdentification = GetJson(RecordType, Lookup, ExpectedResults);
             }
 
+            List<ContactSiteModel> contactSiteModels = new List<ContactSiteModel>();
+            foreach (var item in vs)  //生成可存进数据库的list数据
+            {
+                if (item.Value)
+                {
+                    contactSiteModels.Add(new ContactSiteModel()
+                    {
+                        SiteId = siteId,
+                        ContactId = item.Key,
+                    });
+                }
+            }
             //数据库操作
             if (siteId == -1)
             {
                 if (DBHelper.InsertOneSite(site) == 1) 
                 {
+                    var contactS = ContactSiteDAOImpl.Instance.InsertListConnects(contactSiteModels);
                     Jump(); //返回原界面
                 }
             }
@@ -386,6 +410,8 @@ namespace ServerMonitor.ViewModels
             {
                 if (DBHelper.UpdateSite(site) == 1)
                 {
+                    var in1 = ContactSiteDAOImpl.Instance.DeletSiteAllConnect(siteId);
+                    var contactS = ContactSiteDAOImpl.Instance.InsertListConnects(contactSiteModels);
                     Jump();
                 }
             }
@@ -402,13 +428,14 @@ namespace ServerMonitor.ViewModels
 
         #region 辅助函数
         /// <summary>
-        /// OnNavigatedTo后调用 UI控件对象传递
+        /// OnNavigatedTo后调用 UI控件对象传递 界面元素可交互
         /// </summary>
         public void OnLoaded(ListView contactList,Grid grid)
         {
             rightFrame1 = grid;   //侧边栏
             this.contactList = contactList;   //侧边栏联系人列表
             rightFrame1.Visibility = Visibility.Collapsed;  //关闭侧边栏
+            IsEnabled = CheckDomain(SiteAddress);  //检验Sava是否可用
         }
 
         /// <summary>
@@ -499,14 +526,7 @@ namespace ServerMonitor.ViewModels
             else if(ProtocolType == 4)
             {
                 JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
-                try
-                {
-                    RecordType = int.Parse(js["recordType"].ToString());
-                }
-                catch (Exception)
-                {
-                    RecordType = 0;//出错 默认选第一个
-                }
+                RecordType = GetRecordType(js["recordType"].ToString());
                 Lookup = js["lookup"].ToString();
                 ExpectedResults = js["expectedResults"].ToString();
             }
@@ -528,7 +548,10 @@ namespace ServerMonitor.ViewModels
             {
                 try
                 {
-                    Regex reg = new Regex(@"^((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]\d)|\d)(\.((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]\d)|\d)){3}$");
+                    Regex reg = new Regex(@"^(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|[1-9])\\."
+                                            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
+                                            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
+                                            + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)$");
                     Boolean _domaincheck = reg.IsMatch(domain);
                     //Boolean _ipcheck = Regex.IsMatch(domain, "^(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|[1-9])\\."
                     //                        + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
@@ -704,6 +727,24 @@ namespace ServerMonitor.ViewModels
             if (page == 2)
             {
                 NavigationService.Navigate(typeof(Views.AllServer));
+            }
+        }
+
+        /// <summary>
+        /// 在Edit时，vs填充数据
+        /// </summary>
+        private void SetVS()
+        {
+            var contactS = ContactSiteDAOImpl.Instance.GetConnectsBySiteId(siteId);
+            for (int i = 0; i < contactS.Count; i++)  //vs填充数据
+            {
+                var q = (from t in Contacts
+                        where t.Id == contactS[i].ContactId
+                        select t).ToList().Count;
+                if (q > 0)
+                {
+                    vs[contactS[i].ContactId] = true;
+                }
             }
         }
         #endregion
