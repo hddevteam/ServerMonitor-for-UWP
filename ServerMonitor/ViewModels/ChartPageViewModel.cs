@@ -209,6 +209,9 @@ namespace ServerMonitor.ViewModels
         {
             //清空数据，重新统计
             Infos.Sites.Clear();
+            Lengend.Clear();
+            Chart1Collection.Clear();
+            Infos.BarChart.Clear();
             foreach (var item in Infos.SelectSites.Where(i => i.IsSelected == true).Select(i => i.Site))
             {
                 //获取选择的站点
