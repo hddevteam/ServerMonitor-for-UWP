@@ -13,15 +13,13 @@ using Windows.UI.Xaml.Navigation;
 using Telerik.Charting;
 using Telerik.UI.Xaml.Controls.Chart;
 using GalaSoft.MvvmLight.Threading;
+using ServerMonitor.ViewModels.BLL;
 
 namespace ServerMonitor.ViewModels
 {
     /// <summary>
     /// Created by fjl
     /// </summary>
-    /// 
-
-
     public class ChartPageViewModel : Template10.Mvvm.ViewModelBase
     {
         #region 变量
@@ -114,7 +112,10 @@ namespace ServerMonitor.ViewModels
             Infos.SelectSites = selectResult.Item1;
 
             //计算图表数据
-            await ChartAsync(Infos.Sites, Infos.Logs);
+            var getResult = await Task.Run(() => ChartDao.CacuChartAsync(Infos.Sites, Infos.Logs));
+            Chart1Collection = getResult.Item1;
+            Infos.BarChart = getResult.Item2;
+            Lengend = await ChartDao.ChartLengendAsync(Infos.Sites);
             //默认显示全部
             Type = "All";
             //图表加载完毕后切换加载状态
@@ -149,28 +150,19 @@ namespace ServerMonitor.ViewModels
             await Task.CompletedTask;
             List<LogModel> logs = new List<LogModel>();
             logs = DBHelper.GetAllLog();
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now, Request_time = 2000, Is_error = true, Status_code = "1001" });
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-12), Request_time = 2000, Is_error = true, Status_code = "1001" });
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-22), Request_time = 2040, Is_error = false, Status_code = "1000" });
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-16), Request_time = 2200, Is_error = true, Status_code = "1001" });
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-18), Request_time = 2600, Is_error = true, Status_code = "1002" });
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-13), Request_time = 3000, Is_error = true, Status_code = "1002" });
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-6), Request_time = 200, Is_error = false, Status_code = "1000" });
             //数据排序，便于图表按序显示
             logs = logs.OrderBy(o => o.Create_time).ToList();
             return logs;
         }
 
         #endregion
-
-        /// <summary>
-        /// 计算图表相关数据
-        /// </summary>
-        /// <param name="sites">数据库站点</param>
-        /// <param name="logs">站点日志</param>
-        /// <returns></returns>
-        public async Task<bool> ChartAsync(List<SiteModel> sites,List<LogModel> logs)
-        {
-            var getResult = await Task.Run(() => ChartDao.CacuChartAsync(sites, logs));
-            Chart1Collection = getResult.Item1;
-            Infos.BarChart = getResult.Item2;
-            
-            Lengend = await ChartDao.ChartLengendAsync(sites);
-            return true;
-        }
 
         #region 响应事件
         /// <summary>
@@ -224,9 +216,6 @@ namespace ServerMonitor.ViewModels
         {
             //清空数据，重新统计
             Infos.Sites.Clear();
-            Lengend.Clear();
-            Chart1Collection.Clear();
-            Infos.BarChart.Clear();
             foreach (var item in Infos.SelectSites.Where(i => i.IsSelected == true).Select(i => i.Site))
             {
                 //获取选择的站点
@@ -245,7 +234,10 @@ namespace ServerMonitor.ViewModels
                 Infos.State2 = Visibility.Collapsed;
 
                 //重新统计数据
-                await ChartAsync(Infos.Sites, Infos.Logs);
+                var getResult = await Task.Run(() => ChartDao.CacuChartAsync(Infos.Sites, Infos.Logs));
+                Chart1Collection = getResult.Item1;
+                Infos.BarChart = getResult.Item2;
+                Lengend = await ChartDao.ChartLengendAsync(Infos.Sites);
 
                 //统计完成后触发此方法，计算前台需要显示的数据
                 TypeChanged(Type);
@@ -266,7 +258,7 @@ namespace ServerMonitor.ViewModels
                     Infos.HAxisProperties.MaxnumDateTime = DateTime.Now;
                     Infos.HAxisProperties.MinnumDateTime = DateTime.Now.AddHours(-23);
                     Infos.HAxisProperties.ChartTitle = "Results within the last 24 hours";
-                    Infos.HAxisProperties.MajorStep = 6;
+                    Infos.HAxisProperties.MajorStep = 4;
                     Infos.HAxisProperties.MajorStepUnit = TimeInterval.Hour;
                     return _selectedIndex;
                 case 1:
@@ -342,7 +334,7 @@ namespace ServerMonitor.ViewModels
             var siteId = Convert.ToInt32(content == null ? "" : content.ToString());
             foreach (var item in ChartPageViewModel.siteModels.Where(i => i.Id == siteId).Select(i => i))
             {
-                return item.Site_name;
+                return "#" + item.Id + " " + item.Site_name;
             }
             return "UnknownID" + content.ToString();
         }
