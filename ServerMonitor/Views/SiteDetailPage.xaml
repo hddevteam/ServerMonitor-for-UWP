@@ -59,9 +59,9 @@
         <controls:PageHeader x:Name="pageHeader" Frame="{x:Bind Frame}"
                              RelativePanel.AlignLeftWithPanel="True"
                              RelativePanel.AlignRightWithPanel="True"
-                             RelativePanel.AlignTopWithPanel="True" Text="SiteDetail Page" >
+                             RelativePanel.AlignTopWithPanel="True" Text="Site Detail" >
             <controls:PageHeader.PrimaryCommands>
-                <AppBarButton x:Name="EditButton" Icon="Edit" Foreground="White"/>
+                <AppBarButton x:Name="EditButton" Icon="Edit" Foreground="White" Click="{x:Bind ViewModel.NavigateIntoEditPart}"/>
                 <AppBarButton x:Name="RefreshButton" Icon="Refresh" Foreground="white" Click="{x:Bind ViewModel.Refresh_Click}" IsEnabled="{Binding Infos.RequestAsyncStat}"/>
             </controls:PageHeader.PrimaryCommands>
             <controls:PageHeader.SecondaryCommands>

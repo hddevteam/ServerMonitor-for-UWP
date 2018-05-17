@@ -48,8 +48,41 @@ namespace ServerMonitor.ViewModels.BLL
         /// </summary>
         /// <param name="site">待请求的站点</param>
         /// <param name="request">请求对象</param>
-        Task AccessFTPServer(SiteModel site, FTPRequest request);
-        Task AccessSSHServer(SiteModel site, SSHRequest requuest);
-        Task AccessSMTPServer(SiteModel site, SSHRequest requuest);
+        Task<LogModel> AccessFTPServer(SiteModel site, FTPRequest request);
+        /// <summary>
+        /// 请求SSH服务器的状态
+        /// </summary>
+        /// <param name="site">待请求的站点</param>
+        /// <param name="request">请求对象</param>
+        Task<LogModel> AccessSSHServer(SiteModel site, SSHRequest request);
+        /// <summary>
+        /// 请求SMTP服务器的状态
+        /// </summary>
+        /// <param name="site">待请求的站点</param>
+        /// <param name="request">请求对象</param>
+        Task<LogModel> AccessSMTPServer(SiteModel site, SMTPRequest request);
+        /// <summary>
+        /// 使用Socket 与服务器建立连接
+        /// </summary>
+        /// <returns></returns>
+        Task<LogModel> ConnectToServerWithSocket(SiteModel site, SocketRequest request);
+        /// <summary>
+        /// 请求网站，并存入一条记录
+        /// </summary>
+        /// <returns></returns>
+        Task<LogModel> RequestHTTPSite(SiteModel site, HTTPRequest request);
+        /// <summary>
+        /// 查看是否满足用户提出的成功Code
+        /// </summary>
+        /// <param name="site"></param>
+        /// <param name="statusCode"></param>
+        /// <returns></returns>
+        bool SuccessCodeMatch(SiteModel site, string statusCode);
+        /// <summary>
+        /// 获取服务器状态成功的状态码列表
+        /// </summary>
+        /// <param name="site"></param>
+        /// <returns></returns>
+        string[] getSuccStatusCode(SiteModel site);
     }
 }

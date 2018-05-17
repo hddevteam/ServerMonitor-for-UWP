@@ -43,6 +43,7 @@ namespace ServerMonitor.Models
             get => id;
             set => id = value;
         }
+        [NotNull]
         public string Site_name
         {
             get => site_name;
@@ -52,6 +53,7 @@ namespace ServerMonitor.Models
                 //RaisePropertyChanged(() => Site_name);
             }
         }
+        [NotNull]
         public bool Is_server
         {
             get => is_server;
@@ -61,6 +63,7 @@ namespace ServerMonitor.Models
                 //RaisePropertyChanged(() => Is_server);
             }
         }
+        [NotNull]
         public string Protocol_type
         {
             get => protocol_type;
@@ -70,6 +73,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Protocol_type);
             }
         }
+        [NotNull]
         public int Server_port
         {
             get => server_port;
@@ -192,6 +196,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Protocol_content);
             }
         }
+        [NotNull]
         public string Site_address
         {
             get => site_address;
@@ -201,7 +206,6 @@ namespace ServerMonitor.Models
                 //RaisePropertyChanged(() => Site_address);
             }
         }
-
         [DefaultValue(value: "2", type: typeof(int))]
         public int Last_request_result
         {

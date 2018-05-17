@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace ServerMonitor.Models
 {
     // 联系人类
+    [Table("Contact")]
     public class ContactModel : ObservableObject
     {
         private int id;

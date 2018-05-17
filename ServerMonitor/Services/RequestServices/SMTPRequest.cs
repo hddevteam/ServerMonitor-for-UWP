@@ -8,7 +8,7 @@ using Windows.UI.Xaml;
 
 namespace ServerMonitor.Services.RequestServices
 {
-    class SMTPRequest : BasicRequest,IRequest
+    public class SMTPRequest : BasicRequest,IRequest
     {
         Encoding ASCII = Encoding.ASCII;  //用来转码
         Byte[] ByteCommand;  //待发送命令
@@ -88,7 +88,7 @@ namespace ServerMonitor.Services.RequestServices
                         {
                             Status = "1001";
                             ErrorException = e;
-                            TimeCost = OverTime;
+                            TimeCost = -1;
                         }
                         continue;
                     }
@@ -108,6 +108,7 @@ namespace ServerMonitor.Services.RequestServices
                         s.Send(ByteCommand, ByteCommand.Length, 0);
                         s.Receive(RecvFullMessage);  //接收HELO请求的返回信息
                         stopwatch.Stop();   //结束计时
+                        Debug.WriteLine(ASCII.GetString(RecvFullMessage));
 
                         Status = ASCII.GetString(RecvFullMessage).Substring(0, 3); //去状态码
                         TimeCost = (short)stopwatch.ElapsedMilliseconds;         //计算请求时间
@@ -123,7 +124,7 @@ namespace ServerMonitor.Services.RequestServices
                 // 收集捕获到的异常
                 ErrorException = e;
                 // 请求耗时设置为超时上限
-                TimeCost = OverTime;
+                TimeCost = -1;
             }
             return false;
         }

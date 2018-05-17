@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.Models
 {
+    [Table("ContactSite")]
     public class ContactSiteModel
     {
         private int id;
