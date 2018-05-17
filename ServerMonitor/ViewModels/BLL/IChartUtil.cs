@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Telerik.UI.Xaml.Controls.Chart;
 
-namespace ServerMonitor.ViewModels
+namespace ServerMonitor.ViewModels.BLL
 {
     public interface IChartUtil
     {

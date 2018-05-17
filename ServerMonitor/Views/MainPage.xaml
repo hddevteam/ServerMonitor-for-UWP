@@ -157,7 +157,7 @@
                                         <TextBlock Text="{Binding Id}" Margin="0,4,4,0" Foreground="White"
                                                    HorizontalAlignment="Right" VerticalAlignment="Top">
                                         </TextBlock>
-                                        <TextBlock Text="{Binding Site_name}" Foreground="White" FontSize="32"
+                                        <TextBlock Text="{Binding Site_name}" Foreground="White" FontSize="32" TextTrimming="CharacterEllipsis"
                                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         <TextBlock Text="{Binding Last_result}" Margin="0,0,4,4" Foreground="LightGray"
                                                    HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
@@ -212,17 +212,26 @@
                         </ListView.Resources>
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="-4,0,0,0" HorizontalAlignment="Stretch" Height="44" Width="180">
+                                <Grid HorizontalAlignment="Stretch" Height="44" Width="180">
                                     <TextBlock Text="{Binding Site_name}" FontWeight="Bold" Foreground="{Binding Color}"
-                                           HorizontalAlignment="Left" VerticalAlignment="Center" Width="80"/>
+                                               HorizontalAlignment="Left" VerticalAlignment="Top" TextTrimming="CharacterEllipsis"/>
                                     <TextBlock Text="{Binding LastTime}" Foreground="{Binding Color}" Grid.Column="1"
-                                           HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="12"
-                                           Margin="0,0,4,0"/>
-                                    <!--<Grid BorderThickness="1" BorderBrush="Gray" Margin="0,0,0,0" Height="1"
-                                      VerticalAlignment="Bottom"/>-->
+                                               HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="12"
+                                               Margin="0,0,8,4"/>
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
+                        <!--<ListView.Items>
+                            <ListViewItem>
+                                <Grid HorizontalAlignment="Stretch" Height="44" Width="180">
+                                    <TextBlock Text="123456789123456789123456789123456789" FontWeight="Bold" Foreground="Black"
+                                           HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <TextBlock Text="asdsafd" Foreground="Black" Grid.Column="1" Margin="0,0,8,4"
+                                           HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="12"/>
+                                </Grid>
+                            </ListViewItem>
+                        </ListView.Items>-->
+                        
                     </ListView>
                 </ScrollViewer>
             </Grid>
@@ -276,7 +285,7 @@
                                     <TextBlock Text="{Binding Ranking}" FontWeight="Bold" Foreground="Black" FontSize="20"
                                                HorizontalAlignment="Left" VerticalAlignment="Center" Width="48"/>
                                     <TextBlock Text="{Binding Site_name}" Foreground="Black" Grid.Column="1" FontWeight="Bold"
-                                               HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="12"
+                                               HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="12" TextTrimming="CharacterEllipsis"
                                                Margin="68,8,4,0"/>
                                     <TextBlock Text="Apdex :" Foreground="Black" Grid.Column="1"
                                                HorizontalAlignment="Left" VerticalAlignment="Bottom" FontSize="12"
