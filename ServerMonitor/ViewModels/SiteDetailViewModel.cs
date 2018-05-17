@@ -18,16 +18,18 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Telerik.Charting;
+using Telerik.UI.Xaml.Controls.Chart;
 using Template10.Mvvm;
 using Template10.Services.NavigationService;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace ServerMonitor.ViewModels
 {
-    class SiteDetailViewModel : Template10.Mvvm.ViewModelBase
+    public class SiteDetailViewModel : Template10.Mvvm.ViewModelBase
     {
 
         #region 变量声明
@@ -43,6 +45,12 @@ namespace ServerMonitor.ViewModels
         public ViewInfo Infos { get => infos; set => infos = value; }
         // 字段  ->  refresh_log
         public LogModel Refresh_log { get => refresh_log; set { Set(ref refresh_log, value); RaisePropertyChanged(() => Refresh_log); } }
+
+        public List<FirstChartLengend> LogType = new List<FirstChartLengend>() {
+            new FirstChartLengend(){Title="SUCCESS",Fill = ChartPalettes.DefaultLight.FillEntries.Brushes[0]},
+            new FirstChartLengend(){Title="ERROR",Fill = ChartPalettes.DefaultLight.FillEntries.Brushes[1]},
+            new FirstChartLengend(){Title="OVERTIME",Fill = ChartPalettes.DefaultLight.FillEntries.Brushes[2]}
+        };
         // 临时变量  站点id  ->  由字符串转换来的
         public int id = 0;
         /// <summary>
@@ -60,7 +68,8 @@ namespace ServerMonitor.ViewModels
             {
                 // 初始化记录变量
                 Logs = new ObservableCollection<LogModel>(),
-                RequestTimeList = new ObservableCollection<LogModel>(),
+                //RequestTimeList = new ObservableCollection<LogModel>(),
+                LogCollections = new ObservableCollection<ObservableCollection<LogModel>>()
             };
             // 初始化工具接口
             utilObject = new SiteDetailUtilImpl();
@@ -116,7 +125,7 @@ namespace ServerMonitor.ViewModels
         /// <summary>
         /// 测试提示框的方法
         /// </summary>
-        public async void testMessageDailog()
+        public async void TestMessageDailog()
         {
             var messageBox = new Windows.UI.Popups.MessageDialog("提示框xxx") { Title = "提示框标题" };
             messageBox.Commands.Add(new Windows.UI.Popups.UICommand("第一个按钮的文字", uicommand =>
@@ -149,9 +158,9 @@ namespace ServerMonitor.ViewModels
         {
             ObservableCollection<PieChartInfo> pi = new ObservableCollection<PieChartInfo>
             {
-                new PieChartInfo() { Ry = RequestType.Succeed, Count = 0 },
-                new PieChartInfo() { Ry = RequestType.Error, Count = 0 },
-                new PieChartInfo() { Ry = RequestType.OverTime, Count = 0 }
+                new PieChartInfo() { Ry = RequestType.SUCCESS, Count = 0 },
+                new PieChartInfo() { Ry = RequestType.ERROR, Count = 0 },
+                new PieChartInfo() { Ry = RequestType.OVERTIME, Count = 0 }
             };
             return pi;
         }
@@ -162,6 +171,9 @@ namespace ServerMonitor.ViewModels
         /// <returns></returns>
         public Tuple<double, double> CountAverageMax(ObservableCollection<LogModel> logs)
         {
+            if (logs.Count == 0) {
+                return Tuple.Create<double, double>(0,0);
+            }
             // 构建一个存储请求时间的数组
             double[] request_array = new double[logs.Count];
             // 初始化数组
@@ -179,6 +191,7 @@ namespace ServerMonitor.ViewModels
             double Middle = request_array[request_array.Length / 2];
 
             var t = Tuple.Create<double, double>(Average, Middle);
+            
             return t;
         }
         /// <summary>
@@ -194,7 +207,6 @@ namespace ServerMonitor.ViewModels
 
             // 获取关于站点的信息
             Infos.Detail_Site = DBHelper.GetSiteById(id);
-            //Infos.SiteAddress = new Uri(infos.Detail_Site.Site_address);
             Infos.ContactCollection = new ObservableCollection<ContactModel>();
             Infos.IsMonitor = Infos.Detail_Site.Is_Monitor;
             Infos.IsWebSite = !Infos.Detail_Site.Is_server;
@@ -217,6 +229,14 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public void InitLogsData()
         {
+            // 新建三个存储集合，分别存储成功记录、失败记录、超时记录
+            ObservableCollection<LogModel> SuccessLogs = new ObservableCollection<LogModel>();
+            ObservableCollection<LogModel> ErrorLogs = new ObservableCollection<LogModel>();
+            ObservableCollection<LogModel> OverTimeLogs = new ObservableCollection<LogModel>();
+            // 将其添加至总的记录变量中
+            infos.LogCollections.Add(SuccessLogs);
+            infos.LogCollections.Add(ErrorLogs);
+            infos.LogCollections.Add(OverTimeLogs);
             List<LogModel> l = DBHelper.GetLogsBySiteId(id);
             if (l.Count == 0)
             {
@@ -228,15 +248,57 @@ namespace ServerMonitor.ViewModels
                 foreach (var log in l)
                 {
                     Infos.Logs.Add(log);
-                    var log_temp = new LogModel
-                    {
-                        Create_time = log.Create_time,
-                        Request_time = Math.Log10(log.Request_time)
-                    };
-                    Infos.RequestTimeList.Add(log_temp);
+                    #region 将数据分为三类   新添加
+                    InsertLogWithCategory(infos.LogCollections, log);
+                    #endregion
+                    #region 对数据做log处理   暂时不做处理
+                    //var log_temp = new LogModel
+                    //{
+                    //    Create_time = log.Create_time,
+                    //    //Request_time = Math.Log10(log.Request_time)
+                    //    Request_time = log.Request_time
+                    //};
+                    //Infos.RequestTimeList.Add(log_temp);
+                    #endregion
                 }
                 Infos.LastRequest = l.First<LogModel>();
                 infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.Request_time);
+            }
+        }
+
+        public void InsertLogWithCategory(ObservableCollection<ObservableCollection<LogModel>> logs, LogModel log) {
+            if (infos.IsWebSite)
+            {
+                if (log.Is_error)
+                {
+                    if (log.Status_code == "1002")
+                    {
+                        logs[2].Add(log);
+                    }
+                    else
+                    {
+                        logs[1].Add(log);
+                    }
+                }
+                else
+                {
+                    logs[0].Add(log);
+                }
+            }
+            else
+            {
+                switch (log.Status_code)
+                {
+                    case "1000":
+                        logs[0].Add(log);
+                        break;
+                    case "1001":
+                        logs[1].Add(log);
+                        break;
+                    case "1002":
+                        logs[2].Add(log);
+                        break;
+                }
             }
         }
         /// <summary>
@@ -349,9 +411,11 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public void UpdateBindLine()
         {
-            Tuple<double, double> t = CountAverageMax(Infos.Logs);
-            Infos.AverageValue = Math.Log10(t.Item1);
-            Infos.MedianValue = Math.Log10(t.Item2);
+            Tuple<double, double> t = CountAverageMax(Infos.LogCollections[0]);
+            //Infos.AverageValue = Math.Log10(t.Item1);
+            //Infos.MedianValue = Math.Log10(t.Item2);
+            Infos.AverageValue = t.Item1;
+            Infos.MedianValue = t.Item2;
         }       
         /// <summary>
         /// 更新下面两个图表的数据
@@ -397,12 +461,16 @@ namespace ServerMonitor.ViewModels
             {
                 Debug.WriteLine("成功插入一条日志数据! 日志内容为：" + log.ToString());
                 Infos.Logs.Add(log);
-                var log_temp = new LogModel
-                {
-                    Create_time = log.Create_time,
-                    Request_time = Math.Log10(log.Request_time)
-                };
-                Infos.RequestTimeList.Add(log_temp);
+                InsertLogWithCategory(infos.LogCollections, log);
+                #region 暂时不适用的取对数的部分
+                //var log_temp = new LogModel
+                //{
+                //    Create_time = log.Create_time,
+                //    //Request_time = Math.Log10(log.Request_time)
+                //    Request_time = log.Request_time
+                //};
+                //Infos.RequestTimeList.Add(log_temp);
+                #endregion
             }
             else
             {
@@ -500,7 +568,7 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        public void load_Loading(FrameworkElement sender, object args)
+        public void Load_Loading(FrameworkElement sender, object args)
         {
             Infos.FirstChartAxisProperties = new FirstChartAxisProperties();
             ChangeStepUnitStep(0);
@@ -562,7 +630,11 @@ namespace ServerMonitor.ViewModels
             DBHelper.UpdateSite(Infos.Detail_Site);
             // 重新获取界面信息
             Infos.Logs.Clear();
-            Infos.RequestTimeList.Clear();
+            foreach (var item in infos.LogCollections)
+            {
+                item.Clear();
+            }
+            //Infos.RequestTimeList.Clear();
             #region 清空Re和PieInfo集合每一项的值
             foreach (var item in Infos.Re)
             {
@@ -845,7 +917,7 @@ namespace ServerMonitor.ViewModels
         /// <returns></returns>
         public bool SuccessCodeMatch(SiteModel site, string statusCode)
         {
-            string[] successCodes = getSuccStatusCode(site);
+            string[] successCodes = GetSuccStatusCode(site);
             foreach (var i in successCodes)
             {
                 if (i.Equals(statusCode))
@@ -862,7 +934,7 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="site"></param>
         /// <returns></returns>
-        public string[] getSuccStatusCode(SiteModel site)
+        public string[] GetSuccStatusCode(SiteModel site)
         {
             if (site.Request_succeed_code.Contains(','))
             {
@@ -880,7 +952,7 @@ namespace ServerMonitor.ViewModels
     /// <summary>
     /// 请求类别
     /// </summary>
-    public enum RequestType { Succeed, Error, OverTime };
+    public enum RequestType { SUCCESS, ERROR, OVERTIME };
 
     /// <summary>
     /// 封装用于第三个图表(饼图)的信息结构
@@ -956,12 +1028,12 @@ namespace ServerMonitor.ViewModels
         private string lastRequestWords;
         private double medianValue;
         private double averageValue;
-        private ObservableCollection<LogModel> requestTimeList;
+        //private ObservableCollection<LogModel> requestTimeList;
         private FirstChartAxisProperties firstChartAxisProperties;
         private ObservableCollection<ContactModel> contactCollection;
         private bool loadAsyncStat = false;
         private bool requestAsyncStat = true;
-        private Uri siteAddress;
+        private ObservableCollection<ObservableCollection<LogModel>> logCollections;
 
         // 对应界面上的toggledSwitch 按钮的值，表示此站点是否正在监测
         public bool IsMonitor
@@ -1082,18 +1154,18 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        /// <summary>
-        /// 请求时间列表
-        /// </summary>
-        public ObservableCollection<LogModel> RequestTimeList
-        {
-            get => requestTimeList;
-            set
-            {
-                requestTimeList = value;
-                RaisePropertyChanged(() => RequestTimeList);
-            }
-        }
+        ///// <summary>
+        ///// 请求时间列表
+        ///// </summary>
+        //public ObservableCollection<LogModel> RequestTimeList
+        //{
+        //    get => requestTimeList;
+        //    set
+        //    {
+        //        requestTimeList = value;
+        //        RaisePropertyChanged(() => RequestTimeList);
+        //    }
+        //}
 
         /// <summary>
         /// 第一个图表使用的数据
@@ -1147,12 +1219,15 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        public Uri SiteAddress {
-            get => siteAddress;
+        /// <summary>
+        /// 封装多个请求序列的变量
+        /// </summary>
+        public ObservableCollection<ObservableCollection<LogModel>> LogCollections {
+            get => logCollections;
             set
             {
-                siteAddress = value;
-                RaisePropertyChanged(() => SiteAddress);
+                logCollections = value;
+                RaisePropertyChanged(() => LogCollections);
             }
         }
     }
@@ -1241,6 +1316,83 @@ namespace ServerMonitor.ViewModels
             MajorStepUnit = TimeInterval.Hour;
         }
     }
+
+    public class FirstChartLengend : ObservableObject
+    {
+        private string title;
+
+        public string Title
+        {
+            get { return title; }
+            set { title = value; RaisePropertyChanged(() => Title); }
+        }
+        private Brush fill;
+
+        public Brush Fill
+        {
+            get { return fill; }
+            set { fill = value; RaisePropertyChanged(() => Fill); }
+        }
+
+    }
+    #endregion
+
+    #region 图表标签格式化类
+    //对数轴标签格式化
+    public class CustomLogOperatorAxisLabelFormatter : IContentFormatter
+    {
+        public object Format(object owner, object content)
+        {
+            // The owner parameter is the Axis instance which labels are currently formatted
+            var axis = owner as Axis;
+            var con = content == null ? 0:int.Parse(content.ToString());
+            if (con >= 1000)
+            {
+                content = con / 1000 + "s";
+            }
+            else
+            {
+                content = con + "ms";
+            }
+            return content.ToString();
+        }
+    }
+    //时间轴标签格式化
+    public class CustomOperatorDateTimeAxisLabelFormatter : IContentFormatter
+    {
+        public object Format(object owner, object content)
+        {
+            // The owner parameter is the Axis instance which labels are currently formatted
+            var axis = owner as DateTimeContinuousAxis;
+            var con = Convert.ToDateTime(content);
+
+            if (axis.MajorStepUnit != TimeInterval.Hour) //当时间间隔为天时，格式化显示天
+            {
+                var con_str = String.Format("{0:MM-dd HH:mm}", con);
+                return con_str;
+            }
+            else //否则只显示小时
+            {
+                var con_str = String.Format("{0:HH:mm}", con);
+                return con_str;
+            }
+        }
+    }
+    //分类轴标签格式化（柱状图）
+    public class CustomOperatorCategoricalAxisLabelFormatter : IContentFormatter
+    {
+        public object Format(object owner, object content)
+        {
+            // The owner parameter is the Axis instance which labels are currently formatted
+            var axis = owner as DateTimeContinuousAxis;
+            var siteId = Convert.ToInt32(content == null ? "" : content.ToString());
+            foreach (var item in ChartPageViewModel.siteModels.Where(i => i.Id == siteId).Select(i => i))
+            {
+                return item.Site_name;
+            }
+            return "UnknownID" + content.ToString();
+        }
+    }
     #endregion
 
     #region 转换器
@@ -1268,7 +1420,7 @@ namespace ServerMonitor.ViewModels
         {
             string typeOfValue = parameter as string;
             double _value = double.Parse(value.ToString());
-            return string.Format("{0}：{1} ms", typeOfValue, (int)Math.Pow(10, _value));
+            return string.Format("{0}：{1} ms", typeOfValue,  (int)_value);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)

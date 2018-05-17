@@ -193,7 +193,6 @@ namespace ServerMonitor.ViewModels.BLL
                 {
                     Site_id = site.Id,
                     Create_time = DateTime.Now
-
                 };
                 #endregion                
                 // 开始请求
