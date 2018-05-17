@@ -7,10 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Telerik.UI.Xaml.Controls.Chart;
 
-namespace ServerMonitor.ViewModels
+namespace ServerMonitor.ViewModels.BLL
 {
     public class ChartUtilImpl : IChartUtil
     {
+        const int OVERTIME = 5000;//超时时间
+
         public ChartPalette DefaultPalette{ get{ return ChartPalettes.DefaultLight;} }
 
         public ObservableCollection<ChartLengend> Lengend { get; set; }
@@ -39,7 +41,8 @@ namespace ServerMonitor.ViewModels
                     Sites.Add(item);
                     selectSites.Add(new SelectSite()
                     {
-                        Site = item,IsSelected=true,
+                        Site = item,
+                        IsSelected =true,
                         ImagePath = item.Is_server ? "../images/ic_server.png" : "../images/ic_website.png",
                         SiteType = item.Is_server ? "SERVER" : "WEBSITE"
                     });
@@ -49,7 +52,7 @@ namespace ServerMonitor.ViewModels
                     selectSites.Add(new SelectSite()
                     {
                         Site = item,
-                        IsSelected = true,
+                        IsSelected = false,
                         ImagePath = item.Is_server ? "../images/ic_server.png" : "../images/ic_website.png",
                         SiteType = item.Is_server ? "SERVER" : "WEBSITE"
                     });
@@ -69,7 +72,7 @@ namespace ServerMonitor.ViewModels
             int i = 0;
             foreach (var item in sites)
             {
-                Lengend.Add(new ChartLengend() { Title = item.Site_name, Fill = DefaultPalette.FillEntries.Brushes[i] });
+                Lengend.Add(new ChartLengend() { Title = "#" + item.Id + " " + item.Site_name, Fill = DefaultPalette.FillEntries.Brushes[i] });
                 i++;
             }
             await Task.CompletedTask;
@@ -87,8 +90,6 @@ namespace ServerMonitor.ViewModels
         {
             var chart1Collection = new ObservableCollection<ObservableCollection<Chart1>>();
             //对每个站点进行统计
-            DateTime time = DateTime.Now;
-            
             foreach (var site in sites)
             {
                 //该站点的数据序列,若站点序列只有一条数据，线性表表现为不显示
@@ -120,7 +121,7 @@ namespace ServerMonitor.ViewModels
                         {
                             //失败
                             errorCount++; result = "Error";
-                            responseTime = 0;
+                            responseTime = 1.5*OVERTIME;
                         }
                         chart1Series.Add(new Chart1() { RequestTime = log.Create_time, Result = result, ResponseTime = responseTime });
                     }
@@ -131,13 +132,12 @@ namespace ServerMonitor.ViewModels
                 BarChart.Add(new BarChartData()
                 {
                     SiteId = site.Id.ToString(),
-                    SiteName = site.Site_name,
+                    SiteName = "#" + site.Id + " " + site.Site_name,
                     Success = successCount,
                     Error = errorCount,
                     Overtime = overtimeCount,
                     Type = site.Is_server ? "SERVER" : "WEBSITE"
                 });
-               
             }
             await Task.CompletedTask;
             return new Tuple<ObservableCollection<ObservableCollection<Chart1>>, ObservableCollection<BarChartData>>(chart1Collection, BarChart);

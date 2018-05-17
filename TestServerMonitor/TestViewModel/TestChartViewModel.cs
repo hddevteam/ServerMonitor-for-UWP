@@ -7,9 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ServerMonitor.ViewModels;
+using ServerMonitor.ViewModels.BLL;
 using ServerMonitor.Models;
 using System.Collections.ObjectModel;
 using Telerik.UI.Xaml.Controls.Chart;
+using Microsoft.VisualStudio.TestTools.UnitTesting.AppContainer;
 
 namespace TestServerMonitor.TestViewModel
 {
@@ -33,37 +35,6 @@ namespace TestServerMonitor.TestViewModel
                 Logs.Add(new LogModel() { Site_id = i, Is_error = true });
                 Sites.Add(new SiteModel() { Id = i, Site_name = "Site" + i, Is_server = true });
             }
-        }
-
-        /// <summary>
-        /// 测试ChartAsync方法
-        /// 用例说明：测试方法正常调用，返回true
-        /// </summary>
-        [TestMethod]
-        public void TestChartAsync_NormallyExcuted_ShouldReturnTrue()
-        {
-            var stub = new StubIChartUtil(MockBehavior.Strict);
-            viewModel.ChartDao = stub;
-            int except1 = 0, except2 = 0;
-            stub.ChartLengendAsync(async (sites) =>
-            {
-                ObservableCollection<ChartLengend> s = new ObservableCollection<ChartLengend>();
-                await Task.CompletedTask;
-                except1 = sites.Count;
-                return s;
-            }, Times.Once);
-            stub.CacuChartAsync(async (sites, logs) => 
-            {
-                ObservableCollection<ObservableCollection<Chart1>> data1 = new ObservableCollection<ObservableCollection<Chart1>>();
-                ObservableCollection<BarChartData> data2 = new ObservableCollection<BarChartData>();
-                except2 = sites.Count+logs.Count;
-                await Task.CompletedTask;
-                return new Tuple<ObservableCollection<ObservableCollection<Chart1>>, ObservableCollection<BarChartData>>(data1, data2);
-            }, Times.Once);
-
-            Assert.IsTrue(viewModel.ChartAsync(Sites, Logs).Result);
-            Assert.AreEqual(5, except1);
-            Assert.AreEqual(10, except2);
         }
 
         /// <summary>
@@ -121,7 +92,7 @@ namespace TestServerMonitor.TestViewModel
             catch (AggregateException)
             {
 
-            }
+            }  
         }
 
         /// <summary>
@@ -133,13 +104,15 @@ namespace TestServerMonitor.TestViewModel
         public void TestTypeChanged_CalculationCorrect_ShouldReturnTrue()
         {
             Assert.IsTrue(viewModel.InitAsync().Result);
-            
-            ObservableCollection<Chart1> item = new ObservableCollection<Chart1>();
-            item.Add(new Chart1() { Result = "Error" });
-            item.Add(new Chart1() { Result = "Success" });
-            item.Add(new Chart1() { Result = "OverTime" });
-            item.Add(new Chart1() { Result = "Success" });
-            item.Add(new Chart1() { Result = "Error" });
+
+            ObservableCollection<Chart1> item = new ObservableCollection<Chart1>
+            {
+                new Chart1() { Result = "Error" },
+                new Chart1() { Result = "Success" },
+                new Chart1() { Result = "OverTime" },
+                new Chart1() { Result = "Success" },
+                new Chart1() { Result = "Error" }
+            };
             viewModel.Chart1Collection.Add(item);
 
             Assert.IsTrue(viewModel.TypeChanged("All"));
@@ -165,9 +138,10 @@ namespace TestServerMonitor.TestViewModel
         {
             viewModel.PivotIndex = 2;
             Assert.AreEqual(viewModel.PivotIndex, viewModel.PivotSelectionChanged());
-            
+
             viewModel.PivotIndex = 3;
             Assert.AreEqual(4, viewModel.PivotSelectionChanged());
         }
+
     }
 }
