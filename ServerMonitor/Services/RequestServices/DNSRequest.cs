@@ -216,11 +216,15 @@ namespace ServerMonitor.Services.RequestServices
         {
             return resultSet.Contains(expectResult);
         }
-        /**
-         * int i = 0;
-         * QType q = (QType)Enum.Parse(typeof(QType), i.ToString());
-         * 用来获取枚举值得下标
-         */
+
+        /// <summary>
+        /// 用来获取枚举值得下标
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static QType GetQTypeWithIndex(int index) {
+            return (QType)Enum.Parse(typeof(QType), index.ToString());
+        }
 
         /// <summary>
         /// 用于控制线程安全的内部类

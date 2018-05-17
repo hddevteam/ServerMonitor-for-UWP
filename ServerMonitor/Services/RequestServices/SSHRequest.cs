@@ -14,6 +14,9 @@ namespace ServerMonitor.Services.RequestServices
         /// </summary>
         private static short port = 22;
 
+        /// <summary>
+        /// 请求的IP地址
+        /// </summary>
         public string IPAddress { get; set; }
 
         /// <summary>
@@ -61,12 +64,14 @@ namespace ServerMonitor.Services.RequestServices
                     return true;
                 }
             }
+            // 认证失败
             catch (SshAuthenticationException e)
             {
                 stopwatch.Stop();
                 ProtocolInfo = "Authentication Failed.";
                 ErrorException = e;
             }
+            // 请求超时
             catch (SshOperationTimeoutException e)
             {
                 stopwatch.Stop();
@@ -76,18 +81,21 @@ namespace ServerMonitor.Services.RequestServices
                 ErrorException = e;
                 return false;
             }
+            // 建立连接失败
             catch (SocketException e)
             {
                 stopwatch.Stop();
                 ProtocolInfo = "(SocketException)" + e.SocketErrorCode.ToString();
                 ErrorException = e;
             }
+            // 建立链接失败 服务器不存在SSH模块
             catch (SshConnectionException e)
             {
                 stopwatch.Stop();
                 ProtocolInfo = "Response does not include the SSH protocol ID.";
                 ErrorException = e;
             }
+            // 统一捕获的异常
             catch (Exception e)
             {
                 stopwatch.Stop();
