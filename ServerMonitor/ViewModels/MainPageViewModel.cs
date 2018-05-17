@@ -341,15 +341,17 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public void CopyFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var q = from t in SiteItems
-                    where t.Id == rightTapped_SiteId
-                    select t;
             var q1 = from t in sites
                      where t.Id == rightTapped_SiteId
                      select t;
-            SiteModel site = CloneSite(q1.First());
+            SiteModel site = q1.First();
             site.Site_name = site.Site_name + " Copy";
             site.Last_request_result = 2;
+
+            site.Create_time = DateTime.Now;
+            site.Update_time = DateTime.Now;
+            site.Is_pre_check = false;
+
             if (DBHelper.InsertOneSite(site) == 1)
             {
                 GetListSite();
