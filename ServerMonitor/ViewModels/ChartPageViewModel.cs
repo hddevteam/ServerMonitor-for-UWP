@@ -150,13 +150,6 @@ namespace ServerMonitor.ViewModels
             await Task.CompletedTask;
             List<LogModel> logs = new List<LogModel>();
             logs = DBHelper.GetAllLog();
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now, Request_time = 2000, Is_error = true, Status_code = "1001" });
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-12), Request_time = 2000, Is_error = true, Status_code = "1001" });
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-22), Request_time = 2040, Is_error = false, Status_code = "1000" });
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-16), Request_time = 2200, Is_error = true, Status_code = "1001" });
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-18), Request_time = 2600, Is_error = true, Status_code = "1002" });
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-13), Request_time = 3000, Is_error = true, Status_code = "1002" });
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-6), Request_time = 200, Is_error = false, Status_code = "1000" });
             //数据排序，便于图表按序显示
             logs = logs.OrderBy(o => o.Create_time).ToList();
             return logs;
