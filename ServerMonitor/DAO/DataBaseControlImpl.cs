@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Windows.Storage;
 
 namespace ServerMonitor.SiteDb
@@ -40,6 +41,8 @@ namespace ServerMonitor.SiteDb
         /// 数据库路径由私有方法生成，所以设为只读变量
         /// </summary>
         public static string DBPath { get => dBPath; }
+
+        static DataBaseControlImpl(){}
 
         private DataBaseControlImpl() {
 
@@ -229,7 +232,7 @@ namespace ServerMonitor.SiteDb
             else
             {
                 DbFileName = Filename;
-                dBPath = Path.Combine(ApplicationData.Current.LocalFolder.Path, DbFileName);
+                dBPath = Path.Combine(ApplicationData.Current.LocalFolder.Path, Filename);
             }
         }
 
