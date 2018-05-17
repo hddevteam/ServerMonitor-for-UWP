@@ -277,7 +277,7 @@ namespace ServerMonitor.ViewModels
 
             if (SiteName == null || SiteName.Equals(""))
             {
-                site.Site_name = site.Site_address;
+                site.Site_name = SiteAddress;
             }
             else
             {
