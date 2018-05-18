@@ -88,14 +88,14 @@ namespace ServerMonitor.Services.RequestServices
                         {
                             Status = "1001";
                             ErrorException = e;
-                            TimeCost = -1;
+                            TimeCost = (short)(OverTime * 2);
                         }
                         continue;
                     }
                     if (!s.Connected) // Connection failed
                     {
                         Status = "1001";
-                        TimeCost = OverTime;
+                        TimeCost = (short)(OverTime * 2);
                         ErrorException = new Exception("未建立连接");
                     }
                     else
@@ -124,7 +124,7 @@ namespace ServerMonitor.Services.RequestServices
                 // 收集捕获到的异常
                 ErrorException = e;
                 // 请求耗时设置为超时上限
-                TimeCost = -1;
+                TimeCost = (short)(OverTime * 2);
             }
             return false;
         }

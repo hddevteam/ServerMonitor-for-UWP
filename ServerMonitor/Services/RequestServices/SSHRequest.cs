@@ -107,7 +107,7 @@ namespace ServerMonitor.Services.RequestServices
                 cSSH.Disconnect();
             }
             Status = "1001";
-            TimeCost = (short)stopwatch.ElapsedMilliseconds;
+            TimeCost = (short)(OverTime * 2);
             return false;
         }
     }

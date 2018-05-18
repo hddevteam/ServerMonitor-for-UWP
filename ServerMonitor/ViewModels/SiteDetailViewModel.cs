@@ -48,8 +48,8 @@ namespace ServerMonitor.ViewModels
 
         public List<FirstChartLengend> LogType = new List<FirstChartLengend>() {
             new FirstChartLengend(){Title="SUCCESS",Fill = ChartPalettes.DefaultLight.FillEntries.Brushes[0]},
-            new FirstChartLengend(){Title="ERROR",Fill = ChartPalettes.DefaultLight.FillEntries.Brushes[1]},
-            new FirstChartLengend(){Title="OVERTIME",Fill = ChartPalettes.DefaultLight.FillEntries.Brushes[2]}
+            new FirstChartLengend(){Title="OVERTIME",Fill = ChartPalettes.DefaultLight.FillEntries.Brushes[1]},
+            new FirstChartLengend(){Title="ERROR",Fill = ChartPalettes.DefaultLight.FillEntries.Brushes[2]}
         };
         // 临时变量  站点id  ->  由字符串转换来的
         public int id = 0;
@@ -159,8 +159,8 @@ namespace ServerMonitor.ViewModels
             ObservableCollection<PieChartInfo> pi = new ObservableCollection<PieChartInfo>
             {
                 new PieChartInfo() { Ry = RequestType.SUCCESS, Count = 0 },
-                new PieChartInfo() { Ry = RequestType.ERROR, Count = 0 },
-                new PieChartInfo() { Ry = RequestType.OVERTIME, Count = 0 }
+                new PieChartInfo() { Ry = RequestType.OVERTIME, Count = 0 },
+                new PieChartInfo() { Ry = RequestType.ERROR, Count = 0 }
             };
             return pi;
         }
@@ -235,8 +235,8 @@ namespace ServerMonitor.ViewModels
             ObservableCollection<LogModel> OverTimeLogs = new ObservableCollection<LogModel>();
             // 将其添加至总的记录变量中
             infos.LogCollections.Add(SuccessLogs);
-            infos.LogCollections.Add(ErrorLogs);
             infos.LogCollections.Add(OverTimeLogs);
+            infos.LogCollections.Add(ErrorLogs);
             List<LogModel> l = DBHelper.GetLogsBySiteId(id);
             if (l.Count == 0)
             {
@@ -265,19 +265,24 @@ namespace ServerMonitor.ViewModels
                 infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.Request_time);
             }
         }
-
+        /// <summary>
+        /// 带有分类地插入日志
+        /// </summary>
+        /// <param name="logs"></param>
+        /// <param name="log"></param>
         public void InsertLogWithCategory(ObservableCollection<ObservableCollection<LogModel>> logs, LogModel log) {
+            // logs[i] i-> 0 : Success ,1 : OverTime, 2 : Error
             if (infos.IsWebSite)
             {
                 if (log.Is_error)
                 {
-                    if (log.Status_code == "1002")
+                    if ("1002".Equals(log.Status_code))
                     {
-                        logs[2].Add(log);
+                        logs[1].Add(log);
                     }
                     else
                     {
-                        logs[1].Add(log);
+                        logs[2].Add(log);
                     }
                 }
                 else
@@ -293,10 +298,10 @@ namespace ServerMonitor.ViewModels
                         logs[0].Add(log);
                         break;
                     case "1001":
-                        logs[1].Add(log);
+                        logs[2].Add(log);
                         break;
                     case "1002":
-                        logs[2].Add(log);
+                        logs[1].Add(log);
                         break;
                 }
             }
@@ -487,9 +492,9 @@ namespace ServerMonitor.ViewModels
         public void UpdateChart(LogModel log)
         {
             #region 添加第二个表格需要的数据
-            if (!"200".Equals(log.Status_code))
+            if (log.Is_error)
             {
-                Infos.Re[3].Count++;
+                Infos.Re[4].Count++;
             }
             else if (log.Request_time <= 1)
             {
@@ -514,13 +519,13 @@ namespace ServerMonitor.ViewModels
             {
                 Infos.Pieinfo[0].Count++;
             }
-            else if (log.Status_code.Equals("超时"))
+            else if ("1002".Equals(log.Status_code))
             {
-                Infos.Pieinfo[2].Count++;
+                Infos.Pieinfo[1].Count++;
             }
             else
             {
-                Infos.Pieinfo[1].Count++;
+                Infos.Pieinfo[2].Count++;
             }
             #endregion
         }
@@ -533,28 +538,34 @@ namespace ServerMonitor.ViewModels
             switch (index)
             {
                 case 0:
-                    Infos.FirstChartAxisProperties.Min.MajorStep = 6;
+                    Infos.FirstChartAxisProperties.Min.MajorStep = 3;
                     Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Hour;
-                    Infos.FirstChartAxisProperties.Mid.MajorStep = 4;
-                    Infos.FirstChartAxisProperties.Mid.MajorStepUnit1 = TimeInterval.Hour;
-                    Infos.FirstChartAxisProperties.Max.MajorStep = 2;
-                    Infos.FirstChartAxisProperties.Max.MajorStepUnit1 = TimeInterval.Hour;
+                    //Infos.FirstChartAxisProperties.Min.MajorStep = 6;
+                    //Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Hour;
+                    //Infos.FirstChartAxisProperties.Mid.MajorStep = 4;
+                    //Infos.FirstChartAxisProperties.Mid.MajorStepUnit1 = TimeInterval.Hour;
+                    //Infos.FirstChartAxisProperties.Max.MajorStep = 2;
+                    //Infos.FirstChartAxisProperties.Max.MajorStepUnit1 = TimeInterval.Hour;
                     break;
                 case 1:
-                    Infos.FirstChartAxisProperties.Min.MajorStep = 1.5;
-                    Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Day;
-                    Infos.FirstChartAxisProperties.Mid.MajorStep = 1;
-                    Infos.FirstChartAxisProperties.Mid.MajorStepUnit1 = TimeInterval.Day;
-                    Infos.FirstChartAxisProperties.Max.MajorStep = 12;
-                    Infos.FirstChartAxisProperties.Max.MajorStepUnit1 = TimeInterval.Hour;
+                    Infos.FirstChartAxisProperties.Min.MajorStep = 12;
+                    Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Hour;
+                    //Infos.FirstChartAxisProperties.Min.MajorStep = 1.5;
+                    //Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Day;
+                    //Infos.FirstChartAxisProperties.Mid.MajorStep = 1;
+                    //Infos.FirstChartAxisProperties.Mid.MajorStepUnit1 = TimeInterval.Day;
+                    //Infos.FirstChartAxisProperties.Max.MajorStep = 12;
+                    //Infos.FirstChartAxisProperties.Max.MajorStepUnit1 = TimeInterval.Hour;
                     break;
                 case 2:
-                    Infos.FirstChartAxisProperties.Min.MajorStep = 3;
+                    Infos.FirstChartAxisProperties.Min.MajorStep = 1;
                     Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Day;
-                    Infos.FirstChartAxisProperties.Mid.MajorStep = 2;
-                    Infos.FirstChartAxisProperties.Mid.MajorStepUnit1 = TimeInterval.Day;
-                    Infos.FirstChartAxisProperties.Max.MajorStep = 1;
-                    Infos.FirstChartAxisProperties.Max.MajorStepUnit1 = TimeInterval.Day;
+                    //Infos.FirstChartAxisProperties.Min.MajorStep = 3;
+                    //Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Day;
+                    //Infos.FirstChartAxisProperties.Mid.MajorStep = 2;
+                    //Infos.FirstChartAxisProperties.Mid.MajorStepUnit1 = TimeInterval.Day;
+                    //Infos.FirstChartAxisProperties.Max.MajorStep = 1;
+                    //Infos.FirstChartAxisProperties.Max.MajorStepUnit1 = TimeInterval.Day;
                     break;
                 default:
                     break;
@@ -1366,7 +1377,7 @@ namespace ServerMonitor.ViewModels
             var axis = owner as DateTimeContinuousAxis;
             var con = Convert.ToDateTime(content);
 
-            if (axis.MajorStepUnit != TimeInterval.Hour) //当时间间隔为天时，格式化显示天
+            if (axis.MajorStepUnit != TimeInterval.Hour||axis.MajorStep>=12) //当时间间隔为天时，格式化显示天
             {
                 var con_str = String.Format("{0:MM-dd HH:mm}", con);
                 return con_str;
