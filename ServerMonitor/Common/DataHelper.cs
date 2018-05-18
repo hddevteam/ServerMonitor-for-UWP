@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ServerMonitor.Services.RequestServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -141,6 +142,49 @@ namespace ServerMonitor.Controls
             string status = js["StatusCode"].ToString();
             return status;
         }
-        
+        /// <summary>
+        /// 用于对icmp请求后获取的对象属性进分析，对5条信息 整合成为一条信息
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static RequestObj GetProperty(IcmpRequest request)
+        {
+            List<RequestObj> datas = new List<RequestObj>();
+            datas = request.Requests;
+            RequestObj obj = new RequestObj
+            {
+                TimeCost = 0
+            };
+            int count = datas.Count();
+            for (int i = 0; i < count; i++)
+            {
+                if (obj.Color != null)
+                {
+                    if (obj.Color.Equals("2"))
+                    {
+                        obj.Color = "2";
+                    }
+                    else if (obj.Color.Equals("0"))
+                    {
+                        obj.Color = "0";
+                    }
+                    else if (obj.Color.Equals("1"))
+                    {
+                        obj.Color = "1";
+                    }
+                    else
+                    {
+                        obj.Color = "-1";
+                    } 
+                }
+                else
+                {
+                    obj.Color = datas[i].Color;
+                }
+                obj.TimeCost = short.Parse((short.Parse(((obj.TimeCost*i) + datas[i].TimeCost).ToString())/short.Parse((i+1).ToString())).ToString());
+            }
+            return obj;
+            
+        }
     }
 }

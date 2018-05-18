@@ -14,6 +14,9 @@ using System.Linq;
 using Windows.UI.Core;
 using Windows.ApplicationModel.Background;
 using ServerMonitor.SiteDb;
+using ServerMonitor.Models;
+using ServerMonitor.Controls;
+
 
 namespace ServerMonitor.Views
 {
@@ -27,20 +30,21 @@ namespace ServerMonitor.Views
 			DispatcherTimer timer = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 1) };//倒计时间隔1s
 			timer.Tick += new EventHandler<object>(async (sender, e) =>
 			{
-				await Dispatcher.TryRunAsync(CoreDispatcherPriority.Normal, new DispatchedHandler(() =>
+				await Dispatcher.TryRunAsync(CoreDispatcherPriority.Normal, new DispatchedHandler(async () =>
 				{
 					//https://github.com/hddevteam/ServerMonitor-for-UWP.git
 					var time = DateTime.Now.Minute;
 					var s = DateTime.Now.Second;
 					if (time % 5 == 0 && s == 0)
 					{
-						MainPageViewModel.Pre_Check();//执行pre check
+                        MainPageViewModel model = this.ViewModel as MainPageViewModel;
+                        bool flag = await model.Pre_Check();//执行pre check
 						int text = 0;
 						cdtxt.Text = text.ToString("00:00");
-					}
+                    }
 					else
-					{
-						var min = DateTime.Now.Minute;
+					{                    
+                        var min = DateTime.Now.Minute;
 						var sec = DateTime.Now.Second;
 						var dmin = 4 - (min % 5);
 						var dsec = 60 - sec;

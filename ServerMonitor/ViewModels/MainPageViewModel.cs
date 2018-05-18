@@ -17,6 +17,9 @@ using System.Net.Sockets;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ServerMonitor.Util;
+using ServerMonitor.Services.RequestServices;
+using ServerMonitor.ViewModels.BLL;
+using ServerMonitor.SiteDb;
 
 namespace ServerMonitor.ViewModels
 {
@@ -151,24 +154,60 @@ namespace ServerMonitor.ViewModels
         /// <summary>
         /// 用于precheck方法
         /// </summary>
-        public static void Pre_Check()
+        public async Task<bool> Pre_Check()
         {
-			MessageRemind toast = new MessageRemind();
-            //对google dns进行pre check (8.8.8.8)
-            var _googleDnsBack = Request.IcmpRequest(IPAddress.Parse("8.8.8.8"));
-            string _resultcolor = DataHelper.GetColor(_googleDnsBack);//得到返回值
             SiteModel _preCheckSite = DBHelper.GetSiteById(4);//初始化precheck记录，目前是ID 4 
-            _preCheckSite.Last_request_result = int.Parse(_resultcolor);//更新color
-            _preCheckSite.Request_count = _preCheckSite.Request_count + 1;//更新请求次数
-			if ("0".Equals(_resultcolor))
-			{
-				//如果站点发生错误，发送消息提醒
-				toast.ShowToast(_preCheckSite);
-			}
-            DBHelper.UpdateSite(_preCheckSite);//更新站点
-            MainPageViewModel _getlist = new MainPageViewModel();
-            _getlist.GetListSite();//更新ui
-
+            MessageRemind toast = new MessageRemind();
+            //对google dns进行pre check (8.8.8.8)
+            //IcmpRequest request = new IcmpRequest(IPAddress.Parse("8.8.8.8"));
+            //var data = request.DoRequest();//发起请求 data可以指示值
+            //RequestObj requestObj;//用于存储icmp请求结果的对象              
+            //requestObj = DataHelper.GetProperty(request);
+            //_preCheckSite.Last_request_result = int.Parse(requestObj.Color);//更新color
+            //_preCheckSite.Request_count = _preCheckSite.Request_count + 1;//更新请求次数
+            //_preCheckSite.Request_interval = requestObj.TimeCost;
+            //if (data == false)
+            //{
+            //    toast.ShowToast(_preCheckSite);
+            //    _preCheckSite.Last_request_result = int.Parse("0");//更新color 
+            //}
+            //int up = -1;
+            //while (up == -1)
+            //{
+            //    up = DBHelper.UpdateSite(_preCheckSite);//更新站点
+            //}
+            string baiduDomain = "www.baidu.com";//设定一个网站供dns服务器进行解析
+            DNSRequest pre = new DNSRequest(IPAddress.Parse(_preCheckSite.Site_address), baiduDomain);
+            bool dnsFlag = await pre.MakeRequest();
+            //请求完毕
+            if ("1000".Equals(pre.Status))
+            {
+                //dns正常
+                _preCheckSite.Last_request_result = 1;
+            }
+            else if ("1001".Equals(pre.Status))
+            {
+                //unknown
+                _preCheckSite.Last_request_result = 2;
+            }
+            else if ("1002".Equals(pre.Status))
+            {
+                //timeout
+                _preCheckSite.Last_request_result = -1;
+            }
+            _preCheckSite.Request_interval = pre.TimeCost;
+            _preCheckSite.Request_count += 1;
+            if (dnsFlag == false)
+            {
+                SiteDaoImpl impl = new SiteDaoImpl();
+                impl.SetAllSiteStatus(2);///所有站点置为unknown
+                //消息提醒
+                _preCheckSite.Last_request_result = 0;
+                toast.ShowToast(_preCheckSite);                          
+            }
+            DBHelper.UpdateSite(_preCheckSite);
+            GetListSite();//更新ui
+            return dnsFlag;
         }
         /// <summary>
         /// 请求所有服务的按钮事件
@@ -178,23 +217,23 @@ namespace ServerMonitor.ViewModels
         public async void RequestAll_Click(object sender, RoutedEventArgs e)
         {
 			MessageRemind toast = new MessageRemind();
-            var sitelist = SiteItems;//获取sitelist
-            int leng = sitelist.Count;
-            for (int i = 0; i < leng; i++)
+            //首先进行precheck 
+            bool pre =  await Pre_Check();
+            if (pre)
             {
-                var item = sitelist[i];
-                var _siteid = item.Id;
-                var _sitetype = item.Is_server;
-                var _siteprotocol = item.Protocol_type;
-                var _address = item.Site_address;
-                if (_sitetype == true)
+                var sitelist = SiteItems;//获取sitelist
+                int leng = sitelist.Count;
+                //遍历sitelist 根据协议进行请求
+                for (int i = 0; i < leng; i++)
                 {
-                    //如果是服务器 需要发起ICMP请求 测试连通性
+                    SiteItem _siteItem = sitelist[i];
+                    int _siteid = _siteItem.Id;
+                    SiteModel si = new SiteModel();
+                    si = DBHelper.GetSiteById(_siteid);
+                    string _protocol = si.Protocol_type;
+                    string _address = si.Site_address;
                     string url = _address;
-                    IPAddress reIP;
-                    //var debug = IPAddress.Parse(url);
-                    //var test = IPAddress.TryParse(url, out reIP);
-                    if (!IPAddress.TryParse(url, out reIP))
+                    if (!IPAddress.TryParse(url, out IPAddress reIP))
                     {
                         //如果输入的不是ip地址               
                         //通过域名解析ip地址
@@ -208,64 +247,272 @@ namespace ServerMonitor.ViewModels
                                 break;
                             }
                         }
-                    }
-                    Dictionary<string, string> backData = new Dictionary<string, string>();
-
-                    backData = Request.IcmpRequest(reIP);
-                    SiteModel upSite = new SiteModel();
-                    upSite = DBHelper.GetSiteById(item.Id);//找出请求的站点id
-                    var color = DataHelper.GetColor(backData);//站点请求状态
-                    var dictionary = backData;
-                    var time = DataHelper.GetTime(backData);//请求时间
-
-
-                    try
+                    }//根据地址解析出ipv4地址
+                    switch (_protocol)//根据协议请求站点
                     {
-                        upSite.Last_request_result = int.Parse(color);
-                        upSite.Request_interval = int.Parse(time);
-						if ("0".Equals(color))
-						{
-							//站点发生错误
-							toast.ShowToast(upSite);
-						}
-                        DBHelper.UpdateSite(upSite);
+                        case "HTTPS":
+                            HTTPRequest hTTPs = HTTPRequest.Instance;
+                            hTTPs.ProtocolType = TransportProtocol.https;//更改协议类型
+                            hTTPs.Uri = _address;
+                            bool httpsFlag = await hTTPs.MakeRequest();
+                            //请求完毕
+                            //处理数据
+                            si.Request_interval = hTTPs.TimeCost;
+                            si.Request_count += 1;
+                            if ("1002".Equals(hTTPs.Status))//定义的超时状态码
+                            {
+                                //请求超时
+                                si.Last_request_result = -1;
+                            }
+                            else
+                            {
+                                SiteDetailViewModel util = new SiteDetailViewModel();//用于查看状态码
+                                bool match = util.SuccessCodeMatch(si, hTTPs.Status);//匹配用户设定状态码
+                                if (match)//匹配为成功  否则为失败
+                                {
+                                    si.Last_request_result = 1;
+                                }
+                                else
+                                {
+                                    si.Last_request_result = 0;
+                                    toast.ShowToast(si);
+                                }
+                            }
+                            break;
+                        case "HTTP":
+                            HTTPRequest hTTP = HTTPRequest.Instance;//默认协议类型http
+                            hTTP.Uri = _address;
+                            hTTP.ProtocolType = TransportProtocol.http;
+                            bool httpFlag = await hTTP.MakeRequest();
+                            //请求完毕
+                            //处理数据
+                            si.Request_interval = hTTP.TimeCost;
+                            si.Request_count += 1;
+                            if ("1002".Equals(hTTP.Status))
+                            {
+                                //请求超时
+                                si.Last_request_result = -1;
+                            }
+                            else
+                            {
+                                SiteDetailUtilImpl util = new SiteDetailUtilImpl();
+                                bool match = util.SuccessCodeMatch(si, hTTP.Status);//匹配用户设定状态码
+                                if (match)
+                                {
+                                    si.Last_request_result = 1;
+                                }
+                                else
+                                {
+                                    si.Last_request_result = 0;
+                                }
+                            }
+                            if (httpFlag == false)
+                            {
+                                toast.ShowToast(si);
+                                si.Last_request_result = 0;
+                            }
+                            break;
+                        case "DNS":
+                            string baiduDomain = "www.baidu.com";//设定一个网站供dns服务器进行解析
+                            DNSRequest dNS = new DNSRequest(reIP, baiduDomain);
+                            bool dnsFlag = await dNS.MakeRequest();
+                            //请求完毕
+                            if ("1000".Equals(dNS.Status))
+                            {
+                                //dns正常
+                                si.Last_request_result = 1;
+                            }
+                            else if ("1001".Equals(dNS.Status))
+                            {
+                                //unknown
+                                si.Last_request_result = 2;
+                            }
+                            else if ("1002".Equals(dNS.Status))
+                            {
+                                //timeout
+                                si.Last_request_result = -1;
+                            }
+                            si.Request_interval = dNS.TimeCost;
+                            si.Request_count += 1;
+                            if (dnsFlag == false)
+                            {
+                                //消息提醒
+                                si.Last_request_result = 0;
+                                toast.ShowToast(si);
+                            }
+                            break;
+                        case "ICMP":
+                            IcmpRequest icmp = new IcmpRequest(reIP);
+                            bool icmpFlag = icmp.DoRequest();
+                            //请求完毕
+                            RequestObj requestObj;//用于存储icmp请求结果的对象              
+                            requestObj = DataHelper.GetProperty(icmp);
+                            si.Last_request_result = int.Parse(requestObj.Color);
+                            si.Request_count += 1;
+                            si.Request_interval = requestObj.TimeCost;
+                            if (icmpFlag == false)
+                            {
+                                si.Last_request_result = 0;
+                                toast.ShowToast(si);
+                            }
+                            break;
+                        case "FTP":
+                            var json = si.ProtocolIdentification;
+                            JObject js = (JObject)JsonConvert.DeserializeObject(json);
+                            //在此处加入type类型
+                            string username = js["username"].ToString();
+                            string password = js["password"].ToString();
+                            FTPRequest fTP = new FTPRequest(LoginType.Identify);
+                            fTP.FtpServer = reIP;
+                            fTP.Identification.Username = username;
+                            fTP.Identification.Password = password;
+                            bool ftpFlag = await fTP.MakeRequest();
+                            //请求完毕
+                            if ("1001".Equals(fTP.Status))
+                            {
+                                //置为错误
+                                si.Last_request_result = 0;
+                            }
+                            else if ("1000".Equals(fTP.Status))
+                            {
+                                //置为成功
+                                si.Last_request_result = 1;
+                            }
+                            else if ("1002".Equals(fTP.Status))
+                            {
+                                //超时异常
+                                si.Last_request_result = -1;
+                            }
+                            si.Request_count += 1;
+                            si.Request_interval = fTP.TimeCost;
+                            if (ftpFlag == false)
+                            {
+                                si.Last_request_result = 0;
+                                toast.ShowToast(si);
+                            }
+                            break;
+                        case "SMTP":
+                            SMTPRequest sMTP = new SMTPRequest(_address, si.Server_port);
+                            bool smtpFlag = await sMTP.MakeRequest();
+                            //请求完毕
+
+                            if ("1000".Equals(sMTP.Status))
+                            {
+                                si.Last_request_result = 1;
+                            }
+                            else if ("1001".Equals(sMTP.Status))
+                            {
+                                si.Last_request_result = 0;
+                            }
+                            else if ("1002".Equals(sMTP.Status))
+                            {
+                                si.Last_request_result = -1;
+                            }
+                            si.Request_count += 1;
+                            si.Request_interval = sMTP.TimeCost;
+                            if (smtpFlag == false)
+                            {
+                                si.Last_request_result = 0;
+                                toast.ShowToast(si);
+                            }
+                            break;
+                        default:
+                            break;
                     }
-                    catch { }
-                    GetListSite();//更新站点列表              
-                }
-                else
-                {
-                    //不是服务器
-                    if (Convert.ToBoolean(string.Compare("_siteprotocol", "HTTPS", true)) || Convert.ToBoolean(string.Compare("_siteprotocol", "HTTP", true)))
-                    {
-                        //需要发起HTTP请求
-                        //需要域名传入
-                        //发起http请求示例，传入网址，返回状态码和请求时间
-                        string reback = await Request.HttpRequest(_address);
-                        var color = DataHelper.GetHttpColor(reback);
-                        var time = DataHelper.GetHttpTime(reback);
-                        var status = DataHelper.GetHttpStatus(reback);
-                        SiteModel upSite = new SiteModel();
-                        upSite = DBHelper.GetSiteById(item.Id);
-                        try
-                        {
-                            upSite.Last_request_result = int.Parse(color);
-                            upSite.Status_code = status;
-                            upSite.Request_interval = int.Parse(time);
-							if ("0".Equals(color))
-							{
-								//站点发生错误
-								toast.ShowToast(upSite);
-							}
-							DBHelper.UpdateSite(upSite);
-                        }
-                        catch { }
-                        GetListSite();
-                        //Request.GetHttpResponse(infos.Detail_Site.Site_address);
-                    }
+                    DBHelper.UpdateSite(si);
+                    GetListSite();
                 }
             }
-            var sitelist1 = SiteItems;
+            //      for (int i = 0; i < leng; i++)
+            //      {
+            //          var item = sitelist[i];
+            //          var _siteid = item.Id;
+            //          var _sitetype = item.Is_server;
+            //          var _siteprotocol = item.Protocol_type;
+            //          var _address = item.Site_address;
+            //          if (_sitetype == true)
+            //          {
+            //              //如果是服务器 需要发起ICMP请求 测试连通性
+            //              string url = _address;
+            //              //var debug = IPAddress.Parse(url);
+            //              //var test = IPAddress.TryParse(url, out reIP);
+            //              if (!IPAddress.TryParse(url, out IPAddress reIP))
+            //              {
+            //                  //如果输入的不是ip地址               
+            //                  //通过域名解析ip地址
+            //                  url = url.Substring(url.IndexOf('w'));//网址截取从以第一w
+            //                  IPAddress[] hostEntry = await Dns.GetHostAddressesAsync(url);
+            //                  for (int m = 0; m < hostEntry.Length; m++)
+            //                  {
+            //                      if (hostEntry[m].AddressFamily == AddressFamily.InterNetwork)
+            //                      {
+            //                          reIP = hostEntry[m];
+            //                          break;
+            //                      }
+            //                  }
+            //              }
+            //              //Dictionary<string, string> backData = new Dictionary<string, string>();
+            //              IcmpRequest request = new IcmpRequest(reIP);
+            //              var data =  request.DoRequest();
+            //              RequestObj requestObj;//用于存储icmp请求结果的对象              
+            //              requestObj = DataHelper.GetProperty(request);
+
+            //              //backData = Request.IcmpRequest(reIP);
+
+            //              SiteModel upSite = new SiteModel();
+            //              upSite = DBHelper.GetSiteById(item.Id);//找出请求的站点id
+            //              //var color = DataHelper.GetColor(backData);//站点请求状态
+            //              //var dictionary = backData;
+            //              //var time = DataHelper.GetTime(backData);//请求时间
+            //              var color = requestObj.Color;
+            //              var time = requestObj.TimeCost.ToString();
+            //              try
+            //              {
+            //                  upSite.Last_request_result = int.Parse(requestObj.Color);
+            //                  upSite.Request_interval = int.Parse(requestObj.TimeCost.ToString());
+            //if ("0".Equals(color))
+            //{
+            //	//站点发生错误
+            //	toast.ShowToast(upSite);
+            //}
+            //                  DBHelper.UpdateSite(upSite);
+            //              }
+            //              catch { }
+            //              GetListSite();//更新站点列表              
+            //          }
+            //          else
+            //          {
+            //              //不是服务器
+            //              if (Convert.ToBoolean(string.Compare("_siteprotocol", "HTTPS", true)) || Convert.ToBoolean(string.Compare("_siteprotocol", "HTTP", true)))
+            //              {
+            //                  //需要发起HTTP请求
+            //                  //需要域名传入
+            //                  //发起http请求示例，传入网址，返回状态码和请求时间
+            //                  string reback = await Request.HttpRequest(_address);
+            //                  var color = DataHelper.GetHttpColor(reback);
+            //                  var time = DataHelper.GetHttpTime(reback);
+            //                  var status = DataHelper.GetHttpStatus(reback);
+            //                  SiteModel upSite = new SiteModel();
+            //                  upSite = DBHelper.GetSiteById(item.Id);
+            //                  try
+            //                  {
+            //                      upSite.Last_request_result = int.Parse(color);
+            //                      upSite.Status_code = status;
+            //                      upSite.Request_interval = int.Parse(time);
+            //	if ("0".Equals(color))
+            //	{
+            //		//站点发生错误
+            //		toast.ShowToast(upSite);
+            //	}
+            //	DBHelper.UpdateSite(upSite);
+            //                  }
+            //                  catch { }
+            //                  GetListSite();
+            //                  //Request.GetHttpResponse(infos.Detail_Site.Site_address);
+            //              }
+            //          }
+            //      }
+            //      var sitelist1 = SiteItems;
         }
         
         /// <summary>
@@ -276,6 +523,12 @@ namespace ServerMonitor.ViewModels
         public void Add_Server(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(typeof(Views.AddServerPage), "1,-1"); //1MainPage, 2 AllServerPage; -1没有id是新建site
+            ShowAddServerPage();
+        }
+        private void ShowAddServerPage()
+        {
+            //var msgPopup = new AddServerPage();
+            //AddServerPage.ShowWindow();
         }
 
         /// <summary>
@@ -285,7 +538,12 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public void Add_Website(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(typeof(Views.AddWebsitePage), "1,-1"); //1MainPage, 2 AllServerPage; -1没有id是新建site
+            ShowAddWebsitePage();
+        }
+        private void ShowAddWebsitePage()
+        {
+            var msgPopup = new AddWebsitePage();
+            //AddWebsitePage.ShowWindow();
         }
 
         /// <summary>
@@ -341,17 +599,15 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public void CopyFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
+            var q = from t in SiteItems
+                    where t.Id == rightTapped_SiteId
+                    select t;
             var q1 = from t in sites
                      where t.Id == rightTapped_SiteId
                      select t;
-            SiteModel site = q1.First();
+            SiteModel site = CloneSite(q1.First());
             site.Site_name = site.Site_name + " Copy";
             site.Last_request_result = 2;
-
-            site.Create_time = DateTime.Now;
-            site.Update_time = DateTime.Now;
-            site.Is_pre_check = false;
-
             if (DBHelper.InsertOneSite(site) == 1)
             {
                 GetListSite();
