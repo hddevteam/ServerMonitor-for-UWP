@@ -17,6 +17,7 @@ using ServerMonitor.SiteDb;
 using ServerMonitor.Models;
 using ServerMonitor.Controls;
 
+
 namespace ServerMonitor.Views
 {
     public sealed partial class MainPage : Page
@@ -57,10 +58,10 @@ namespace ServerMonitor.Views
 				}));
 			});
 			timer.Start();
+            
+            //在这里启动后台定时十五分钟请求
 
-			//在这里启动后台定时十五分钟请求
-
-			var  builder = new BackgroundTaskBuilder();
+            var  builder = new BackgroundTaskBuilder();
 			builder.Name = "backgroud request";//进程内的name 用于标识任务内容即可
 			builder.SetTrigger(new TimeTrigger(15, false));//用法在官方文档表明，15表示间隔，不能更少，否则会抛出异常，false代表不是一次
 			BackgroundTaskRegistration taskRegistration = builder.Register();//注册后台服务
@@ -83,7 +84,6 @@ namespace ServerMonitor.Views
 			//    }));
 			//});
 			//timer.Start();
-
 			this.Loaded += MainPage_Loaded;
         }
 

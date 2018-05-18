@@ -25,14 +25,14 @@
     <RelativePanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" >
         <!-- VisualStateManager 应该放置在生成模板的顶层元素下第一级内 -->
         <!-- 这部分是写的界面触发器 -->
-        <VisualStateManager.VisualStateGroups>
+        <!--<VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState>
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="600"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <!--{x:Bind ViewModel.Infos.FirstChartAxisProperties.Min.MajorStep,Mode=OneWay}-->
+                        --><!--{x:Bind ViewModel.Infos.FirstChartAxisProperties.Min.MajorStep,Mode=OneWay}--><!--
                         <Setter Target="HorizontalAxis.MajorStep" Value="6"/>
                     </VisualState.Setters>
                 </VisualState>
@@ -53,13 +53,13 @@
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
+        </VisualStateManager.VisualStateGroups>-->
 
         <!--  header  -->
         <controls:PageHeader x:Name="pageHeader" Frame="{x:Bind Frame}"
                              RelativePanel.AlignLeftWithPanel="True"
                              RelativePanel.AlignRightWithPanel="True"
-                             RelativePanel.AlignTopWithPanel="True" Text="Site Detail" >
+                             RelativePanel.AlignTopWithPanel="True" Text="{x:Bind ViewModel.Infos.Detail_Site.Site_name}" >
             <controls:PageHeader.PrimaryCommands>
                 <AppBarButton x:Name="EditButton" Icon="Edit" Foreground="White" Click="{x:Bind ViewModel.NavigateIntoEditPart}"/>
                 <AppBarButton x:Name="RefreshButton" Icon="Refresh" Foreground="white" Click="{x:Bind ViewModel.Refresh_Click}" IsEnabled="{Binding Infos.RequestAsyncStat}"/>
@@ -206,12 +206,13 @@
                             </telerik:DateTimeContinuousAxis>
                         </telerik:RadCartesianChart.HorizontalAxis>
                         <telerik:RadCartesianChart.VerticalAxis>
-                            <telerik:LinearAxis Title="RequestTimeCost"
+                            <telerik:LogarithmicAxis Title="RequestTimeCost"
+                                                     LogarithmBase="10"
                                                         x:Name="VerticalAxis">
-                                <telerik:LinearAxis.LabelFormatter>
+                                <telerik:LogarithmicAxis.LabelFormatter>
                                     <vm:CustomLogOperatorAxisLabelFormatter/>
-                                </telerik:LinearAxis.LabelFormatter>
-                            </telerik:LinearAxis>
+                                </telerik:LogarithmicAxis.LabelFormatter>
+                            </telerik:LogarithmicAxis>
                         </telerik:RadCartesianChart.VerticalAxis>
                         <!-- end -->
 
@@ -367,7 +368,7 @@
                             </telerik:RadPieChart>
 
                             <!-- 这是饼图的图注-->
-                            <telerikPrimitives:RadLegendControl LegendProvider="{x:Bind Path=AnalysisPeiChart}">
+                            <telerikPrimitives:RadLegendControl LegendProvider="{x:Bind Path=AnalysisPeiChart}" HorizontalAlignment="Center">
                                 <telerikPrimitives:RadLegendControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <StackPanel Orientation="Horizontal"/>
