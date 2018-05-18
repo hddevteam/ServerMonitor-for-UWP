@@ -14,6 +14,7 @@ using Telerik.Charting;
 using Telerik.UI.Xaml.Controls.Chart;
 using GalaSoft.MvvmLight.Threading;
 using ServerMonitor.ViewModels.BLL;
+using Windows.UI.Xaml.Data;
 
 namespace ServerMonitor.ViewModels
 {
@@ -150,6 +151,13 @@ namespace ServerMonitor.ViewModels
             await Task.CompletedTask;
             List<LogModel> logs = new List<LogModel>();
             logs = DBHelper.GetAllLog();
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now, Request_time = 2000, Is_error = true, Status_code = "1001" });
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-12), Request_time = 2000, Is_error = true, Status_code = "1002" });
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-22), Request_time = 2040, Is_error = false, Status_code = "1000" });
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-16), Request_time = 2200, Is_error = true, Status_code = "1001" });
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-18), Request_time = 2600, Is_error = true, Status_code = "1002" });
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-13), Request_time = 3000, Is_error = true, Status_code = "1002" });
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-6), Request_time = 200, Is_error = false, Status_code = "1000" });
             //数据排序，便于图表按序显示
             logs = logs.OrderBy(o => o.Create_time).ToList();
             return logs;
@@ -254,22 +262,16 @@ namespace ServerMonitor.ViewModels
                     Infos.HAxisProperties.MaxnumDateTime = DateTime.Now;
                     Infos.HAxisProperties.MinnumDateTime = DateTime.Now.AddHours(-23);
                     Infos.HAxisProperties.ChartTitle = "Results within the last 24 hours";
-                    Infos.HAxisProperties.MajorStep = 4;
-                    Infos.HAxisProperties.MajorStepUnit = TimeInterval.Hour;
                     return _selectedIndex;
                 case 1:
                     Infos.HAxisProperties.MaxnumDateTime = DateTime.Now;
                     Infos.HAxisProperties.MinnumDateTime = DateTime.Now.AddDays(-2);
                     Infos.HAxisProperties.ChartTitle = "Nearly three days of request results";
-                    Infos.HAxisProperties.MajorStep = 1;
-                    Infos.HAxisProperties.MajorStepUnit = TimeInterval.Day;
                     return _selectedIndex;
                 case 2:
                     Infos.HAxisProperties.MaxnumDateTime = DateTime.Now;
                     Infos.HAxisProperties.MinnumDateTime = DateTime.Now.AddDays(-6);
                     Infos.HAxisProperties.ChartTitle = "Nearly a week of request results";
-                    Infos.HAxisProperties.MajorStep = 1;
-                    Infos.HAxisProperties.MajorStepUnit = TimeInterval.Day;
                     return _selectedIndex;
                 default:
                     break;
@@ -308,12 +310,12 @@ namespace ServerMonitor.ViewModels
             var axis = owner as DateTimeContinuousAxis;
             var con = Convert.ToDateTime(content);
 
-            if (axis.MajorStepUnit != TimeInterval.Hour) //当时间间隔为天时，格式化显示天
+            if(axis.Title.ToString().Contains("three days") || axis.Title.ToString().Contains("week"))
             {
                 var con_str = String.Format("{0:MM-dd HH:mm}", con);
                 return con_str;
             }
-            else //否则只显示小时
+            else
             {
                 var con_str = String.Format("{0:HH:mm}", con);
                 return con_str;
@@ -343,8 +345,6 @@ namespace ServerMonitor.ViewModels
     /// </summary>
     public class Chart1HAxisProperties : ObservableObject
     {
-        private TimeInterval majorStepUnit;
-        private double majorStep;
         //图表1 坐标轴时间线结束值
         private DateTime maxnumDateTime = DateTime.Now;
         //图表1 坐标轴时间线起始值
@@ -355,31 +355,6 @@ namespace ServerMonitor.ViewModels
         {
             get { return chartTitle; }
             set { chartTitle = value; RaisePropertyChanged(() => ChartTitle); }
-        }
-        
-        /// <summary>
-        /// 第一个图表的横轴单位
-        /// </summary>
-        public TimeInterval MajorStepUnit
-        {
-            get => majorStepUnit;
-            set
-            {
-                majorStepUnit = value;
-                RaisePropertyChanged(() => MajorStepUnit);
-            }
-        }
-        /// <summary>
-        /// 第一个图表的横轴坐标之间的间隔
-        /// </summary>
-        public double MajorStep
-        {
-            get => majorStep;
-            set
-            {
-                majorStep = value;
-                RaisePropertyChanged(() => MajorStep);
-            }
         }
 
         public DateTime MaxnumDateTime
@@ -392,12 +367,6 @@ namespace ServerMonitor.ViewModels
         {
             get { return minnumDateTime; }
             set { minnumDateTime = value; RaisePropertyChanged(() => MinnumDateTime); }
-        }
-
-        public Chart1HAxisProperties()
-        {
-            MajorStep = 1;
-            MajorStepUnit = TimeInterval.Hour;
         }
     }
 

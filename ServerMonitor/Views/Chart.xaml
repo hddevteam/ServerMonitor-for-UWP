@@ -12,7 +12,6 @@
     xmlns:telerikGrid="using:Telerik.UI.Xaml.Controls.Grid"
     xmlns:gridPrimitives="using:Telerik.UI.Xaml.Controls.Grid.Primitives"
     xmlns:telerikGrid1="using:Telerik.Data.Core"
-    xmlns:local1="using:ServerMonitor"
     mc:Ignorable="d">
     <Page.DataContext>
         <vm1:ChartPageViewModel x:Name="ViewModel"></vm1:ChartPageViewModel>
@@ -27,9 +26,8 @@
                         <AdaptiveTrigger MinWindowWidth="521" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="LineChart.Padding" Value="24,24,0,24" />
+                        <Setter Target="Linelengend.Margin" Value="0,80,0,0"/>
                         <Setter Target="BarChart.Padding" Value="24" />
-                        <Setter Target="grid2.Margin" Value="48" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="VisualStateWide">
@@ -37,6 +35,7 @@
                         <AdaptiveTrigger MinWindowWidth="850" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
+                        <Setter Target="Linelengend.Margin" Value="0,80,0,0"/>
                         <Setter Target="period.(Grid.ColumnSpan)" Value="1"></Setter>
                         <Setter Target="selectionTypeCombo.(Grid.ColumnSpan)" Value="1"></Setter>
                         <Setter Target="selectionTypeCombo.HorizontalAlignment" Value="Right"></Setter>
@@ -81,12 +80,12 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="7*"></ColumnDefinition>
                     <ColumnDefinition Width="6*"></ColumnDefinition>
-                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <!--区间切换-->
-                <Pivot x:Name="period" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                <Pivot x:Name="period" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Width="400" HorizontalAlignment="Left"
                        SelectedIndex="{Binding PivotIndex,Mode=TwoWay}" SelectionChanged="{x:Bind ViewModel.PivotSelectionChanged}">
-                    <PivotItem Header="Today">
+                    <PivotItem Header="Today" FontSize="8">
                     </PivotItem>
                     <PivotItem Header="Three Days">
                     </PivotItem>
@@ -106,24 +105,23 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
-                
-                <StackPanel x:Name="LineChart" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+
+                <StackPanel x:Name="LineChart" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Padding="0,0,24,0">
                     <!--线形图-->
-                    <telerik:RadCartesianChart PaletteName="DefaultLight" Height="300" x:Name="RequestTimeLineChar" >
+                    <telerik:RadCartesianChart x:Name="RequestTimeLineChar" PaletteName="DefaultLight" MinHeight="325" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
                         <telerik:RadCartesianChart.VerticalAxis>
-                            <telerik:LogarithmicAxis x:Name="logarithmicAxis" LogarithmBase="10" Title="RequestTime" FontWeight="Medium">
+                            <telerik:LogarithmicAxis x:Name="logarithmicAxis" TickThickness="0" Title="RequestTime" FontWeight="Medium">
                                 <telerik:LogarithmicAxis.LabelFormatter>
                                     <vm1:CustomLogarithmicAxisLabelFormatter/>
                                 </telerik:LogarithmicAxis.LabelFormatter>
                             </telerik:LogarithmicAxis>
                         </telerik:RadCartesianChart.VerticalAxis>
                         <telerik:RadCartesianChart.HorizontalAxis>
-                            <telerik:DateTimeContinuousAxis x:Name="axis" Title="{x:Bind ViewModel.Infos.HAxisProperties.ChartTitle,Mode=OneWay}"
+                            <telerik:DateTimeContinuousAxis x:Name="dateTimeContinuousAxis" Title="{x:Bind ViewModel.Infos.HAxisProperties.ChartTitle,Mode=OneWay}"
                                                             Maximum="{x:Bind ViewModel.Infos.HAxisProperties.MaxnumDateTime,Mode=OneWay}"
                                                             Minimum="{x:Bind ViewModel.Infos.HAxisProperties.MinnumDateTime,Mode=OneWay}"
-                                                            MajorStep="{x:Bind ViewModel.Infos.HAxisProperties.MajorStep,Mode=OneWay}"
-                                                            MajorStepUnit="{x:Bind ViewModel.Infos.HAxisProperties.MajorStepUnit,Mode=OneWay}"
-                                                            FontWeight="Medium">
+                                                            LabelRotationAngle="-45" LabelFitMode="Rotate" PlotMode="BetweenTicks" TickThickness="0"
+                                                            FontWeight="Medium" MaximumTicks="10">
                                 <telerik:DateTimeContinuousAxis.LabelFormatter>
                                     <vm1:CustomDateTimeAxisLabelFormatter/>
                                 </telerik:DateTimeContinuousAxis.LabelFormatter>
@@ -150,8 +148,8 @@
                 </StackPanel>
 
                 <!--线形图图例-->
-                <StackPanel Grid.Column="2" Grid.Row="2" VerticalAlignment="Center">
-                    <ListBox x:Name="Linelengend" Padding="-24,0,0,0" Background="White" ItemsSource="{x:Bind ViewModel.Lengend}" VerticalAlignment="Center">
+                <StackPanel x:Name="Linelengend" Grid.Column="2" Grid.Row="2" Margin="-24,80,0,0">
+                    <ListBox Background="White" ItemsSource="{x:Bind ViewModel.Lengend}" VerticalAlignment="Center">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
                                 <Setter Property="Template">
@@ -173,7 +171,7 @@
                 
                 <!--柱形图-->
                 <StackPanel x:Name="BarChart" Grid.Row="3" Grid.ColumnSpan="3" Padding="0,0,24,0">
-                    <telerikPrimitives:RadLegendControl x:Name="barchartLegend" HorizontalAlignment="Right" >
+                    <telerikPrimitives:RadLegendControl x:Name="barchartLegend" HorizontalAlignment="Right">
                         <telerikPrimitives:RadLegendControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Horizontal"/>
@@ -235,7 +233,7 @@
                     </telerik:RadCartesianChart>
                 </StackPanel>
                 <!--表格-->
-                <StackPanel Grid.Row="4" Grid.ColumnSpan="3" Padding="24">
+                <StackPanel Grid.Row="4" Grid.ColumnSpan="3" Padding="24" >
                     <telerikGrid:RadDataGrid x:Name="grid1" ItemsSource="{x:Bind ViewModel.Infos.BarChart}"
                                          AutoGenerateColumns="False" VerticalAlignment="Center" HorizontalAlignment="Center" 
                                          IsTabStop="True" IsHitTestVisible="True" UserGroupMode="Disabled">
