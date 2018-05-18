@@ -349,11 +349,11 @@ namespace ServerMonitor.ViewModels.BLL
             {
                 if (i.Equals(statusCode))
                 {
-                    return false;
+                    return true;
 
                 }
             }
-            return true;
+            return false;
         }
         /// <summary>
         /// 获取服务器状态成功的状态码列表
