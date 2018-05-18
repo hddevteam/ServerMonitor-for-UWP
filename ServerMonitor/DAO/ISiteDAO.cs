@@ -57,5 +57,6 @@ namespace ServerMonitor.SiteDb
         /// <param name="param"></param>
         /// <returns></returns>
         List<SiteModel> DBExcuteSiteCommand(string command, object[] param);
+        int SetAllSiteStatus(int statusCode);
     }
 }

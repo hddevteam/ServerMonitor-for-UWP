@@ -143,7 +143,7 @@ namespace ServerMonitor.Services.RequestServices
                     // Dns服务器状态未知，但是该域名无法解析
                     Status = "1001";
                     // 请求耗时应该在2^15-1(ms)内完成
-                    TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                    TimeCost = (short)(OverTime * 2);
                     actualResult.Add("No Data!");
                     requestInfos = "Request Failed!";
                     return false;

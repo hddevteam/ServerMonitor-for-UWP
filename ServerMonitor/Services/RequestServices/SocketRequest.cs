@@ -24,6 +24,7 @@ namespace ServerMonitor.Services.RequestServices
 
         public async Task<bool> MakeRequest()
         {
+            CreateTime = DateTime.Now;
             // 用来记录请求耗时
             var s = new System.Diagnostics.Stopwatch();
             s.Start();
@@ -79,7 +80,7 @@ namespace ServerMonitor.Services.RequestServices
                 {
                     #region 修改返回数据
                     Status = "1001";
-                    TimeCost = (short)s.ElapsedMilliseconds;
+                    TimeCost = (short)(OverTime * 2);
                     protocolInfo = String.Format("Success, remote server contacted at IP address {0},and the connecting work cost {1} millsseconds!", targetEndPoint.Address, s.ElapsedMilliseconds);
                     #endregion
                     Debug.WriteLine("Error: No such host is known");
@@ -101,7 +102,7 @@ namespace ServerMonitor.Services.RequestServices
                 {
                     #region 修改返回数据
                     Status = "1001";
-                    TimeCost = OverTime;
+                    TimeCost = (short)(OverTime * 2);
                     protocolInfo = "Error: Timeout when connecting (check hostname and port)";
                     #endregion
                     Debug.WriteLine("Error: Timeout when connecting (check hostname and port)");

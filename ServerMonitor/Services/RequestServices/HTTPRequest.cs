@@ -111,7 +111,7 @@ namespace ServerMonitor.Services.RequestServices
             {
                 Debug.WriteLine("请求失败" + e.Message);
                 DBHelper.InsertErrorLog(e);
-                TimeCost = -1;
+                TimeCost = (short)(OverTime * 2);
                 ErrorException = e;
                 requestInfo = e.Message;
                 return false;
