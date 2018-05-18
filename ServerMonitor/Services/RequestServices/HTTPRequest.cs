@@ -64,7 +64,7 @@ namespace ServerMonitor.Services.RequestServices
                 HttpClientHandler handler = new HttpClientHandler
                 {
                     // 设置程序是否跟随重定向
-                    AllowAutoRedirect = false
+                    AllowAutoRedirect = true
                 };
                 // 自动释放链接资源
                 using (HttpClient client = new HttpClient(handler))
