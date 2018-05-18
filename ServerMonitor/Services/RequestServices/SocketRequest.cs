@@ -24,6 +24,7 @@ namespace ServerMonitor.Services.RequestServices
 
         public async Task<bool> MakeRequest()
         {
+            CreateTime = DateTime.Now;
             // 用来记录请求耗时
             var s = new System.Diagnostics.Stopwatch();
             s.Start();

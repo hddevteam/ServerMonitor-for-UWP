@@ -247,6 +247,8 @@ namespace ServerMonitor.ViewModels
             {
                 foreach (var log in l)
                 {
+                    // 这里加上这句话是为把数据库里的Utc时间转换为LocalTime
+                    log.Create_time = log.Create_time.ToLocalTime();
                     Infos.Logs.Add(log);
                     #region 将数据分为三类   新添加
                     InsertLogWithCategory(infos.LogCollections, log);
@@ -261,7 +263,7 @@ namespace ServerMonitor.ViewModels
                     //Infos.RequestTimeList.Add(log_temp);
                     #endregion
                 }
-                Infos.LastRequest = l.First<LogModel>();
+                Infos.LastRequest = l.Last<LogModel>();
                 infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.Request_time);
             }
         }
@@ -390,7 +392,7 @@ namespace ServerMonitor.ViewModels
                             log = await utilObject.AccessSSHServer(infos.Detail_Site, new SSHRequest(infos.Detail_Site.Site_address, SshLoginType.Anonymous));
                             break;
                         case "SMTP":
-                            log = await utilObject.AccessSMTPServer(infos.Detail_Site, new SMTPRequest(infos.Detail_Site.Site_address));
+                            log = await utilObject.AccessSMTPServer(infos.Detail_Site, new SMTPRequest(infos.Detail_Site.Site_address,infos.Detail_Site.Server_port));
                             break;
                         case "SOCKET":
                             log = await utilObject.ConnectToServerWithSocket(infos.Detail_Site, new SocketRequest());
@@ -1401,7 +1403,7 @@ namespace ServerMonitor.ViewModels
             {
                 return item.Site_name;
             }
-            return "UnknownID" + content.ToString();
+            return "UnkUtcNownID" + content.ToString();
         }
     }
     #endregion

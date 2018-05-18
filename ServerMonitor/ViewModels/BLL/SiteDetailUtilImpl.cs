@@ -323,7 +323,13 @@ namespace ServerMonitor.ViewModels.BLL
             // 更新站点变量的信息
             site.Status_code = log.Status_code;
             site.Update_time = DateTime.Now;
-            site.Last_request_result = log.Is_error ? 0 : 1;
+            if (log.Is_error)
+            {
+                site.Last_request_result = "1002".Equals(log.Status_code) ? -1 : 0;
+            }
+            else {
+                site.Last_request_result = 1;
+            }
             site.Request_interval = (int)log.Request_time;
             site.Request_count++;
             // 更新数据库中的站点的信息
