@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 
@@ -25,12 +26,20 @@ namespace ServerMonitor.Services.RequestServices
         public string ActualResult { get => actualResult; set => actualResult = value; }
 
         /// <summary>
+        /// 待请求的SMTP服务器的端口
+        /// </summary>
+        int port;
+        public int Port { get => port; set => port = value; }
+
+        /// <summary>
         /// 生成一个SMTP请求对象
         /// </summary>
         /// <param name="DomainName">待请求的SMTP域名</param>
-        public SMTPRequest(string DomainName)
+        /// <param name="port">待请求的SMTP服务器的端口</param>
+        public SMTPRequest(string DomainName,int port)
         {
             this.DomainName = DomainName;
+            this.Port = port;
         }
 
         /// <summary>
@@ -40,82 +49,100 @@ namespace ServerMonitor.Services.RequestServices
         public async Task<bool> MakeRequest()
         {
             CreateTime = DateTime.Now;// 赋值生成请求的时间
-            bool outTime = false; //true 为超时
             try
             {
-                Socket s = null;  //用他来建立连接，发送信息
-                IPAddress hostAddress = null;  // 主机IP地址
-                IPEndPoint hostEndPoint;     //主机端点 IP地址+端口
                 // get all the ip with the domain  一般只有一个
                 IPHostEntry hostInfo = await Dns.GetHostEntryAsync(DomainName);
                 IPAddress[] IPaddresses = hostInfo.AddressList;
+                IPAddress hostAddress = IPaddresses[0];// 主机IP地址
+                IPEndPoint hostEndPoint = new IPEndPoint(hostAddress, 25);// get our end point主机端点 IP地址+端口
+                //用他来建立连接，发送信息 prepare the socket
+                Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-                // go through each ip and attempt a connection，成功请求就停止（返回true），失败就继续下一个（有的话）
-                for (int index = 0; index < IPaddresses.Length; index++)
+                Stopwatch stopwatch = new Stopwatch(); // 记录请求耗时
+                CancellationTokenSource cts = new CancellationTokenSource();
+                stopwatch.Start();
+                // 二次封装任务，目的在于让请求过程变成可控的
+                Task queryTask = Task.Run(async () =>
                 {
-                    outTime = false; //true 为超时  ，false为不超时
-                    hostAddress = IPaddresses[index];
-                    hostEndPoint = new IPEndPoint(hostAddress, 587);// get our end point
-                    // prepare the socket
-                    s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    await s.ConnectAsync(hostEndPoint);
+                }, cts.Token);
+                // 开启另一个任务同时进行用于记录是否超时
+                var ranTask = Task.WaitAny(queryTask, Task.Delay(OverTime));
+                if (0 != ranTask)
+                {
+                    s.Dispose();     //让连接暂停
+                    // 取消任务，并返回超时异常
+                    cts.Cancel();
+                    stopwatch.Stop();
+                    TimeCost = OverTime;
+                    Status = "1002";
+                    ErrorException = new TaskCanceledException("Overtime");
+                    return false;
+                }
+                await Task.CompletedTask;
+                stopwatch.Stop();
 
-                    Stopwatch stopwatch = new Stopwatch(); // 记录请求耗时
+                if (s.Connected && queryTask.IsCompleted) // 请求成功，获取到了解析结果
+                {
+                    //接收建立连接时的返回信息
+                    s.Receive(RecvFullMessage);//交代自己认证SMTP服务器的域名 然后发送 接收信息存在RecvFullMessage
+                    stopwatch.Start();  //开始计时
+                    ByteCommand = ASCII.GetBytes("HELO " + DomainName + "\r\n"); //规定的HELO请求格式
+                    s.Send(ByteCommand, ByteCommand.Length, 0);
+                    s.Receive(RecvFullMessage);  //接收HELO请求的返回信息
+                    stopwatch.Stop();   //结束计时
 
-                    //捕捉连接超时，异步执行timer.Tick事件的方法，该方法只在OverTime（ms）后执行一次
-                    DispatcherTimer timer = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 0, 0, OverTime) };
-                    timer.Tick += new EventHandler<object>((sender, e) =>
+                    string str = ASCII.GetString(RecvFullMessage).Substring(0, 1); //去状态码
+                    if (str.Equals("2"))
                     {
-                        if (!s.Connected) // //Connection timed out...
-                        {
-                            Status = "1002"; //超时1002  错误1001
-                            TimeCost = OverTime;    //设为规定值
-                            ErrorException = new Exception("请求超时");  //记录错误信息
-                            s.Dispose();     //让连接暂停
-                            outTime = true;      // 标记为超时，且此情况已处理
-                        }
-                        timer.Stop();  //关闭计算器，让该方法只执行一次，
-                    });
-
-                    try
-                    {
-                        timer.Start();  //开始执行timer.Tick事件的方法
-                        //建立TCP连接，不能用s.Connect(hostEndPoint); 会使timer.Tick无法正常执行
-                        await s.ConnectAsync(hostEndPoint);  
-                    }
-                    catch (Exception e) //Connection error
-                    {
-                        if (outTime == false)  //false为不超时 ,对此情况下的报错处理
-                        {
-                            Status = "1001";
-                            ErrorException = e;
-                            TimeCost = (short)(OverTime * 2);
-                        }
-                        continue;
-                    }
-                    if (!s.Connected) // Connection failed
-                    {
-                        Status = "1001";
-                        TimeCost = (short)(OverTime * 2);
-                        ErrorException = new Exception("未建立连接");
-                    }
-                    else
-                    {
-                        s.Receive(RecvFullMessage);//接收建立连接时的返回信息
-                        //交代自己认证SMTP服务器的域名 然后发送 接收信息存在RecvFullMessage
-
-                        stopwatch.Start();  //开始计时
-                        ByteCommand = ASCII.GetBytes("HELO " + DomainName + "\r\n"); //规定的HELO请求格式
-                        s.Send(ByteCommand, ByteCommand.Length, 0);
-                        s.Receive(RecvFullMessage);  //接收HELO请求的返回信息
-                        stopwatch.Stop();   //结束计时
-                        Debug.WriteLine(ASCII.GetString(RecvFullMessage));
-
-                        Status = ASCII.GetString(RecvFullMessage).Substring(0, 3); //去状态码
+                        // Dns服务器状态良好
+                        Status = "1000";
+                        // 请求耗时应该在2^15-1(ms)内完成
                         TimeCost = (short)stopwatch.ElapsedMilliseconds;         //计算请求时间
                         ActualResult = ASCII.GetString(RecvFullMessage);         //记录请求结果
                         return true;                                            //停止循环，返回true
                     }
+                    else
+                    {
+                        // Dns服务器状态未知，但是该域名无法解析
+                        Status = "1001";
+                        // 请求耗时应该在2^15-1(ms)内完成
+                        TimeCost = (short)stopwatch.ElapsedMilliseconds;
+
+                        return false;
+                    }
                 }
+                else // 请求失败，无解析结果
+                {
+                    // Dns服务器状态未知，但是该域名无法解析
+                    Status = "1001";
+                    // 请求耗时应该在2^15-1(ms)内完成
+                    TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                    return false;
+                }
+            }
+            // 捕获到请求超时的情况
+            catch (TaskCanceledException e)
+            {
+                // Dns服务器超时
+                Status = "1002";
+                // 收集捕获到的异常
+                ErrorException = e;
+                // 请求耗时设置为超时上限
+                TimeCost = OverTime;
+                return false;
+            }
+            // 这个是TaskCanceledException的基类
+            catch (OperationCanceledException e)
+            {
+                // Dns服务器超时
+                Status = "1002";
+                // 收集捕获到的异常
+                ErrorException = e;
+                // 请求耗时设置为超时上限
+                TimeCost = OverTime;
+                return false;
             }
             catch (Exception e)
             {
@@ -124,7 +151,7 @@ namespace ServerMonitor.Services.RequestServices
                 // 收集捕获到的异常
                 ErrorException = e;
                 // 请求耗时设置为超时上限
-                TimeCost = (short)(OverTime * 2);
+                TimeCost = OverTime;
             }
             return false;
         }
