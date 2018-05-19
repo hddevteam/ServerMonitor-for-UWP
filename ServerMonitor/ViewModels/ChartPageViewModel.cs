@@ -150,7 +150,7 @@ namespace ServerMonitor.ViewModels
         {
             await Task.CompletedTask;
             List<LogModel> logs = new List<LogModel>();
-            logs = DBHelper.GetAllLog();
+            //logs = DBHelper.GetAllLog();
             logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now, Request_time = 2000, Is_error = true, Status_code = "1001" });
             logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-12), Request_time = 2000, Is_error = true, Status_code = "1002" });
             logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-22), Request_time = 2040, Is_error = false, Status_code = "1000" });
@@ -307,7 +307,7 @@ namespace ServerMonitor.ViewModels
         public object Format(object owner, object content)
         {
             // The owner parameter is the Axis instance which labels are currently formatted
-            var axis = owner as DateTimeContinuousAxis;
+            var axis = owner as CategoricalAxis;
             var con = Convert.ToDateTime(content);
 
             if(axis.Title.ToString().Contains("three days") || axis.Title.ToString().Contains("week"))
@@ -446,9 +446,9 @@ namespace ServerMonitor.ViewModels
             set { requestTime = value; RaisePropertyChanged(() => RequestTime); }
         }
         //站点请求回复时间
-        private Double responseTime;
+        private Double? responseTime;
 
-        public Double ResponseTime
+        public Double? ResponseTime
         {
             get { return responseTime; }
             set { responseTime = value; RaisePropertyChanged(() => ResponseTime); }

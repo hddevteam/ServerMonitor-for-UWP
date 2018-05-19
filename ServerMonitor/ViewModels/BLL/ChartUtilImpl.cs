@@ -110,20 +110,23 @@ namespace ServerMonitor.ViewModels.BLL
                             //成功
                             successCount++; result = "Success";
                             responseTime = log.Request_time;
+                            chart1Series.Add(new Chart1() { RequestTime = log.Create_time, Result = result, ResponseTime = responseTime });
                         }
                         else if (log.Status_code == "1002") //状态码为1002时表示请求超时
                         {
                             //超时
                             overtimeCount++; result = "OverTime";
                             responseTime = log.Request_time;
+                            chart1Series.Add(new Chart1() { RequestTime = log.Create_time, Result = result, ResponseTime = responseTime });
                         }
                         else
                         {
                             //失败
                             errorCount++; result = "Error";
-                            responseTime = 1.5*OVERTIME;
+                            chart1Series.Add(new Chart1() { RequestTime = log.Create_time, Result = result, ResponseTime = null });
+                            responseTime = 0;
                         }
-                        chart1Series.Add(new Chart1() { RequestTime = log.Create_time, Result = result, ResponseTime = responseTime });
+                        //chart1Series.Add(new Chart1() { RequestTime = log.Create_time, Result = result, ResponseTime = null });
                     }
                     #endregion
                 }
