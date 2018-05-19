@@ -116,7 +116,7 @@
     <Compile Include="Common\IcmpPacket.cs" />
     <Compile Include="Controls\Request.cs" />
     <Compile Include="Services\RequestServices\HTTPRequest.cs" />
-    <Compile Include="Services\RequestServices\ICMPRequest.cs" />
+    <Compile Include="Services\RequestServices\IcmpRequest.cs" />
     <Compile Include="Services\RequestServices\IRequest.cs" />
     <Compile Include="Services\RequestServices\SMTPRequest.cs" />
     <Compile Include="CustomConverter.cs" />
