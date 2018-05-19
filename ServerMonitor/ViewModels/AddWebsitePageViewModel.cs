@@ -393,15 +393,16 @@ namespace ServerMonitor.ViewModels
             {
                 try
                 {
-                    Regex reg = new Regex(@"^((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]\d)|\d)(\.((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]\d)|\d)){3}$");
+                    //域名的正则表达式
+                    Regex reg = new Regex(@"^[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+\.?$");
                     Boolean _domaincheck = reg.IsMatch(domain);
                     if (_domaincheck)
                     {
-                        return false;
+                        return true;
                     }
                     else
                     {
-                        return true;
+                        return false;
                     }
                 }
                 catch

@@ -64,7 +64,7 @@ namespace ServerMonitor.Services.RequestServices
                 HttpClientHandler handler = new HttpClientHandler
                 {
                     // 设置程序是否跟随重定向
-                    AllowAutoRedirect = false
+                    AllowAutoRedirect = true
                 };
                 // 自动释放链接资源
                 using (HttpClient client = new HttpClient(handler))
@@ -111,7 +111,7 @@ namespace ServerMonitor.Services.RequestServices
             {
                 Debug.WriteLine("请求失败" + e.Message);
                 DBHelper.InsertErrorLog(e);
-                TimeCost = -1;
+                TimeCost = (short)(OverTime * 2);
                 ErrorException = e;
                 requestInfo = e.Message;
                 return false;

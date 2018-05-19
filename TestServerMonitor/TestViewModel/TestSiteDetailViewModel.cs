@@ -26,7 +26,22 @@ namespace TestServerMonitor.TestViewModel
             // 实例化待测试的对象
             utilObject = new SiteDetailUtilImpl();
         }
-        [TestCleanup]
+
+        private SiteDetailUtilImpl util = new SiteDetailUtilImpl();
+        [TestMethod]
+        public void TestSuccessCodeMatch()
+        {
+            SiteModel site1 = new SiteModel() { Request_succeed_code = "220,310" };
+            SiteModel site2 = new SiteModel() { Request_succeed_code = "220" };
+            SiteModel site3 = new SiteModel() { Request_succeed_code = "" };
+            SiteModel site4 = new SiteModel() { Request_succeed_code = null };
+            Assert.IsTrue(util.SuccessCodeMatch(site1, "220"));
+            Assert.IsTrue(util.SuccessCodeMatch(site1, "310"));
+            Assert.IsTrue(util.SuccessCodeMatch(site2, "220"));
+            Assert.IsFalse(util.SuccessCodeMatch(site2, ""));
+            Assert.IsFalse(util.SuccessCodeMatch(site3, "220"));
+        }
+
 
         [TestMethod]
         [Owner("Bin")]

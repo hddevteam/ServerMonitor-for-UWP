@@ -143,7 +143,7 @@ namespace ServerMonitor.Services.RequestServices
                     // Dns服务器状态未知，但是该域名无法解析
                     Status = "1001";
                     // 请求耗时应该在2^15-1(ms)内完成
-                    TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                    TimeCost = (short)(OverTime * 2);
                     actualResult.Add("No Data!");
                     requestInfos = "Request Failed!";
                     return false;
@@ -216,11 +216,15 @@ namespace ServerMonitor.Services.RequestServices
         {
             return resultSet.Contains(expectResult);
         }
-        /**
-         * int i = 0;
-         * QType q = (QType)Enum.Parse(typeof(QType), i.ToString());
-         * 用来获取枚举值得下标
-         */
+
+        /// <summary>
+        /// 用来获取枚举值得下标
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static QType GetQTypeWithIndex(int index) {
+            return (QType)Enum.Parse(typeof(QType), index.ToString());
+        }
 
         /// <summary>
         /// 用于控制线程安全的内部类

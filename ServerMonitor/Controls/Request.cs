@@ -239,8 +239,7 @@ namespace ServerMonitor.Controls
                     requestStatus = "200";
                     requestCost = s.ElapsedMilliseconds.ToString();
                     color = "green";
-                    others = String.Format("Success, remote server contacted at IP address {0},and the connecting work cost {1} millsseconds!",
-                                                                 remoteIp, s.ElapsedMilliseconds);
+                    others = String.Format("Success, remote server contacted at IP address {0},and the connecting work cost {1} millsseconds!",                                                                 remoteIp, s.ElapsedMilliseconds);
                     #endregion
                     // 释放连接
                     TcpClient.Dispose();
