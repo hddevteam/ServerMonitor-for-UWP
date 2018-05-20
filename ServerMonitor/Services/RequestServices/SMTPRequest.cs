@@ -47,7 +47,7 @@ namespace ServerMonitor.Services.RequestServices
         /// </summary>
         /// <returns>是否请求成功</returns>
         public async Task<bool> MakeRequest()
-        {
+        {            
             CreateTime = DateTime.Now;// 赋值生成请求的时间
             try
             {
@@ -55,7 +55,7 @@ namespace ServerMonitor.Services.RequestServices
                 IPHostEntry hostInfo = await Dns.GetHostEntryAsync(DomainName);
                 IPAddress[] IPaddresses = hostInfo.AddressList;
                 IPAddress hostAddress = IPaddresses[0];// 主机IP地址
-                IPEndPoint hostEndPoint = new IPEndPoint(hostAddress, Port);// get our end point主机端点 IP地址+端口
+                IPEndPoint hostEndPoint = new IPEndPoint(hostAddress, port);// get our end point主机端点 IP地址+端口
                 //用他来建立连接，发送信息 prepare the socket
                 Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 

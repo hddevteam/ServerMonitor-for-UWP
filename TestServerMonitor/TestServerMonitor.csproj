@@ -100,6 +100,7 @@
     <Compile Include="TestRequest\TestDnsRequest.cs" />
     <Compile Include="TestRequest\TestFtpRequest.cs" />
     <Compile Include="TestRequest\TestHTTPRequest.cs" />
+    <Compile Include="TestRequest\TestSMTPRequest.cs" />
     <Compile Include="TestRequest\TestSSHRequest.cs" />
     <Compile Include="TestViewModel\TestChartViewModel.cs" />
     <Compile Include="TestViewModel\TestSiteDetailViewModel.cs" />
