@@ -44,6 +44,6 @@ namespace ServerMonitor.DAO
         /// <returns></returns>
         int UpdateContact(ContactModel contact);
 
-
+        List<ContactModel> GetContactModelsBySiteId(int siteid);
     }
 }

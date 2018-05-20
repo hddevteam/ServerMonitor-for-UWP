@@ -107,7 +107,24 @@ namespace ServerMonitor.DAOImpl
             }
             return result;
         }
+        //根据siteid的id从contactsite表里查找contactid
+        public List<ContactSiteModel> GetContactSiteBySiteId(int siteid)
+        {
 
+            List<ContactSiteModel> contactsiteList;
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
+            {
+                try
+                {
+                    contactsiteList = conn.Table<ContactSiteModel>().Where(v => v.SiteId == siteid).ToList<ContactSiteModel>();
+                }
+                catch
+                {
+                    contactsiteList = new List<ContactSiteModel>();
+                }
+            }
+            return contactsiteList;
+        }
         /// <summary>
         /// 用于延迟加载的实例
         /// </summary>
