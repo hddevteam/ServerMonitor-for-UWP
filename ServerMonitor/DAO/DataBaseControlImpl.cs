@@ -10,11 +10,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Windows.Storage;
 
 namespace ServerMonitor.SiteDb
 {
-    public class DbInitImpl : DBInit
+    public class DataBaseControlImpl : DBInit
     {
         /// <summary>
         /// 持有SiteDAO对象实现对Site的操作
@@ -31,7 +32,7 @@ namespace ServerMonitor.SiteDb
         /// <summary>
         /// 延迟加载对象
         /// </summary>
-        public static DbInitImpl Instance {
+        public static DataBaseControlImpl Instance {
             get {
                 return Nested.instance;
             }
@@ -42,7 +43,11 @@ namespace ServerMonitor.SiteDb
         /// </summary>
         public static string DBPath { get => dBPath; }
 
-        private DbInitImpl() { }
+        static DataBaseControlImpl(){}
+
+        private DataBaseControlImpl() {
+
+        }
 
         /// <summary>
         /// 初始化数据库
@@ -228,14 +233,13 @@ namespace ServerMonitor.SiteDb
             else
             {
                 DbFileName = Filename;
-                dBPath = Path.Combine(ApplicationData.Current.LocalFolder.Path, DbFileName);
+                dBPath = Path.Combine(ApplicationData.Current.LocalFolder.Path, Filename);
             }
         }
 
         class Nested {
             static Nested(){}
-            internal static readonly DbInitImpl instance = new DbInitImpl();
-            
+            internal static readonly DataBaseControlImpl instance = new DataBaseControlImpl();           
         }
     }
 }

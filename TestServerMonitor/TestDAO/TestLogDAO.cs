@@ -33,7 +33,7 @@ namespace TestServerMonitor.TestDAO
         [AssemblyInitialize]
         public static void InitDatabase(TestContext testContext)
         {
-            DBInit db = DbInitImpl.Instance;
+            DBInit db = DataBaseControlImpl.Instance;
             db.InitDB("testdb.db");
         }
         [TestMethod]

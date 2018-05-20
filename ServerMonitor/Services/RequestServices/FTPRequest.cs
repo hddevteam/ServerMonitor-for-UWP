@@ -55,6 +55,18 @@ namespace ServerMonitor.Services.RequestServices
         //public LoginType IdentifyType { get => identifyType; set => identifyType = value; }
         public IdentificationInfo Identification { get => identification; set => identification = value; }
         public IPAddress FtpServer { get => ftpServer; set => ftpServer = value; }
+        /// <summary>
+        /// 线程安全的请求对象 --完全延迟加载
+        /// </summary>
+        public static FTPRequest Instance
+        {
+            get
+            {
+                return Nested.instance;
+            }
+        }
+
+        private FTPRequest() { }
 
         /// <summary>
         /// 构造函数
@@ -96,7 +108,7 @@ namespace ServerMonitor.Services.RequestServices
                 default:
                     // ftp请求登陆模式异常
                     CreateTime = DateTime.Now;
-                    TimeCost = 0;
+                    TimeCost = (short)(OverTime * 2);
                     Status = "1001";
                     ErrorException = new Exception("User identifyType is invalid!");
                     protocalInfo = "User identifyType is invalid!";
@@ -110,7 +122,7 @@ namespace ServerMonitor.Services.RequestServices
             // 检测服务器的IPAddress是否合法
             if (! ValidateIPv4(ftpServer.ToString()))
             {
-                TimeCost = 0;
+                TimeCost = (short)(OverTime * 2);
                 Status = "1001";
                 ErrorException = new Exception("Server address is invalid!");
                 protocalInfo = "Server address is invalid!";
@@ -176,7 +188,7 @@ namespace ServerMonitor.Services.RequestServices
                                 // 请求失败 
                                 case 4:
                                 case 5:
-                                    TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                                    TimeCost = (short)(OverTime * 2);
                                     Status = "1001";
                                     protocalInfo = strRet;
                                     break;
@@ -192,7 +204,7 @@ namespace ServerMonitor.Services.RequestServices
                         {
                             // 未连接，将秒表停止，此次请求作为失败的请求
                             stopwatch.Stop();
-                            TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                            TimeCost = (short)(OverTime * 2);
                             Status = "1001";
                             protocalInfo = "Connect failed!";
                         }
@@ -236,7 +248,7 @@ namespace ServerMonitor.Services.RequestServices
                             ErrorException = e;
                             break;
                         default:
-                            TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                            TimeCost = (short)(OverTime * 2);
                             Status = "1001";
                             protocalInfo = e.Message;
                             break;
@@ -308,6 +320,18 @@ namespace ServerMonitor.Services.RequestServices
             }
 
             return splitValues.All(r => byte.TryParse(r, out byte tempForParsing));
+        }
+
+        /// <summary>
+        /// 用于控制线程安全的内部类
+        /// </summary>
+        private class Nested
+        {
+            static Nested()
+            {
+
+            }
+            internal static readonly FTPRequest instance = new FTPRequest();
         }
     }
 

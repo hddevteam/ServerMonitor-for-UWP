@@ -7,11 +7,11 @@ using System;
 namespace TestServerMonitor.TestRequest
 {
     [TestClass]
-    public class TestDnsRequest// Dns请求模块测试
+    public class TestDNSRequest// Dns请求模块测试
     {
         private static IPAddress testIpAddress = IPAddress.Parse("8.8.8.8");
         private static string testDomainName = "www.baidu.com";
-        private DnsRequest dnsRequest = new DnsRequest(testIpAddress, testDomainName);
+        private DNSRequest dnsRequest = new DNSRequest(testIpAddress, testDomainName);
 
         [Owner("Bin")]
         [TestInitialize()] // 测试类生成预处理
@@ -30,8 +30,8 @@ namespace TestServerMonitor.TestRequest
             // 校验 dnsRequest 是否为空
             Assert.AreNotEqual(null, dnsRequest);
 
-            Assert.AreEqual(true, dnsRequest.MakeRequest().Result, "测试 成功请求case 解析不成功!");
-            Assert.AreEqual("1000", dnsRequest.Status, "测试 成功请求case 状态码不为正常状态码!");
+            Assert.AreEqual(true, dnsRequest.MakeRequest().Result, "Cannot succeed in accessing the specified DNS server");
+            Assert.AreEqual("1000", dnsRequest.Status, "Failed in getting the \'Succeed\' status code!");
         }
 
         /// <summary>
@@ -46,8 +46,8 @@ namespace TestServerMonitor.TestRequest
             // 校验 dnsRequest 是否为空
             Assert.AreNotEqual(null, dnsRequest);
 
-            Assert.IsFalse(dnsRequest.MakeRequest().Result, "测试 URL为空case 异常解析通过!");
-            Assert.AreEqual("1001", dnsRequest.Status, "测试 URL为空case 状态码不为1001!");
+            Assert.IsFalse(dnsRequest.MakeRequest().Result, "Unusually passed when the DNS server address is null!");
+            Assert.AreEqual("1001", dnsRequest.Status, "Failed in getting the \'Error\' status code!");
         }
 
         /// <summary>
@@ -62,8 +62,8 @@ namespace TestServerMonitor.TestRequest
             // 校验 dnsRequest 是否为空
             Assert.AreNotEqual(null, dnsRequest);
 
-            Assert.IsFalse(dnsRequest.MakeRequest().Result, "测试 DomainName为空case 异常解析通过!");
-            Assert.AreEqual("1001", dnsRequest.Status, "测试 DomainName为空case 状态码不为1001!");
+            Assert.IsFalse(dnsRequest.MakeRequest().Result, "Unusually passed when the domain name is null !");
+            Assert.AreEqual("1001", dnsRequest.Status, "Failed in getting the \'Error\' status code!");
         }
 
         [Owner("Bin")]// Owner 标签标识测试方法创建者
@@ -75,21 +75,56 @@ namespace TestServerMonitor.TestRequest
             // 校验 dnsRequest 是否为空
             Assert.AreNotEqual(null, dnsRequest);
             dnsRequest.MakeRequest().Wait();
-            //Assert.IsFalse(dnsRequest.MakeRequest().Result, "测试 请求超时case 异常解析通过!");
-            //Assert.AreEqual("1002", dnsRequest.Status, "测试 请求超时case 状态码不为1002!");
+            Assert.IsFalse(dnsRequest.MakeRequest().Result, "Unusually passed when it is TimeOver !");
+            Assert.AreEqual("1002", dnsRequest.Status, "Failed in getting the \'OverTime\' status code!");
         }
 
+        [Owner("Bin")]// Owner 标签标识测试方法创建者
+        [TestMethod]
+        [Priority(1)]// 优先级
+        public void TestMakeRequest_WithoutSpecifiedResource()// 测试发起Dns请求 
+        {
+            dnsRequest.RecordType = Heijden.DNS.QType.CNAME;
+            dnsRequest.DnsServer = IPAddress.Parse("8.8.8.8");
+            dnsRequest.DomainName = "naotu.baidu.com";
+            // 校验 dnsRequest 是否为空
+            Assert.AreNotEqual(null, dnsRequest);
+            dnsRequest.MakeRequest().Wait();
+            Assert.IsFalse(dnsRequest.MakeRequest().Result, "Unusually passed when it failed in getting specified record !");
+        }
+
+        /// <summary>
+        /// 测试成功命中
+        /// </summary>
         [Owner("Bin")]
         [TestMethod]
         [Priority(2)]
-        public void TestIsMatchResult()
+        public void TestIsMatchResult_NormallySucceed()
         {
+            dnsRequest.DomainName = "localhost";            
             // 校验 dnsRequest 是否为空
             Assert.AreNotEqual(null, dnsRequest);
             // 校验解析是否成功
             dnsRequest.MakeRequest().Wait();
             Assert.IsNotNull(dnsRequest.ActualResult);
-            //Assert.AreEqual(true, dnsRequest.IsMatchResult("180.149.131.98", dnsRequest.ActualResult), "解析结果不匹配！");
+            Assert.AreEqual(true, dnsRequest.IsMatchResult("127.0.0.1", dnsRequest.ActualResult), "Cannot match the result ");
+        }
+
+        /// <summary>
+        /// 测试未能成功命中
+        /// </summary>
+        [Owner("Bin")]
+        [TestMethod]
+        [Priority(2)]
+        public void TestIsMatchResult_CannotHitRightly()
+        {
+            dnsRequest.DomainName = "localhost";
+            // 校验 dnsRequest 是否为空
+            Assert.AreNotEqual(null, dnsRequest);
+            // 校验解析是否成功
+            dnsRequest.MakeRequest().Wait();
+            Assert.IsNotNull(dnsRequest.ActualResult);
+            Assert.IsFalse(dnsRequest.IsMatchResult("127.0.0.3", dnsRequest.ActualResult), "Unusually matching result !");
         }
     }
 }

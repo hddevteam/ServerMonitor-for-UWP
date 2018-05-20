@@ -24,7 +24,7 @@ namespace ServerMonitor.SiteDb
         public List<SiteModel> DBExcuteSiteCommand(string command, object[] param)
         {
             List<SiteModel> result;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 SQLiteCommand cmd = conn.CreateCommand(command, param);
                 result = cmd.ExecuteQuery<SiteModel>();
@@ -40,7 +40,7 @@ namespace ServerMonitor.SiteDb
         {
             // result = -1 表示异常返回值，执行操作失败
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 try
                 {
@@ -65,7 +65,7 @@ namespace ServerMonitor.SiteDb
         public int DeleteOneSite(int siteId)
         {
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 result = conn.Execute("delete from Site where Id = ?", siteId);
             }
@@ -78,7 +78,7 @@ namespace ServerMonitor.SiteDb
         public List<SiteModel> GetAllSite()
         {
             List<SiteModel> r;//返回Site列表
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 r = conn.Table<SiteModel>().ToList<SiteModel>();
             }
@@ -92,7 +92,7 @@ namespace ServerMonitor.SiteDb
         public SiteModel GetSiteById(int id)
         {
             SiteModel s;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 try
                 {
@@ -113,7 +113,7 @@ namespace ServerMonitor.SiteDb
         public int InsertListSite(List<SiteModel> sites)
         {
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 result = conn.InsertAll(sites);
             }
@@ -127,7 +127,7 @@ namespace ServerMonitor.SiteDb
         public int InsertOneSite(SiteModel site)
         {
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 result = conn.Insert(site);
             }
@@ -141,13 +141,26 @@ namespace ServerMonitor.SiteDb
         public int UpdateListSite(List<SiteModel> sites)
         {
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 result = conn.UpdateAll(sites);
             }
             return result;
         }
-
-       
+        /// <summary>
+        /// 修改所有站点的状态
+        /// </summary>
+        /// <param name="statusCode"></param>
+        /// <returns></returns>
+        public int SetAllSiteStatus(int statusCode)
+        {
+            int result = -1;
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
+            {
+                SQLiteCommand cmd = conn.CreateCommand("update Site set Last_request_result = ?;", statusCode);
+                result = cmd.ExecuteNonQuery();
+            }
+            return result;
+        }
     }
 }

@@ -24,7 +24,8 @@ namespace ServerMonitor.LogDb
         public List<LogModel> DBExcuteLogCommand(string command, object[] param)
         {
             List<LogModel> result;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 SQLiteCommand cmd = conn.CreateCommand(command, param);
                 result = cmd.ExecuteQuery<LogModel>();
@@ -41,7 +42,7 @@ namespace ServerMonitor.LogDb
             int result = -1;
             try
             {
-                using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+                using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
                 {
                     result = conn.Execute("delete from Log where Site_id = ?", siteId);
                 }
@@ -64,7 +65,8 @@ namespace ServerMonitor.LogDb
         public int DeleteOneLog(int LogId)
         {
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 result = conn.Execute("delete from Log where Id = ?", LogId);
             }
@@ -78,7 +80,8 @@ namespace ServerMonitor.LogDb
         public  List<LogModel> GetAllLog()
         {
             List<LogModel> r;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 r = conn.Table<LogModel>().ToList<LogModel>();
             }
@@ -92,7 +95,7 @@ namespace ServerMonitor.LogDb
         public  LogModel GetLogById(int id)
         {
             LogModel l;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 try
                 {
@@ -113,7 +116,8 @@ namespace ServerMonitor.LogDb
         public List<LogModel> GetLogsBySiteId(int id)
         {
             List<LogModel> l;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 try
                 {
@@ -147,7 +151,8 @@ namespace ServerMonitor.LogDb
             // 开始插入
             try
             {
-                using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+
+                using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
                 {
                     result = conn.Insert(log);
                     Debug.WriteLine("写入错误日志:");
@@ -168,7 +173,8 @@ namespace ServerMonitor.LogDb
         public int InsertListLog(List<LogModel> logs)
         {
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 result = conn.InsertAll(logs);
             }
@@ -181,8 +187,9 @@ namespace ServerMonitor.LogDb
         /// <returns></returns>
         public int InsertOneLog(LogModel log)
         {
+
             int result = 0;//如果插入的Log == null 则返回 0
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 result = conn.Insert(log);
             }
@@ -196,7 +203,7 @@ namespace ServerMonitor.LogDb
         public int UpdateListLog(List<LogModel> logs)
         {
             int result = -1;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 result = conn.UpdateAll(logs);
             }
@@ -210,7 +217,7 @@ namespace ServerMonitor.LogDb
         public int UpdateLog(LogModel log)
         {
             int result;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 result = conn.Update(log);
             }
