@@ -17,21 +17,23 @@ using System.Threading.Tasks;
 namespace TestServerMonitor.TestDAO
 {
     [TestClass]
-    public class GetContactModelsBySiteId
+    public class TestContactDAOImpl
     {
         private int a;
 
         public object Count { get; private set; }
-        [AssemblyInitialize]
+        [AssemblyInitialize] // 测试类生成预处理
         public static void Init(TestContext testContext)
         {
             DBInit db1 = DataBaseControlImpl.Instance;
             db1.InitDB("Filename.db");
-        }
+        }//对数据库进行初始化，连接数据库
         [TestMethod]
-        public void Method1()
+        public void GetContactModelsBySiteId()
         {
             List<ContactModel> l_list = new List<ContactModel>();
+            //新建一个表，验证表
+
             IContactDAO n = new ContactDAOImpl();
             ContactModel l_CL = new ContactModel()
             {
@@ -45,6 +47,7 @@ namespace TestServerMonitor.TestDAO
                 SiteId = 1
             };
             n.InsertOneContact(l_CL);
+            //为了防止数据库起初没数据，为表插入一条Contact信息，使测试通过
             IContactSiteDao contactSiteDao = ContactSiteDAOImpl.Instance;
             contactSiteDao.InsertListConnects(new List<ContactSiteModel>()
             {
@@ -52,14 +55,13 @@ namespace TestServerMonitor.TestDAO
                 {
                     SiteId=1,
                     ContactId=l_CL.Id
+                    //注意Contact里面的Id是自动生成，不一定是输入的值，所以ContactSite的Id需要获取一下当前Contact的Id
                 }
             });
+            //插入一条ContactSite信息
             l_list = n.GetContactModelsBySiteId(1);
             Assert.AreNotEqual(l_list.Count, 0);
-            foreach (ContactModel m in l_list)
-            {
-                Assert.AreEqual(m.SiteId, 1);
-            }
+            //已经有数据看结果是否有值，验证方法
         }
     }
 }
