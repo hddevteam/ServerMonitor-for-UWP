@@ -138,7 +138,9 @@
     <Compile Include="ViewModels\AddWebsitePageViewModel.cs" />
     <Compile Include="ViewModels\AllServerViewModel.cs" />
     <Compile Include="ViewModels\AllServer_addserverViewModel.cs" />
+    <Compile Include="ViewModels\BLL\AddServerUtilImpl.cs" />
     <Compile Include="ViewModels\BLL\ChartUtilImpl.cs" />
+    <Compile Include="ViewModels\BLL\IAddServerUtil.cs" />
     <Compile Include="ViewModels\BLL\IChartUtil.cs" />
     <Compile Include="ViewModels\BLL\ISiteDetailUtil.cs" />
     <Compile Include="ViewModels\BLL\SiteDetailUtilImpl.cs" />
