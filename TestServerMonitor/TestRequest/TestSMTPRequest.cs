@@ -33,19 +33,24 @@ namespace TestServerMonitor.TestRequest
             Assert.AreEqual("1000", smtpRequest.Status, "Cannot get the \'Succeed\' status code!");
         }
 
+        /// <summary>
+        /// 测试请求的域名为空
+        /// </summary>
         [Owner("Bin")]
         [TestMethod]
-        public void TestSMTPRequest_DomainNameValueNull()
+        public void TestSMTPRequest_DomainNameValueNull()       //测试发起SMTP请求
         {
             smtpRequest.DomainName = "";
             Assert.AreNotEqual(null, smtpRequest);
             Assert.IsFalse(smtpRequest.MakeRequest().Result, " The DomainName is null");
             Assert.AreEqual("1001", smtpRequest.Status, "Cannot get the \'Error\' status code!");
         }
-
+        /// <summary>
+        /// 测试请求超时
+        /// </summary>
         [Owner("Bin")]
         [TestMethod]
-        public void TestSMTPRequest_OutTime()
+        public void TestSMTPRequest_OutTime()                 //测试发起SMTP请求
         {
             smtpRequest.OverTime = 1;
             Assert.AreNotEqual(null, smtpRequest);
@@ -53,9 +58,13 @@ namespace TestServerMonitor.TestRequest
             Assert.IsFalse(smtpRequest.MakeRequest().Result, "It is TimeOver!");
             Assert.AreEqual("1002", smtpRequest.Status, "Cannot get the \'OverTime\' status code!");
         }
+
+        /// <summary>
+        /// 测试请求的端口有误
+        /// </summary>
         [Owner("Bin")]
         [TestMethod]
-        public void TestSMTPRequest_NotTruePort()
+        public void TestSMTPRequest_NotTruePort()                   //测试发起SMTP请求
         {
             smtpRequest.Port = 465;
             Assert.AreNotEqual(null,smtpRequest);
@@ -63,9 +72,13 @@ namespace TestServerMonitor.TestRequest
             Assert.AreEqual("1001", smtpRequest.Status, "Cannot get the \'Error\' status code!");
 
         }
+
+        /// <summary>
+        /// 测试请求非法的域名
+        /// </summary>
         [Owner("Bin")]
         [TestMethod]
-        public void TestSMTPRequest_InvaildDomainName()
+        public void TestSMTPRequest_InvaildDomainName()              //测试发起SMTP请求
         {
             smtpRequest.DomainName = "smtp.16111113.com";
             smtpRequest.Port = 25;
