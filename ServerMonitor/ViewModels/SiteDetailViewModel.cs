@@ -702,7 +702,13 @@ namespace ServerMonitor.ViewModels
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public void NavigateIntoEditPart(object sender, RoutedEventArgs e) {
-            NavigationService.Navigate(typeof(Views.AddServerPage), "2,"+infos.Detail_Site.Id);
+            if (infos.IsWebSite)
+            {
+                NavigationService.Navigate(typeof(Views.AddWebsitePage), "2," + infos.Detail_Site.Id);
+            }
+            else {
+                NavigationService.Navigate(typeof(Views.AddServerPage), "2," + infos.Detail_Site.Id);
+            }
         }
         #endregion
         #region 没有用到方法集
