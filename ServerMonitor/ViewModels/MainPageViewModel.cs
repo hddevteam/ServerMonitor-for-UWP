@@ -230,6 +230,11 @@ namespace ServerMonitor.ViewModels
                     int _siteid = _siteItem.Id;
                     SiteModel si = new SiteModel();
                     si = DBHelper.GetSiteById(_siteid);
+                    bool _is_Monitor = si.Is_Monitor;
+                    if (!_is_Monitor)
+                    {
+                        continue;
+                    }
                     string _protocol = si.Protocol_type;
                     string _address = si.Site_address;
                     string url = _address;
@@ -237,7 +242,17 @@ namespace ServerMonitor.ViewModels
                     {
                         //如果输入的不是ip地址               
                         //通过域名解析ip地址
-                        url = url.Substring(url.IndexOf('w'));//网址截取从以第一w
+                        //网址简单处理 去除http和https
+                        var http = url.StartsWith("http://");
+                        var https = url.StartsWith("https://");
+                        if (http)
+                        {
+                            url = url.Substring(7);//网址截取从以第一w
+                        }
+                        else if (https)
+                        {
+                            url = url.Substring(8);//网址截取从以第一w
+                        }
                         IPAddress[] hostEntry = await Dns.GetHostAddressesAsync(url);
                         for (int m = 0; m < hostEntry.Length; m++)
                         {
@@ -342,7 +357,7 @@ namespace ServerMonitor.ViewModels
                             }
                             break;
                         case "ICMP":
-                            ICMPRequest icmp = new ICMPRequest(reIP);
+                            IcmpRequest icmp = new IcmpRequest(reIP);
                             bool icmpFlag = icmp.DoRequest();
                             //请求完毕
                             RequestObj requestObj;//用于存储icmp请求结果的对象              
@@ -423,98 +438,8 @@ namespace ServerMonitor.ViewModels
                     GetListSite();
                 }
             }
-            //      for (int i = 0; i < leng; i++)
-            //      {
-            //          var item = sitelist[i];
-            //          var _siteid = item.Id;
-            //          var _sitetype = item.Is_server;
-            //          var _siteprotocol = item.Protocol_type;
-            //          var _address = item.Site_address;
-            //          if (_sitetype == true)
-            //          {
-            //              //如果是服务器 需要发起ICMP请求 测试连通性
-            //              string url = _address;
-            //              //var debug = IPAddress.Parse(url);
-            //              //var test = IPAddress.TryParse(url, out reIP);
-            //              if (!IPAddress.TryParse(url, out IPAddress reIP))
-            //              {
-            //                  //如果输入的不是ip地址               
-            //                  //通过域名解析ip地址
-            //                  url = url.Substring(url.IndexOf('w'));//网址截取从以第一w
-            //                  IPAddress[] hostEntry = await Dns.GetHostAddressesAsync(url);
-            //                  for (int m = 0; m < hostEntry.Length; m++)
-            //                  {
-            //                      if (hostEntry[m].AddressFamily == AddressFamily.InterNetwork)
-            //                      {
-            //                          reIP = hostEntry[m];
-            //                          break;
-            //                      }
-            //                  }
-            //              }
-            //              //Dictionary<string, string> backData = new Dictionary<string, string>();
-            //              IcmpRequest request = new IcmpRequest(reIP);
-            //              var data =  request.DoRequest();
-            //              RequestObj requestObj;//用于存储icmp请求结果的对象              
-            //              requestObj = DataHelper.GetProperty(request);
-
-            //              //backData = Request.IcmpRequest(reIP);
-
-            //              SiteModel upSite = new SiteModel();
-            //              upSite = DBHelper.GetSiteById(item.Id);//找出请求的站点id
-            //              //var color = DataHelper.GetColor(backData);//站点请求状态
-            //              //var dictionary = backData;
-            //              //var time = DataHelper.GetTime(backData);//请求时间
-            //              var color = requestObj.Color;
-            //              var time = requestObj.TimeCost.ToString();
-            //              try
-            //              {
-            //                  upSite.Last_request_result = int.Parse(requestObj.Color);
-            //                  upSite.Request_interval = int.Parse(requestObj.TimeCost.ToString());
-            //if ("0".Equals(color))
-            //{
-            //	//站点发生错误
-            //	toast.ShowToast(upSite);
-            //}
-            //                  DBHelper.UpdateSite(upSite);
-            //              }
-            //              catch { }
-            //              GetListSite();//更新站点列表              
-            //          }
-            //          else
-            //          {
-            //              //不是服务器
-            //              if (Convert.ToBoolean(string.Compare("_siteprotocol", "HTTPS", true)) || Convert.ToBoolean(string.Compare("_siteprotocol", "HTTP", true)))
-            //              {
-            //                  //需要发起HTTP请求
-            //                  //需要域名传入
-            //                  //发起http请求示例，传入网址，返回状态码和请求时间
-            //                  string reback = await Request.HttpRequest(_address);
-            //                  var color = DataHelper.GetHttpColor(reback);
-            //                  var time = DataHelper.GetHttpTime(reback);
-            //                  var status = DataHelper.GetHttpStatus(reback);
-            //                  SiteModel upSite = new SiteModel();
-            //                  upSite = DBHelper.GetSiteById(item.Id);
-            //                  try
-            //                  {
-            //                      upSite.Last_request_result = int.Parse(color);
-            //                      upSite.Status_code = status;
-            //                      upSite.Request_interval = int.Parse(time);
-            //	if ("0".Equals(color))
-            //	{
-            //		//站点发生错误
-            //		toast.ShowToast(upSite);
-            //	}
-            //	DBHelper.UpdateSite(upSite);
-            //                  }
-            //                  catch { }
-            //                  GetListSite();
-            //                  //Request.GetHttpResponse(infos.Detail_Site.Site_address);
-            //              }
-            //          }
-            //      }
-            //      var sitelist1 = SiteItems;
         }
-
+        
         /// <summary>
         /// add server点击事件
         /// </summary>
@@ -523,6 +448,12 @@ namespace ServerMonitor.ViewModels
         public void Add_Server(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(typeof(Views.AddServerPage), "1,-1"); //1MainPage, 2 AllServerPage; -1没有id是新建site
+            ShowAddServerPage();
+        }
+        private void ShowAddServerPage()
+        {
+            //var msgPopup = new AddServerPage();
+            //AddServerPage.ShowWindow();
         }
 
         /// <summary>
@@ -532,7 +463,12 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public void Add_Website(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(typeof(Views.AddWebsitePage), "1,-1"); //1MainPage, 2 AllServerPage; -1没有id是新建site
+            ShowAddWebsitePage();
+        }
+        private void ShowAddWebsitePage()
+        {
+            var msgPopup = new AddWebsitePage();
+            //AddWebsitePage.ShowWindow();
         }
 
         /// <summary>
@@ -588,17 +524,15 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public void CopyFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
+            var q = from t in SiteItems
+                    where t.Id == rightTapped_SiteId
+                    select t;
             var q1 = from t in sites
                      where t.Id == rightTapped_SiteId
                      select t;
-            SiteModel site = q1.First();
+            SiteModel site = CloneSite(q1.First());
             site.Site_name = site.Site_name + " Copy";
             site.Last_request_result = 2;
-
-            site.Create_time = DateTime.Now;
-            site.Update_time = DateTime.Now;
-            site.Is_pre_check = false;
-
             if (DBHelper.InsertOneSite(site) == 1)
             {
                 GetListSite();

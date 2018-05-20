@@ -12,5 +12,11 @@ namespace TestServerMonitor
         {
 
         }
+
+        [TestMethod]
+        public void TestMethod2()
+        {
+
+        }
     }
 }
