@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 
-namespace ServerMonitor.DAO
+namespace ServerMonitor.SiteDb
 {
     public class DbInitImpl : DBInit
     {
@@ -31,7 +31,7 @@ namespace ServerMonitor.DAO
         /// <summary>
         /// 延迟加载对象
         /// </summary>
-        private DbInitImpl Instance {
+        public static DbInitImpl Instance {
             get {
                 return Nested.instance;
             }

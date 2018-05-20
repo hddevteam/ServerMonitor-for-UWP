@@ -13,7 +13,7 @@ using SQLite.Net.Platform.WinRT;
 
 namespace ServerMonitor.LogDb
 {
-    class LogDaoImpl : LogDAO
+    public class LogDaoImpl : LogDAO
     {
         /// <summary>
         /// 执行有返回对象(Log)的命令
@@ -181,7 +181,7 @@ namespace ServerMonitor.LogDb
         /// <returns></returns>
         public int InsertOneLog(LogModel log)
         {
-            int result = -1;
+            int result = 0;//如果插入的Log == null 则返回 0
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DbInitImpl.DBPath))
             {
                 result = conn.Insert(log);

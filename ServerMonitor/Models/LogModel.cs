@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace ServerMonitor.Models
 {
     // 对应数据库里的Log表
+    [Table("Log")]
     public class LogModel : ObservableObject
     {
         int id;
@@ -25,6 +26,7 @@ namespace ServerMonitor.Models
             get => id;
             set => id = value;
         }
+        [NotNull]
         public int Site_id { get => site_id;
             set
             {
