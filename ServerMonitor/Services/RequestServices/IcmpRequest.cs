@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.Services.RequestServices
 {
-    class ICMPRequest
+    class IcmpRequest
     {
         public static Dictionary<string, string> backData = new Dictionary<string, string>();
 
-        public ICMPRequest(IPAddress iPAddress)
+        public IcmpRequest(IPAddress iPAddress)
         {
             //icmp构造函数
             this.MyIPAddress = iPAddress;

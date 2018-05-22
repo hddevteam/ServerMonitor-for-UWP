@@ -454,7 +454,7 @@ namespace ServerMonitor.ViewModels
                     #endregion
                 }
                 // 更新上次请求记录
-                Infos.LastRequest = Infos.Logs.Last<LogModel>();
+                Infos.LastRequest = Infos.Logs.First<LogModel>();
                 Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.Request_time);
             }
         }
@@ -702,7 +702,13 @@ namespace ServerMonitor.ViewModels
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public void NavigateIntoEditPart(object sender, RoutedEventArgs e) {
-            NavigationService.Navigate(typeof(Views.AddServerPage), "2,"+infos.Detail_Site.Id);
+            if (infos.IsWebSite)
+            {
+                NavigationService.Navigate(typeof(Views.AddWebsitePage), "2," + infos.Detail_Site.Id);
+            }
+            else {
+                NavigationService.Navigate(typeof(Views.AddServerPage), "2," + infos.Detail_Site.Id);
+            }
         }
         #endregion
         #region 没有用到方法集

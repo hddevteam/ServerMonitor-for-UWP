@@ -10,7 +10,7 @@ namespace ServerMonitor.DAO
     /// <summary>
     /// Author:xb
     /// </summary>
-    interface IContactSiteDao
+    public interface IContactSiteDao
     {        
         /// <summary>
         /// 插入一条绑定记录
@@ -42,6 +42,7 @@ namespace ServerMonitor.DAO
         /// </summary>
         /// <param name="connects"></param>
         /// <returns></returns>
-        int InsertListConnects(List<ContactSiteModel> connects);        
+        int InsertListConnects(List<ContactSiteModel> connects);
+        List<ContactSiteModel> GetContactSiteBySiteId(int siteid);
     }
 }

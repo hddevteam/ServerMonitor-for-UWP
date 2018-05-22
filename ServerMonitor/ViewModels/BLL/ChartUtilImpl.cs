@@ -142,5 +142,10 @@ namespace ServerMonitor.ViewModels.BLL
             await Task.CompletedTask;
             return new Tuple<ObservableCollection<ObservableCollection<Chart1>>, ObservableCollection<BarChartData>>(chart1Collection, BarChart);
         }
+
+        public void testmethod()
+        {
+            
+        }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.SiteDb
 {
-    interface DBInit
+    public interface DBInit
     {
 
         //设置数据库名称
