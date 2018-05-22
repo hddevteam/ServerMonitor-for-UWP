@@ -130,7 +130,7 @@
         <!--详细信息-->
         <Grid Grid.Row="1" Background="White" Name="RightFrame1"
               BorderThickness="0.5" BorderBrush="LightGray"
-              HorizontalAlignment="Right" Visibility="Visible">
+              HorizontalAlignment="Right" Visibility="Collapsed">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -183,11 +183,12 @@
                         </StackPanel>
                     </StackPanel>
                     <TextBlock Text="Contact" Foreground="Gray" FontSize="16" Grid.Row="2" Margin="12,0,0,8"/>
+                    <ListBox Grid.Row="0" Height="0"/>
                     <ListView x:Name="contactList" SelectionMode="Single" Grid.Row="3" Margin="0,0,0,12"
-                          ItemsSource="{Binding Contacts}" Foreground="White" IsItemClickEnabled="True">
+                          ItemsSource="{Binding BindingContact}" Foreground="White">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="8">
+                                <Grid Margin="0,8,8,8">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="*"/>

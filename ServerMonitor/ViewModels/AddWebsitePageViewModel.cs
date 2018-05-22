@@ -273,8 +273,13 @@ namespace ServerMonitor.ViewModels
             //将界面数据保存下来
             site.Protocol_type = GetProtocolType(ProtocolType);
             site.Site_address = (ProtocolType == 0 ? "http://" : "https://") + SiteAddress;
-            site.Status_code = "200," + StatusCodes;
-
+            if (StatusCodes==null||"".Equals(StatusCodes))
+            {
+                site.Status_code = "200";
+            }else
+            {
+                site.Status_code = "200," + StatusCodes;
+            }
             if (SiteName == null || SiteName.Equals(""))
             {
                 site.Site_name = SiteAddress;

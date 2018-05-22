@@ -42,7 +42,7 @@ namespace ServerMonitor.DAOImpl
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
-                result = conn.Execute("delete from ContactSite where SiteId = ? and ContactId = ?", SiteId, ContactId);
+                result = conn.Execute("delete from Site_Contact where SiteId = ? and contact_id = ?", SiteId, ContactId);
             }
             return result;
         }
@@ -57,7 +57,7 @@ namespace ServerMonitor.DAOImpl
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
-                result = conn.Execute("delete from ContactSite where SiteId = ?", SiteId);
+                result = conn.Execute("delete from Site_Contact where site_id = ?", SiteId);
             }
             return result;
         }
