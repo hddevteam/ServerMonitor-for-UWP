@@ -147,7 +147,7 @@ namespace ServerMonitor.Controls
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public static RequestObj GetProperty(IcmpRequest request)
+        public static RequestObj GetProperty(ICMPRequest request)
         {
             List<RequestObj> datas = new List<RequestObj>();
             datas = request.Requests;

@@ -96,7 +96,7 @@ namespace ServerMonitor
 			var len = sitelist.Count;//使用foreach会出现不在期望中的异常
 			SiteModel _presite = new SiteModel();
 			_presite = DBHelper.GetSiteById(4);//这里是指定了precheck的id为4
-			var _precolor = _presite.Last_request_result;//如果percheck为错误 就不进行请求了
+			var _precolor = _presite.Is_success;//如果percheck为错误 就不进行请求了
 			if (_precolor != 0)
             {
                 //遍历sitelist 根据协议进行请求
@@ -145,12 +145,12 @@ namespace ServerMonitor
                             bool httpsFlag = await hTTPs.MakeRequest();
                             //请求完毕
                             //处理数据
-                            si.Request_interval = hTTPs.TimeCost;
+                            si.Request_TimeCost = hTTPs.TimeCost;
                             si.Request_count += 1;
                             if ("1002".Equals(hTTPs.Status))//定义的超时状态码
                             {
                                 //请求超时
-                                si.Last_request_result = -1;
+                                si.Is_success = -1;
                             }
                             else
                             {
@@ -158,11 +158,11 @@ namespace ServerMonitor
                                 bool match = util.SuccessCodeMatch(si, hTTPs.Status);//匹配用户设定状态码
                                 if (match)//匹配为成功  否则为失败
                                 {
-                                    si.Last_request_result = 1;
+                                    si.Is_success = 1;
                                 }
                                 else
                                 {
-                                    si.Last_request_result = 0;
+                                    si.Is_success = 0;
                                     toast.ShowToast(si);
                                 }
                             }
@@ -174,12 +174,12 @@ namespace ServerMonitor
                             bool httpFlag = await hTTP.MakeRequest();
                             //请求完毕
                             //处理数据
-                            si.Request_interval = hTTP.TimeCost;
+                            si.Request_TimeCost = hTTP.TimeCost;
                             si.Request_count += 1;
                             if ("1002".Equals(hTTP.Status))
                             {
                                 //请求超时
-                                si.Last_request_result = -1;
+                                si.Is_success = -1;
                             }
                             else
                             {
@@ -187,17 +187,17 @@ namespace ServerMonitor
                                 bool match = util.SuccessCodeMatch(si, hTTP.Status);//匹配用户设定状态码
                                 if (match)
                                 {
-                                    si.Last_request_result = 1;
+                                    si.Is_success = 1;
                                 }
                                 else
                                 {
-                                    si.Last_request_result = 0;
+                                    si.Is_success = 0;
                                 }
                             }
                             if (httpFlag == false)
                             {
                                 toast.ShowToast(si);
-                                si.Last_request_result = 0;
+                                si.Is_success = 0;
                             }
                             break;
                         case "DNS":
@@ -208,24 +208,24 @@ namespace ServerMonitor
                             if ("1000".Equals(dNS.Status))
                             {
                                 //dns正常
-                                si.Last_request_result = 1;
+                                si.Is_success = 1;
                             }
                             else if ("1001".Equals(dNS.Status))
                             {
                                 //unknown
-                                si.Last_request_result = 2;
+                                si.Is_success = 2;
                             }
                             else if ("1002".Equals(dNS.Status))
                             {
                                 //timeout
-                                si.Last_request_result = -1;
+                                si.Is_success = -1;
                             }
-                            si.Request_interval = dNS.TimeCost;
+                            si.Request_TimeCost = dNS.TimeCost;
                             si.Request_count += 1;
                             if (dnsFlag == false)
                             {
                                 //消息提醒
-                                si.Last_request_result = 0;
+                                si.Is_success = 0;
                                 toast.ShowToast(si);
                             }
                             break;
@@ -235,12 +235,12 @@ namespace ServerMonitor
                             //请求完毕
                             RequestObj requestObj;//用于存储icmp请求结果的对象              
                             requestObj = DataHelper.GetProperty(icmp);
-                            si.Last_request_result = int.Parse(requestObj.Color);
+                            si.Is_success = int.Parse(requestObj.Color);
                             si.Request_count += 1;
-                            si.Request_interval = requestObj.TimeCost;
+                            si.Request_TimeCost = requestObj.TimeCost;
                             if (icmpFlag == false)
                             {
-                                si.Last_request_result = 0;
+                                si.Is_success = 0;
                                 toast.ShowToast(si);
                             }
                             break;
@@ -250,8 +250,10 @@ namespace ServerMonitor
                             //在此处加入type类型
                             string username = js["username"].ToString();
                             string password = js["password"].ToString();
-                            FTPRequest fTP = new FTPRequest(LoginType.Identify);
-                            fTP.FtpServer = reIP;
+                            FTPRequest fTP = new FTPRequest(LoginType.Identify)
+                            {
+                                FtpServer = reIP
+                            };
                             fTP.Identification.Username = username;
                             fTP.Identification.Password = password;
                             bool ftpFlag = await fTP.MakeRequest();
@@ -259,23 +261,23 @@ namespace ServerMonitor
                             if ("1001".Equals(fTP.Status))
                             {
                                 //置为错误
-                                si.Last_request_result = 0;
+                                si.Is_success = 0;
                             }
                             else if ("1000".Equals(fTP.Status))
                             {
                                 //置为成功
-                                si.Last_request_result = 1;
+                                si.Is_success = 1;
                             }
                             else if ("1002".Equals(fTP.Status))
                             {
                                 //超时异常
-                                si.Last_request_result = -1;
+                                si.Is_success = -1;
                             }
                             si.Request_count += 1;
-                            si.Request_interval = fTP.TimeCost;
+                            si.Request_TimeCost = fTP.TimeCost;
                             if (ftpFlag == false)
                             {
-                                si.Last_request_result = 0;
+                                si.Is_success = 0;
                                 toast.ShowToast(si);
                             }
                             break;
@@ -286,21 +288,21 @@ namespace ServerMonitor
 
                             if ("1000".Equals(sMTP.Status))
                             {
-                                si.Last_request_result = 1;
+                                si.Is_success = 1;
                             }
                             else if ("1001".Equals(sMTP.Status))
                             {
-                                si.Last_request_result = 0;
+                                si.Is_success = 0;
                             }
                             else if ("1002".Equals(sMTP.Status))
                             {
-                                si.Last_request_result = -1;
+                                si.Is_success = -1;
                             }
                             si.Request_count += 1;
-                            si.Request_interval = sMTP.TimeCost;
+                            si.Request_TimeCost = sMTP.TimeCost;
                             if (smtpFlag == false)
                             {
-                                si.Last_request_result = 0;
+                                si.Is_success = 0;
                                 toast.ShowToast(si);
                             }
                             break;

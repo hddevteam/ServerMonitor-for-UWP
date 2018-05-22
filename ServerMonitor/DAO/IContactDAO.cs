@@ -17,13 +17,6 @@ namespace ServerMonitor.DAO
         List<ContactModel> GetAllContact();
 
         /// <summary>
-        /// 通过站点Id查询关联管理员
-        /// </summary>
-        /// <param name="siteId"></param>
-        /// <returns></returns>
-        List<ContactModel> GetContactBySiteId(int siteId);
-
-        /// <summary>
         /// 插入一条联系人
         /// </summary>
         /// <param name="Contact"></param>

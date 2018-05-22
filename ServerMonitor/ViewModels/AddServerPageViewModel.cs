@@ -365,7 +365,7 @@ namespace ServerMonitor.ViewModels
                     Monitor_interval = 5,
                     Is_Monitor = true,
                     Create_time = DateTime.Now,
-                    Last_request_result = 2,
+                    Is_success = 2,
                     Status_code = "1000/0",
                     Request_succeed_code = "1000",
                 };
@@ -406,12 +406,12 @@ namespace ServerMonitor.ViewModels
                 site.ProtocolIdentification = GetJson(RecordType, Lookup, ExpectedResults);
             }
 
-            List<ContactSiteModel> contactSiteModels = new List<ContactSiteModel>();
+            List<SiteContactModel> contactSiteModels = new List<SiteContactModel>();
             foreach (var item in vs)  //生成可存进数据库的list数据
             {
                 if (item.Value)
                 {
-                    contactSiteModels.Add(new ContactSiteModel()
+                    contactSiteModels.Add(new SiteContactModel()
                     {
                         SiteId = siteId,
                         ContactId = item.Key,

@@ -30,28 +30,6 @@ namespace ServerMonitor.DAO
             return r;
         }
 
-        /// <summary>
-        /// 通过站点Id查询关联管理员
-        /// </summary>
-        /// <param name="siteId"></param>
-        /// <returns></returns>
-        public List<ContactModel> GetContactBySiteId(int siteId)
-        {
-            //sll
-            List<ContactModel> contactList;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
-            {
-                try
-                {
-                    contactList = conn.Table<ContactModel>().Where(v => v.SiteId == siteId).ToList<ContactModel>();
-                }
-                catch
-                {
-                    contactList = new List<ContactModel>();
-                }
-            }
-            return contactList;
-        }
 
         /// <summary>
         /// 插入一条联系人
@@ -130,8 +108,8 @@ namespace ServerMonitor.DAO
         {
             List<ContactModel> contactModels = new List<ContactModel>();
             IContactSiteDao k = ContactSiteDAOImpl.Instance;
-            List<ContactSiteModel> contactSiteModels = k.GetConnectsBySiteId(siteid);
-            foreach (ContactSiteModel m in contactSiteModels)
+            List<SiteContactModel> contactSiteModels = k.GetConnectsBySiteId(siteid);
+            foreach (SiteContactModel m in contactSiteModels)
             {
                 ContactModel tmp = GetContactByContactId(m.ContactId);
                 contactModels.Add(tmp);
