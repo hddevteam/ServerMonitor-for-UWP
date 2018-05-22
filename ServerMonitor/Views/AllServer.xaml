@@ -188,7 +188,7 @@
                           ItemsSource="{Binding BindingContact}" Foreground="White">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="8">
+                                <Grid Margin="0,8,8,8">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="*"/>
