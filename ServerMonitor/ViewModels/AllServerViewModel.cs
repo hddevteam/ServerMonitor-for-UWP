@@ -285,14 +285,14 @@ namespace ServerMonitor.ViewModels
             {
                 q = (from t in sites
                      where t.Is_Monitor == true
-                     where t.Last_request_result == 1
+                     where t.Is_success == 1
                      select t).ToList();
             }
             else
             {
                 q = (from t in sites
                      where t.Is_Monitor == true
-                     where t.Last_request_result != 1
+                     where t.Is_success != 1
                      select t).ToList();
             }
             switch (order)  //1:id As 2:id De 3:Al As 4:Al De
