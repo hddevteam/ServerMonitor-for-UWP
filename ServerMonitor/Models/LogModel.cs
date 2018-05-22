@@ -20,12 +20,13 @@ namespace ServerMonitor.Models
         bool is_error;
         string log_record;
 
-        [PrimaryKey,AutoIncrement]
+        [PrimaryKey,AutoIncrement,Column("id")]
         public int Id
         {
             get => id;
             set => id = value;
         }
+        [Column("site_id")]
         public int Site_id { get => site_id;
             set
             {
@@ -33,6 +34,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Site_id);
             }
         }
+        [Column("status_code")]
         public string Status_code { get => status_code;
             set
             {
@@ -40,6 +42,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Status_code);
             }
         }
+        [Column("request_time")]
         public double Request_time {
             get => request_time;
             set
@@ -48,6 +51,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Request_time);
             }
         }
+        [Column("create_time")]
         public DateTime Create_time {
             get => create_time;
             set
@@ -64,6 +68,7 @@ namespace ServerMonitor.Models
                 }
             }
         }
+        [Column("is_error")]
         public bool Is_error { get => is_error;
             set
             {
@@ -71,6 +76,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Is_error);
             }
         }
+        [Column("log_record")]
         public string Log_record { get => log_record;
             set
             {

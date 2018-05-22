@@ -49,7 +49,7 @@ namespace ServerMonitor.Controls
                     conn.CreateTable<LogModel>();
                     conn.CreateTable<ErrorLogModel>();
                     conn.CreateTable<ContactModel>();
-                    conn.CreateTable<ContactSiteModel>();
+                    conn.CreateTable<SiteContactModel>();
                     List<SiteModel> l_site = new List<SiteModel>
                     {
                         // 插入默认的五条数据
@@ -68,7 +68,7 @@ namespace ServerMonitor.Controls
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
                             Request_succeed_code = "200",
-                            Last_request_result = 0
+                            Is_success = 0
                         },
                         new SiteModel()
                         {
@@ -85,7 +85,7 @@ namespace ServerMonitor.Controls
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
                             Request_succeed_code = "200",
-                            Last_request_result = 1
+                            Is_success = 1
                         },
                         new SiteModel()
                         {
@@ -102,7 +102,7 @@ namespace ServerMonitor.Controls
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
                             Request_succeed_code = "200",
-                            Last_request_result = -1
+                            Is_success = -1
                         },
                         new SiteModel()
                         {
@@ -119,7 +119,7 @@ namespace ServerMonitor.Controls
                             Update_time = DateTime.Now,
                             Is_pre_check = true,
                             Request_succeed_code = "1000",
-                            Last_request_result = 2
+                            Is_success = 2
                         },
                         new SiteModel()
                         {
@@ -136,7 +136,7 @@ namespace ServerMonitor.Controls
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
                             Request_succeed_code = "1000",
-                            Last_request_result = 2
+                            Is_success = 2
                         }
                     };
                     //for (int i = 0; i < 30; i++)
@@ -581,29 +581,7 @@ namespace ServerMonitor.Controls
                 r = conn.Table<ContactModel>().ToList<ContactModel>();
             }
             return r;
-        }
-
-        /// <summary>
-        /// 通过站点Id查询关联管理员
-        /// </summary>
-        /// <param name="siteId"></param>
-        /// <returns></returns>
-        public static List<ContactModel> GetContactBySiteId(int siteId)
-        {
-            List<ContactModel> contactList;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
-            {
-                try
-                {
-                    contactList = conn.Table<ContactModel>().Where(v => v.SiteId == siteId).ToList<ContactModel>();
-                }
-                catch
-                {
-                    contactList = new List<ContactModel>();
-                }
-            }
-            return contactList;
-        }
+        }        
 
         /// <summary>
         /// 插入一条联系人

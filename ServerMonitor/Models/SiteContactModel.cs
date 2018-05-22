@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.Models
 {
-    [Table("ContactSite")]
-    public class ContactSiteModel
+    [Table("SiteContact")]
+    public class SiteContactModel
     {
         private int id;
         private int siteId;
@@ -17,15 +17,15 @@ namespace ServerMonitor.Models
         private DateTime bindTime;
         private string others;
 
-        [PrimaryKey, AutoIncrement]
+        [PrimaryKey, AutoIncrement,Column("id")]
         public int Id { get => id; set => id = value; }
-        [NotNull]
+        [NotNull,Column("site_id")]
         public int SiteId { get => siteId; set => siteId = value; }
-        [NotNull]
+        [NotNull, Column("contact_id")]
         public int ContactId { get => contactId; set => contactId = value; }
-        [Default(true)]
+        [Default(true), Column("create_time")]
         public DateTime BindTime { get => bindTime; set => bindTime = value; }
-        [DefaultValue(value: "", type: typeof(string))]
+        [DefaultValue(value: "", type: typeof(string)), Column("others")]
         public string Others { get => others; set => others = value; }
     }
 }

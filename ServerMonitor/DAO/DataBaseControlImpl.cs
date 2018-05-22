@@ -66,7 +66,7 @@ namespace ServerMonitor.SiteDb
                     conn.CreateTable<LogModel>();
                     conn.CreateTable<ErrorLogModel>();
                     conn.CreateTable<ContactModel>();
-                    conn.CreateTable<ContactSiteModel>();
+                    conn.CreateTable<SiteContactModel>();
                     List<SiteModel> l_site = new List<SiteModel>
                     {
                         // 插入默认的五条数据
@@ -85,7 +85,7 @@ namespace ServerMonitor.SiteDb
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
                             Request_succeed_code = "200",
-                            Last_request_result = 0
+                            Is_success = 0
                         },
                         new SiteModel()
                         {
@@ -102,7 +102,7 @@ namespace ServerMonitor.SiteDb
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
                             Request_succeed_code = "200",
-                            Last_request_result = 1
+                            Is_success = 1
                         },
                         new SiteModel()
                         {
@@ -119,7 +119,7 @@ namespace ServerMonitor.SiteDb
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
                             Request_succeed_code = "200",
-                            Last_request_result = -1
+                            Is_success = -1
                         },
                         new SiteModel()
                         {
@@ -136,7 +136,7 @@ namespace ServerMonitor.SiteDb
                             Update_time = DateTime.Now,
                             Is_pre_check = true,
                             Request_succeed_code = "1000",
-                            Last_request_result = 2
+                            Is_success = 2
                         },
                         new SiteModel()
                         {
@@ -153,7 +153,7 @@ namespace ServerMonitor.SiteDb
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
                             Request_succeed_code = "1000",
-                            Last_request_result = 2
+                            Is_success = 2
                         }
                     };
                     //for (int i = 0; i < 30; i++)

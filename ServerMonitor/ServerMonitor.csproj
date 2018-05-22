@@ -107,7 +107,7 @@
     <Compile Include="DAO\IContactSiteDao.cs" />
     <Compile Include="DAO\IDatbaBaseControl.cs" />
     <Compile Include="DAO\ISiteDAO.cs" />
-    <Compile Include="Models\ContactSiteModel.cs" />
+    <Compile Include="Models\SiteContactModel.cs" />
     <Compile Include="Services\RequestServices\BasicRequest.cs" />
     <Compile Include="Common\DataHelper.cs" />
     <Compile Include="Controls\DBHelper.cs" />

@@ -31,19 +31,20 @@ namespace ServerMonitor.Models
         string request_succeed_code;
         string protocol_content;
         // 上次请求结果(Red：0,错误)  (Orange：-1 超时) (Gray：2,未知)   (Blue：1成功)
-        int last_request_result;
+        int is_success;
         // 补充信息
         string others;
         // 协议请求验证信息
         string protocolIdentification;
+        string last_response;
 
-        [PrimaryKey, AutoIncrement]
+        [PrimaryKey, AutoIncrement, Column("id")]
         public int Id
         {
             get => id;
             set => id = value;
         }
-        [NotNull]
+        [NotNull, Column("site_name")]
         public string Site_name
         {
             get => site_name;
@@ -53,7 +54,7 @@ namespace ServerMonitor.Models
                 //RaisePropertyChanged(() => Site_name);
             }
         }
-        [NotNull]
+        [NotNull, Column("is_server")]
         public bool Is_server
         {
             get => is_server;
@@ -63,7 +64,7 @@ namespace ServerMonitor.Models
                 //RaisePropertyChanged(() => Is_server);
             }
         }
-        [NotNull]
+        [NotNull, Column("protocol_type")]
         public string Protocol_type
         {
             get => protocol_type;
@@ -73,7 +74,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Protocol_type);
             }
         }
-        [NotNull]
+        [NotNull, Column("server_port")]
         public int Server_port
         {
             get => server_port;
@@ -83,7 +84,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Server_port);
             }
         }
-        [DefaultValue(value: "1", type: typeof(int))]
+        [DefaultValue(value: "1", type: typeof(int)), Column("monitor_interval")]
         public int Monitor_interval
         {
             get => monitor_interval;
@@ -93,7 +94,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Monitor_interval);
             }
         }
-        [DefaultValue(value: "true", type: typeof(bool))]
+        [DefaultValue(value: "true", type: typeof(bool)), Column("is_monitoring")]
         public bool Is_Monitor
         {
             get => is_Monitor;
@@ -104,7 +105,7 @@ namespace ServerMonitor.Models
                 //DBHelper.UpdateSite(this);
             }
         }
-        [DefaultValue(value: "5", type: typeof(int))]
+        [DefaultValue(value: "5", type: typeof(int)), Column("request_interval")]
         public int Request_interval
         {
             get => request_interval;
@@ -114,7 +115,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Request_interval);
             }
         }
-        [DefaultValue(value: "0", type: typeof(int))]
+        [DefaultValue(value: "0", type: typeof(int)), Column("request_count")]
         public int Request_count
         {
             get => request_count;
@@ -124,6 +125,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Request_count);
             }
         }
+        [Column("status_code")]
         public string Status_code
         {
             get => status_code;
@@ -133,6 +135,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Status_code);
             }
         }
+        [Column("create_time")]
         public DateTime Create_time
         {
             get => create_time;
@@ -150,6 +153,7 @@ namespace ServerMonitor.Models
                 }
             }
         }
+        [Column("update_time")]
         public DateTime Update_time
         {
             get => update_time;
@@ -167,6 +171,7 @@ namespace ServerMonitor.Models
                 }
             }
         }
+        [Column("is_precheck")]
         [DefaultValue(value: "false", type: typeof(bool))]
         public bool Is_pre_check
         {
@@ -177,6 +182,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Is_pre_check);
             }
         }
+        [Column("request_succeed_code")]
         [DefaultValue(value: "200", type: typeof(string))]
         public string Request_succeed_code
         {
@@ -187,6 +193,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Request_succeed_code);
             }
         }
+        [Column("protocol_content")]
         public string Protocol_content
         {
             get => protocol_content;
@@ -196,6 +203,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Protocol_content);
             }
         }
+        [Column("site_address")]
         [NotNull]
         public string Site_address
         {
@@ -206,29 +214,38 @@ namespace ServerMonitor.Models
                 //RaisePropertyChanged(() => Site_address);
             }
         }
+        [Column("is_success")]
         [DefaultValue(value: "2", type: typeof(int))]
-        public int Last_request_result
+        public int Is_success
         {
-            get => last_request_result;
+            get => is_success;
             set
             {
-                last_request_result = value;
-                RaisePropertyChanged(() => Last_request_result);
+                is_success = value;
+                RaisePropertyChanged(() => Is_success);
             }
         }
+        [Column("others")]
         [DefaultValue(value: "", type: typeof(string))]
         public string Others
         {
             get => others;
             set => others = value;
         }
+        [Column("protocol_identification")]
         [DefaultValue(value: "", type: typeof(string))]
         public string ProtocolIdentification
         {
             get => protocolIdentification;
             set => protocolIdentification = value;
         }
-
-
+        [Column("last_response")]
+        [DefaultValue(value: "", type: typeof(string))]
+        public string Last_response {
+            get => last_response;
+            set => last_response = value;
+        }
     }
+
+
 }

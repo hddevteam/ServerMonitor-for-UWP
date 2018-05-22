@@ -325,10 +325,10 @@ namespace ServerMonitor.ViewModels.BLL
             site.Update_time = DateTime.Now;
             if (log.Is_error)
             {
-                site.Last_request_result = "1002".Equals(log.Status_code) ? -1 : 0;
+                site.Is_success = "1002".Equals(log.Status_code) ? -1 : 0;
             }
             else {
-                site.Last_request_result = 1;
+                site.Is_success = 1;
             }
             site.Request_interval = (int)log.Request_time;
             site.Request_count++;

@@ -816,7 +816,7 @@ namespace ServerMonitor.ViewModels
                 // 更新站点信息
                 Infos.Detail_Site.Status_code = log.Status_code;
                 Infos.Detail_Site.Update_time = DateTime.Now;
-                Infos.Detail_Site.Last_request_result = log.Is_error ? 0 : 1;
+                Infos.Detail_Site.Is_success = log.Is_error ? 0 : 1;
                 Infos.Detail_Site.Request_interval = int.Parse(tuple.Item2);
                 Infos.Detail_Site.Request_count++;
                 DBHelper.UpdateSite(infos.Detail_Site);
@@ -884,7 +884,7 @@ namespace ServerMonitor.ViewModels
                 newLog.Is_error = SuccessCodeMatch(Infos.Detail_Site, Infos.Detail_Site.Status_code);
                 // 更新站点信息
                 Infos.Detail_Site.Update_time = DateTime.Now;
-                Infos.Detail_Site.Last_request_result = newLog.Is_error ? 0 : 1;
+                Infos.Detail_Site.Is_success = newLog.Is_error ? 0 : 1;
                 Infos.Detail_Site.Request_interval = httpRequestInterval;
                 Infos.Detail_Site.Request_count++;
             }
@@ -920,12 +920,12 @@ namespace ServerMonitor.ViewModels
             switch (customResult)
             {
                 case "请求超时":
-                    Infos.Detail_Site.Last_request_result = -1;
+                    Infos.Detail_Site.Is_success = -1;
                     Infos.Detail_Site.Update_time = DateTime.Now;
                     Infos.Detail_Site.Request_interval = 5000;
                     break;
                 case "请求失败":
-                    Infos.Detail_Site.Last_request_result = 0;
+                    Infos.Detail_Site.Is_success = 0;
                     Infos.Detail_Site.Update_time = DateTime.Now;
                     Infos.Detail_Site.Request_interval = 5000;
                     break;

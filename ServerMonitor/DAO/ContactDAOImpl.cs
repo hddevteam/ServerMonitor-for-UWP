@@ -108,8 +108,8 @@ namespace ServerMonitor.DAO
         {
             List<ContactModel> contactModels = new List<ContactModel>();
             IContactSiteDao k = ContactSiteDAOImpl.Instance;
-            List<ContactSiteModel> contactSiteModels = k.GetConnectsBySiteId(siteid);
-            foreach (ContactSiteModel m in contactSiteModels)
+            List<SiteContactModel> contactSiteModels = k.GetConnectsBySiteId(siteid);
+            foreach (SiteContactModel m in contactSiteModels)
             {
                 ContactModel tmp = GetContactByContactId(m.ContactId);
                 contactModels.Add(tmp);
