@@ -15,7 +15,7 @@ namespace ServerMonitor.Models
         int id;
         int site_id;
         string status_code;
-        double request_time;
+        double timeCost;
         DateTime create_time;
         bool is_error;
         string log_record;
@@ -42,29 +42,29 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Status_code);
             }
         }
-        [Column("request_time")]
-        public double Request_time {
-            get => request_time;
+        [Column("timecost")]
+        public double TimeCost{
+            get => timeCost;
             set
             {
-                request_time = value;
-                RaisePropertyChanged(() => Request_time);
+                timeCost = value;
+                RaisePropertyChanged(() => TimeCost);
             }
         }
         [Column("create_time")]
-        public DateTime Create_time {
+        public DateTime Create_Time {
             get => create_time;
             set
             {
                 if (!value.Equals(null))
                 {
                     create_time = value;
-                    RaisePropertyChanged(() => Create_time);
+                    RaisePropertyChanged(() => Create_Time);
                 }
                 else
                 {
                     create_time = DateTime.Now;
-                    RaisePropertyChanged(() => Create_time);
+                    RaisePropertyChanged(() => Create_Time);
                 }
             }
         }
@@ -77,17 +77,17 @@ namespace ServerMonitor.Models
             }
         }
         [Column("log_record")]
-        public string Log_record { get => log_record;
+        public string Log_Record { get => log_record;
             set
             {
                 log_record = value;
-                RaisePropertyChanged(() => Log_record);
+                RaisePropertyChanged(() => Log_Record);
             }
         }
 
         public override string ToString()
         {
-            return string.Format("站点:{0}\t时间:{1}\t请求状态码:{2}",Site_id,request_time,status_code);
+            return string.Format("站点:{0}\t时间:{1}\t请求状态码:{2}",Site_id,timeCost,status_code);
         }
     }
 }

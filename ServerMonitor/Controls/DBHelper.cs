@@ -63,7 +63,7 @@ namespace ServerMonitor.Controls
                             Monitor_interval = 5,
                             Is_Monitor = false,
                             Status_code = "200",
-                            Request_interval = 25383,
+                            Request_TimeCost = 25383,
                             Create_time = DateTime.Now,
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
@@ -80,7 +80,7 @@ namespace ServerMonitor.Controls
                             Monitor_interval = 5,
                             Is_Monitor = true,
                             Status_code = "200",
-                            Request_interval = 11851,
+                            Request_TimeCost = 11851,
                             Create_time = DateTime.Now,
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
@@ -97,7 +97,7 @@ namespace ServerMonitor.Controls
                             Monitor_interval = 5,
                             Is_Monitor = false,
                             Status_code = "200",
-                            Request_interval = 287,
+                            Request_TimeCost = 287,
                             Create_time = DateTime.Now,
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
@@ -114,7 +114,7 @@ namespace ServerMonitor.Controls
                             Monitor_interval = 5,
                             Is_Monitor = true,
                             Status_code = "1000/0",
-                            Request_interval = 11,
+                            Request_TimeCost = 11,
                             Create_time = DateTime.Now,
                             Update_time = DateTime.Now,
                             Is_pre_check = true,
@@ -131,7 +131,7 @@ namespace ServerMonitor.Controls
                             Monitor_interval = 5,
                             Is_Monitor = false,
                             Status_code = "1000/0",
-                            Request_interval = 25383,
+                            Request_TimeCost = 25383,
                             Create_time = DateTime.Now,
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
@@ -150,46 +150,46 @@ namespace ServerMonitor.Controls
                         {
                             Site_id = 1,
                             Status_code = "200",
-                            Request_time = 30,
-                            Create_time = DateTime.Now.AddDays(-2),
+                            TimeCost = 30,
+                            Create_Time = DateTime.Now.AddDays(-2),
                             Is_error = false,
-                            Log_record = null
+                            Log_Record = null
                         },
                         new LogModel()
                         {
                             Site_id = 2,
                             Status_code = "200",
-                            Request_time = 20,
-                            Create_time = DateTime.Now,
+                            TimeCost = 20,
+                            Create_Time = DateTime.Now,
                             Is_error = false,
-                            Log_record = null
+                            Log_Record = null
                         },
                         new LogModel()
                         {
                             Site_id = 3,
                             Status_code = "1000",
-                            Request_time = 40,
-                            Create_time = DateTime.Now.AddDays(-5),
+                            TimeCost = 40,
+                            Create_Time = DateTime.Now.AddDays(-5),
                             Is_error = false,
-                            Log_record = null
+                            Log_Record = null
                         },
                         new LogModel()
                         {
                             Site_id = 4,
                             Status_code = "1000",
-                            Request_time = 30,
-                            Create_time = DateTime.Now.AddDays(-3),
+                            TimeCost = 30,
+                            Create_Time = DateTime.Now.AddDays(-3),
                             Is_error = false,
-                            Log_record = null
+                            Log_Record = null
                         },
                         new LogModel()
                         {
                             Site_id = 5,
                             Status_code = "1000",
-                            Request_time = 10,
-                            Create_time = DateTime.Now.AddDays(-6),
+                            TimeCost = 10,
+                            Create_Time = DateTime.Now.AddDays(-6),
                             Is_error = false,
-                            Log_record = null
+                            Log_Record = null
                         }
                     };
                     InsertListLog(l_log);

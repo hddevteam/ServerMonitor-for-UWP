@@ -44,7 +44,6 @@ namespace TestServerMonitor.TestDAO
                 Update_time = DateTime.Now,
                 Others = null,
                 Telephone = null,
-                SiteId = 1
             };
             n.InsertOneContact(l_CL);
             //为了防止数据库起初没数据，为表插入一条Contact信息，使测试通过

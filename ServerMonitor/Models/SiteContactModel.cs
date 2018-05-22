@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.Models
 {
-    [Table("SiteContact")]
+    [Table("Site_Contact")]
     public class SiteContactModel
     {
         private int id;
         private int siteId;
         private int contactId;
-        private DateTime bindTime;
+        private DateTime create_time;
         private string others;
 
         [PrimaryKey, AutoIncrement,Column("id")]
@@ -24,7 +24,7 @@ namespace ServerMonitor.Models
         [NotNull, Column("contact_id")]
         public int ContactId { get => contactId; set => contactId = value; }
         [Default(true), Column("create_time")]
-        public DateTime BindTime { get => bindTime; set => bindTime = value; }
+        public DateTime CreatTime { get => create_time; set => create_time = value; }
         [DefaultValue(value: "", type: typeof(string)), Column("others")]
         public string Others { get => others; set => others = value; }
     }

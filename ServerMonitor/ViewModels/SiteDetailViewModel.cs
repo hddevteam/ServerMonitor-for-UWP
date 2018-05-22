@@ -185,7 +185,7 @@ namespace ServerMonitor.ViewModels
             request_array.Initialize();
             foreach (var l in logs)
             {
-                request_array[logs.IndexOf(l)] = l.Request_time;
+                request_array[logs.IndexOf(l)] = l.TimeCost;
             }
             // 对数组进行排序
             utilObject.QuickSort(ref request_array, 0, request_array.Length - 1);
@@ -253,7 +253,7 @@ namespace ServerMonitor.ViewModels
                 foreach (var log in l)
                 {
                     // 这里加上这句话是为把数据库里的Utc时间转换为LocalTime
-                    log.Create_time = log.Create_time.ToLocalTime();
+                    log.Create_Time = log.Create_Time.ToLocalTime();
                     Infos.Logs.Add(log);
                     #region 将数据分为三类   新添加
                     InsertLogWithCategory(infos.LogCollections, log);
@@ -269,7 +269,7 @@ namespace ServerMonitor.ViewModels
                     #endregion
                 }
                 Infos.LastRequest = l.Last<LogModel>();
-                infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.Request_time);
+                infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
             }
         }
         /// <summary>
@@ -461,7 +461,7 @@ namespace ServerMonitor.ViewModels
                 }
                 // 更新上次请求记录
                 Infos.LastRequest = Infos.Logs.First<LogModel>();
-                Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.Request_time);
+                Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
             }
         }
         /// <summary>
@@ -504,15 +504,15 @@ namespace ServerMonitor.ViewModels
             {
                 Infos.Re[4].Count++;
             }
-            else if (log.Request_time <= 1)
+            else if (log.TimeCost <= 1)
             {
                 Infos.Re[0].Count++;
             }
-            else if (log.Request_time <= 30)
+            else if (log.TimeCost <= 30)
             {
                 Infos.Re[1].Count++;
             }
-            else if (log.Request_time <= 100)
+            else if (log.TimeCost <= 100)
             {
                 Infos.Re[2].Count++;
             }
@@ -690,7 +690,7 @@ namespace ServerMonitor.ViewModels
                 UpdateBindLine();
                 // 更新上次请求记录
                 Infos.LastRequest = Infos.Logs.Last();
-                Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.Request_time);
+                Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
             }
             else
             {
@@ -739,7 +739,7 @@ namespace ServerMonitor.ViewModels
                 }
                 else
                 {
-                    log.Create_time = DateTime.Now;
+                    log.Create_Time = DateTime.Now;
                     log.Site_id = site.Id;
 
                     Debug.WriteLine("");
@@ -798,7 +798,7 @@ namespace ServerMonitor.ViewModels
                 log = new LogModel
                 {
                     Site_id = site.Id,
-                    Create_time = DateTime.Now
+                    Create_Time = DateTime.Now
                 };
                 if ("200".Equals(tuple.Item1))
                 {
@@ -808,16 +808,16 @@ namespace ServerMonitor.ViewModels
                 {
                     log.Is_error = true;
                 }
-                log.Request_time = int.Parse(tuple.Item2);
+                log.TimeCost = int.Parse(tuple.Item2);
                 log.Status_code = tuple.Item1;
-                log.Log_record = tuple.Item4;
+                log.Log_Record = tuple.Item4;
                 #endregion
 
                 // 更新站点信息
                 Infos.Detail_Site.Status_code = log.Status_code;
                 Infos.Detail_Site.Update_time = DateTime.Now;
                 Infos.Detail_Site.Is_success = log.Is_error ? 0 : 1;
-                Infos.Detail_Site.Request_interval = int.Parse(tuple.Item2);
+                Infos.Detail_Site.Request_TimeCost = int.Parse(tuple.Item2);
                 Infos.Detail_Site.Request_count++;
                 DBHelper.UpdateSite(infos.Detail_Site);
                 Debug.WriteLine("请求了一次服务器!");
@@ -876,8 +876,8 @@ namespace ServerMonitor.ViewModels
 
                 newLog.Status_code = httpRequestStatus;
                 newLog.Site_id = id;
-                newLog.Request_time = httpRequestInterval;
-                newLog.Create_time = DateTime.Now;
+                newLog.TimeCost = httpRequestInterval;
+                newLog.Create_Time = DateTime.Now;
                 // 更新站点信息           
                 Infos.Detail_Site.Status_code = httpRequestStatus;
                 // 判断获取到的请求结果是不是请求成功
@@ -885,7 +885,7 @@ namespace ServerMonitor.ViewModels
                 // 更新站点信息
                 Infos.Detail_Site.Update_time = DateTime.Now;
                 Infos.Detail_Site.Is_success = newLog.Is_error ? 0 : 1;
-                Infos.Detail_Site.Request_interval = httpRequestInterval;
+                Infos.Detail_Site.Request_TimeCost = httpRequestInterval;
                 Infos.Detail_Site.Request_count++;
             }
             catch (JsonReaderException e)
@@ -922,12 +922,12 @@ namespace ServerMonitor.ViewModels
                 case "请求超时":
                     Infos.Detail_Site.Is_success = -1;
                     Infos.Detail_Site.Update_time = DateTime.Now;
-                    Infos.Detail_Site.Request_interval = 5000;
+                    Infos.Detail_Site.Request_TimeCost = 5000;
                     break;
                 case "请求失败":
                     Infos.Detail_Site.Is_success = 0;
                     Infos.Detail_Site.Update_time = DateTime.Now;
-                    Infos.Detail_Site.Request_interval = 5000;
+                    Infos.Detail_Site.Request_TimeCost = 5000;
                     break;
                 default:
                     throw new ArgumentException("返回参数不合法!");

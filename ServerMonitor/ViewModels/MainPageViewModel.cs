@@ -195,7 +195,7 @@ namespace ServerMonitor.ViewModels
                 //timeout
                 _preCheckSite.Is_success = -1;
             }
-            _preCheckSite.Request_interval = pre.TimeCost;
+            _preCheckSite.Request_TimeCost = pre.TimeCost;
             _preCheckSite.Request_count += 1;
             if (dnsFlag == false)
             {
@@ -272,7 +272,7 @@ namespace ServerMonitor.ViewModels
                             bool httpsFlag = await hTTPs.MakeRequest();
                             //请求完毕
                             //处理数据
-                            si.Request_interval = hTTPs.TimeCost;
+                            si.Request_TimeCost = hTTPs.TimeCost;
                             si.Request_count += 1;
                             if ("1002".Equals(hTTPs.Status))//定义的超时状态码
                             {
@@ -301,7 +301,7 @@ namespace ServerMonitor.ViewModels
                             bool httpFlag = await hTTP.MakeRequest();
                             //请求完毕
                             //处理数据
-                            si.Request_interval = hTTP.TimeCost;
+                            si.Request_TimeCost = hTTP.TimeCost;
                             si.Request_count += 1;
                             if ("1002".Equals(hTTP.Status))
                             {
@@ -347,7 +347,7 @@ namespace ServerMonitor.ViewModels
                                 //timeout
                                 si.Is_success = -1;
                             }
-                            si.Request_interval = dNS.TimeCost;
+                            si.Request_TimeCost = dNS.TimeCost;
                             si.Request_count += 1;
                             if (dnsFlag == false)
                             {
@@ -364,7 +364,7 @@ namespace ServerMonitor.ViewModels
                             requestObj = DataHelper.GetProperty(icmp);
                             si.Is_success = int.Parse(requestObj.Color);
                             si.Request_count += 1;
-                            si.Request_interval = requestObj.TimeCost;
+                            si.Request_TimeCost = requestObj.TimeCost;
                             if (icmpFlag == false)
                             {
                                 si.Is_success = 0;
@@ -399,7 +399,7 @@ namespace ServerMonitor.ViewModels
                                 si.Is_success = -1;
                             }
                             si.Request_count += 1;
-                            si.Request_interval = fTP.TimeCost;
+                            si.Request_TimeCost = fTP.TimeCost;
                             if (ftpFlag == false)
                             {
                                 si.Is_success = 0;
@@ -424,7 +424,7 @@ namespace ServerMonitor.ViewModels
                                 si.Is_success = -1;
                             }
                             si.Request_count += 1;
-                            si.Request_interval = sMTP.TimeCost;
+                            si.Request_TimeCost = sMTP.TimeCost;
                             if (smtpFlag == false)
                             {
                                 si.Is_success = 0;
@@ -798,7 +798,7 @@ namespace ServerMonitor.ViewModels
                     continue;
                 }
                 var w = from t in logList   //总的采样 距现在3天内
-                        where DateTime.Now.Subtract(t.Create_time).Days < 3
+                        where DateTime.Now.Subtract(t.Create_Time).Days < 3
                         select t;
                 int total = w.Count(); //总的采样个数
                 if (total == 0)
@@ -812,12 +812,12 @@ namespace ServerMonitor.ViewModels
                 }
 
                 var x = from t in w
-                        where t.Request_time <= T
+                        where t.TimeCost <= T
                         select t;
                 int satis = x.Count();   //满意的样本个数
 
                 var y = from t in w
-                        where t.Request_time <= 4 * T && t.Request_time > T
+                        where t.TimeCost <= 4 * T && t.TimeCost > T
                         select t;
                 int toler = y.Count();          //可忍受样本个数
                 container.Add(new SitePerformance()
@@ -926,16 +926,16 @@ namespace ServerMonitor.ViewModels
                 switch (site.Is_success) //0错误，-1超时，2未知，1成功
                 {
                     case 0:
-                        result = "Error in " + site.Request_interval + "ms";
+                        result = "Error in " + site.Request_TimeCost + "ms";
                         break;
                     case 1:
-                        result = "Port" + site.Server_port + " (open) in " + site.Request_interval + "ms";
+                        result = "Port" + site.Server_port + " (open) in " + site.Request_TimeCost + "ms";
                         break;
                     case 2:
                         result = "Unknown";
                         break;
                     case -1:
-                        result = "Timeout in " + site.Request_interval + "ms";
+                        result = "Timeout in " + site.Request_TimeCost + "ms";
                         break;
                     default:
                         break;
@@ -946,16 +946,16 @@ namespace ServerMonitor.ViewModels
                 switch (site.Is_success)
                 {
                     case 0:
-                        result = "Error in " + site.Request_interval + "ms";
+                        result = "Error in " + site.Request_TimeCost + "ms";
                         break;
                     case 1:
-                        result = site.Status_code + " (OK) in " + site.Request_interval + "ms";
+                        result = site.Status_code + " (OK) in " + site.Request_TimeCost + "ms";
                         break;
                     case 2:
                         result = "Unknown";
                         break;
                     case -1:
-                        result = "Timeout in " + site.Request_interval + "ms";
+                        result = "Timeout in " + site.Request_TimeCost + "ms";
                         break;
                     default:
                         break;

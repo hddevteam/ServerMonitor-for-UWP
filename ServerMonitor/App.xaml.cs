@@ -145,7 +145,7 @@ namespace ServerMonitor
                             bool httpsFlag = await hTTPs.MakeRequest();
                             //请求完毕
                             //处理数据
-                            si.Request_interval = hTTPs.TimeCost;
+                            si.Request_TimeCost = hTTPs.TimeCost;
                             si.Request_count += 1;
                             if ("1002".Equals(hTTPs.Status))//定义的超时状态码
                             {
@@ -174,7 +174,7 @@ namespace ServerMonitor
                             bool httpFlag = await hTTP.MakeRequest();
                             //请求完毕
                             //处理数据
-                            si.Request_interval = hTTP.TimeCost;
+                            si.Request_TimeCost = hTTP.TimeCost;
                             si.Request_count += 1;
                             if ("1002".Equals(hTTP.Status))
                             {
@@ -220,7 +220,7 @@ namespace ServerMonitor
                                 //timeout
                                 si.Is_success = -1;
                             }
-                            si.Request_interval = dNS.TimeCost;
+                            si.Request_TimeCost = dNS.TimeCost;
                             si.Request_count += 1;
                             if (dnsFlag == false)
                             {
@@ -237,7 +237,7 @@ namespace ServerMonitor
                             requestObj = DataHelper.GetProperty(icmp);
                             si.Is_success = int.Parse(requestObj.Color);
                             si.Request_count += 1;
-                            si.Request_interval = requestObj.TimeCost;
+                            si.Request_TimeCost = requestObj.TimeCost;
                             if (icmpFlag == false)
                             {
                                 si.Is_success = 0;
@@ -274,7 +274,7 @@ namespace ServerMonitor
                                 si.Is_success = -1;
                             }
                             si.Request_count += 1;
-                            si.Request_interval = fTP.TimeCost;
+                            si.Request_TimeCost = fTP.TimeCost;
                             if (ftpFlag == false)
                             {
                                 si.Is_success = 0;
@@ -299,7 +299,7 @@ namespace ServerMonitor
                                 si.Is_success = -1;
                             }
                             si.Request_count += 1;
-                            si.Request_interval = sMTP.TimeCost;
+                            si.Request_TimeCost = sMTP.TimeCost;
                             if (smtpFlag == false)
                             {
                                 si.Is_success = 0;

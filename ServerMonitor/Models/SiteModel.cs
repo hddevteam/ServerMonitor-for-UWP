@@ -22,20 +22,32 @@ namespace ServerMonitor.Models
         int server_port;
         int monitor_interval;
         bool is_Monitor;
-        int request_interval;
+        int request_timecost;
         int request_count;
         string status_code;
         DateTime create_time;
         DateTime update_time;
         bool is_pre_check;
         string request_succeed_code;
+        /// <summary>
+        /// 协议请求结果验证的信息（如：用于测试的域名以及预期域名解析结果）
+        /// </summary>
         string protocol_content;
-        // 上次请求结果(Red：0,错误)  (Orange：-1 超时) (Gray：2,未知)   (Blue：1成功)
+        /// <summary>
+        /// 上次请求结果(Red：0,错误)  (Orange：-1 超时) (Gray：2,未知)   (Blue：1成功)
+        /// </summary>
         int is_success;
-        // 补充信息
+        /// <summary>
+        /// 补充信息
+        /// </summary>
         string others;
-        // 协议请求验证信息
+        /// <summary>
+        /// 用于协议请求验证信息（如：用户身份验证信息）
+        /// </summary>
         string protocolIdentification;
+        /// <summary>
+        /// 上次请求的返回内容
+        /// </summary>
         string last_response;
 
         [PrimaryKey, AutoIncrement, Column("id")]
@@ -105,14 +117,14 @@ namespace ServerMonitor.Models
                 //DBHelper.UpdateSite(this);
             }
         }
-        [DefaultValue(value: "5", type: typeof(int)), Column("request_interval")]
-        public int Request_interval
+        [DefaultValue(value: "5000", type: typeof(int)), Column("request_timecost")]
+        public int Request_TimeCost
         {
-            get => request_interval;
+            get => request_timecost;
             set
             {
-                request_interval = value;
-                RaisePropertyChanged(() => Request_interval);
+                request_timecost = value;
+                RaisePropertyChanged(() => Request_TimeCost);
             }
         }
         [DefaultValue(value: "0", type: typeof(int)), Column("request_count")]

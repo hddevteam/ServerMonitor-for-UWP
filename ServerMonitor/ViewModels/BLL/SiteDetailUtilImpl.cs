@@ -39,12 +39,12 @@ namespace ServerMonitor.ViewModels.BLL
                 log = new LogModel
                 {
                     Site_id = site.Id,
-                    Create_time = DateTime.Now
+                    Create_Time = DateTime.Now
 
                 };
                 #endregion
                 // 获取存储的请求预处理信息
-                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);                
+                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
                 try
                 {
                     // 赋值请求类型
@@ -62,20 +62,21 @@ namespace ServerMonitor.ViewModels.BLL
                 // 处理请求记录
                 CreateLogWithRequestServerResult(log, request);
                 // 补充额外添加的判断
-                log.Log_record = request.RequestInfos;
-                log.Is_error= ! request.IsMatchResult(request.ActualResult.First(), 
+                log.Log_Record = request.RequestInfos;
+                log.Is_error = !request.IsMatchResult(request.ActualResult.First(),
                     new HashSet<string>() {
                         // 赋值保存的期待返回值
                         js["expectedResults"].ToString()
                     });
-                if (log.Is_error) {
+                if (log.Is_error)
+                {
                     log.Status_code = "1001";
                 }
                 // 更新站点信息
                 UpdateSiteStatus(site, log);
             }
             return log;
-        }        
+        }
         /// <summary>
         /// 请求FTP服务器的状态
         /// </summary>
@@ -100,7 +101,7 @@ namespace ServerMonitor.ViewModels.BLL
                 LogModel log = new LogModel
                 {
                     Site_id = site.Id,
-                    Create_time = DateTime.Now
+                    Create_Time = DateTime.Now
 
                 };
                 #endregion                
@@ -109,7 +110,7 @@ namespace ServerMonitor.ViewModels.BLL
                 // 处理请求记录
                 CreateLogWithRequestServerResult(log, request);
                 // 补充额外添加的判断
-                log.Log_record = request.ProtocalInfo;
+                log.Log_Record = request.ProtocalInfo;
                 // 更新站点信息
                 UpdateSiteStatus(site, log);
                 return log;
@@ -133,7 +134,7 @@ namespace ServerMonitor.ViewModels.BLL
                 LogModel log = new LogModel
                 {
                     Site_id = site.Id,
-                    Create_time = DateTime.Now
+                    Create_Time = DateTime.Now
                 };
                 #endregion                
                 // 开始请求
@@ -141,7 +142,7 @@ namespace ServerMonitor.ViewModels.BLL
                 // 处理请求记录
                 CreateLogWithRequestServerResult(log, request);
                 // 补充额外添加的判断
-                log.Log_record = request.ProtocolInfo;
+                log.Log_Record = request.ProtocolInfo;
                 // 更新站点信息
                 UpdateSiteStatus(site, log);
                 return log;
@@ -162,7 +163,7 @@ namespace ServerMonitor.ViewModels.BLL
                 LogModel log = new LogModel
                 {
                     Site_id = site.Id,
-                    Create_time = DateTime.Now
+                    Create_Time = DateTime.Now
 
                 };
                 #endregion                
@@ -171,7 +172,7 @@ namespace ServerMonitor.ViewModels.BLL
                 // 处理请求记录
                 CreateLogWithRequestServerResult(log, request);
                 // 补充额外添加的判断
-                log.Log_record = request.ActualResult;
+                log.Log_Record = request.ActualResult;
                 // 更新站点信息
                 UpdateSiteStatus(site, log);
                 return log;
@@ -192,7 +193,7 @@ namespace ServerMonitor.ViewModels.BLL
                 LogModel log = new LogModel
                 {
                     Site_id = site.Id,
-                    Create_time = DateTime.Now
+                    Create_Time = DateTime.Now
                 };
                 #endregion                
                 // 开始请求
@@ -200,7 +201,7 @@ namespace ServerMonitor.ViewModels.BLL
                 // 处理请求记录
                 CreateLogWithRequestServerResult(log, request);
                 // 补充额外添加的判断
-                log.Log_record = request.ProtocolInfo;
+                log.Log_Record = request.ProtocolInfo;
                 // 更新站点信息
                 UpdateSiteStatus(site, log);
                 return log;
@@ -216,7 +217,7 @@ namespace ServerMonitor.ViewModels.BLL
         {
             // 请求成功
             log.Status_code = request.Status;
-            log.Request_time = request.TimeCost;
+            log.TimeCost = request.TimeCost;
             // 请求失败
             switch (log.Status_code)
             {
@@ -327,11 +328,13 @@ namespace ServerMonitor.ViewModels.BLL
             {
                 site.Is_success = "1002".Equals(log.Status_code) ? -1 : 0;
             }
-            else {
+            else
+            {
                 site.Is_success = 1;
             }
-            site.Request_interval = (int)log.Request_time;
+            site.Request_TimeCost = (int)log.TimeCost;
             site.Request_count++;
+            site.Last_response = string.IsNullOrEmpty(log.Log_Record) ? "" : log.Log_Record;
             // 更新数据库中的站点的信息
             DBHelper.UpdateSite(site);
             Debug.WriteLine("请求了一次服务器!");
@@ -384,7 +387,7 @@ namespace ServerMonitor.ViewModels.BLL
                 LogModel log = new LogModel
                 {
                     Site_id = site.Id,
-                    Create_time = DateTime.Now
+                    Create_Time = DateTime.Now
 
                 };
                 #endregion                
@@ -393,8 +396,8 @@ namespace ServerMonitor.ViewModels.BLL
                 // 处理请求记录
                 CreateLogWithRequestServerResult(log, request);
                 // 补充额外添加的判断
-                log.Log_record = request.RequestInfo;
-                log.Is_error = ! SuccessCodeMatch(site, log.Status_code);
+                log.Log_Record = request.RequestInfo;
+                log.Is_error = !SuccessCodeMatch(site, log.Status_code);
                 // 更新站点信息
                 UpdateSiteStatus(site, log);
                 return log;
