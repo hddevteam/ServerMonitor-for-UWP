@@ -250,8 +250,10 @@ namespace ServerMonitor
                             //在此处加入type类型
                             string username = js["username"].ToString();
                             string password = js["password"].ToString();
-                            FTPRequest fTP = new FTPRequest(LoginType.Identify);
-                            fTP.FtpServer = reIP;
+                            FTPRequest fTP = new FTPRequest(LoginType.Identify)
+                            {
+                                FtpServer = reIP
+                            };
                             fTP.Identification.Username = username;
                             fTP.Identification.Password = password;
                             bool ftpFlag = await fTP.MakeRequest();

@@ -107,7 +107,7 @@ namespace ServerMonitor.DAOImpl
             }
             return result;
         }
-        //根据siteid的id从contactsite表里查找contactid
+        //根据 siteid 的 id 从 contactsite 表里查找 contactid
         public List<ContactSiteModel> GetContactSiteBySiteId(int siteid)
         {
 

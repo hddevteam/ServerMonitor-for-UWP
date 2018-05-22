@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ServerMonitor.Controls;
+using ServerMonitor.DAO;
 using ServerMonitor.Models;
 using ServerMonitor.Services.RequestServices;
 using ServerMonitor.ViewModels.BLL;
@@ -39,6 +40,10 @@ namespace ServerMonitor.ViewModels
         private ViewInfo infos;
         // 传进来的站点id    属性
         private string _SiteId = "Default";
+        /// <summary>
+        /// 接口 -> 联系人操作
+        /// </summary>
+        private IContactDAO ContactImpl;
         // 点击查看详情的站点的ID   字段  ->  _SiteId
         public string SiteId { get { return _SiteId; } set { Set(ref _SiteId, value); RaisePropertyChanged(() => SiteId); } }
         // 界面的信息  字段   ->  infos
@@ -313,9 +318,10 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public void InitContactData()
         {
+            ContactImpl = new ContactDAOImpl();
             // 初始化封装的信息集合
             Infos.ContactCollection = new ObservableCollection<ContactModel>();
-            List<ContactModel> contactList = DBHelper.GetContactBySiteId(id);
+            List<ContactModel> contactList = ContactImpl.GetContactModelsBySiteId(infos.Detail_Site.Id);
             if (contactList.Count == 0)
             {
                 Debug.WriteLine("无联系人!");
