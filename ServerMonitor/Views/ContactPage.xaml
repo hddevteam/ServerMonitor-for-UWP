@@ -63,8 +63,8 @@
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="/Images/head.png"
                                        Width="36" Height="36" Margin="0,4,0,4"/>
-                                <TextBlock Text="{Binding Contact_name}" FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" Width="208" Margin="8,0,8,0"/>
-                                <TextBlock Text="{Binding Contact_email}" FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" Width="232" Margin="0,0,8,0"/>
+                                <TextBlock Text="{Binding Contact_name}" FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" Width="208" Margin="8,0,8,0" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding Contact_email}" FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" Width="232" Margin="0,0,8,0" TextTrimming="CharacterEllipsis"/>
                                 <TextBlock Text="{Binding Telephone}" FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" Width="232" Margin="0,0,8,0"/>
                             </StackPanel>
                         </DataTemplate>
@@ -90,11 +90,9 @@
                 <Grid Width="80" Margin="28,48,0,32">
                     <Image Source="/Images/head.png"/>
                 </Grid>
-                <TextBlock Text="{Binding ElementName=contactList,Path=SelectedItem.Contact_name}"
-                           FontWeight="Bold" Foreground="Black"
-                           VerticalAlignment="Center" Grid.Column="1"
-                           FontSize="20" MaxLines="2" TextWrapping="Wrap"
-                           Margin="8,0,8,0"/>
+                <TextBlock Text="{Binding ElementName=contactList,Path=SelectedItem.Contact_name}" Margin="8,0,8,0"
+                           FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" Grid.Column="1"
+                           FontSize="20" MaxLines="2" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
             </Grid>
             <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
                 <Grid>
