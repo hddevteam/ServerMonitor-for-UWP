@@ -23,7 +23,7 @@ namespace ServerMonitor.DAO
         /// </summary>
         /// <param name="SiteId"></param>
         /// <returns></returns>
-        List<ContactSiteModel> GetConnectsBySiteId(int SiteId);
+        List<SiteContactModel> GetConnectsBySiteId(int SiteId);
         /// <summary>
         /// 根据单个站点ID删除此站点与指定ID联系人的记录
         /// </summary>
@@ -42,7 +42,7 @@ namespace ServerMonitor.DAO
         /// </summary>
         /// <param name="connects"></param>
         /// <returns></returns>
-        int InsertListConnects(List<ContactSiteModel> connects);
-        List<ContactSiteModel> GetContactSiteBySiteId(int siteid);
+        int InsertListConnects(List<SiteContactModel> connects);
+        List<SiteContactModel> GetContactSiteBySiteId(int siteid);
     }
 }

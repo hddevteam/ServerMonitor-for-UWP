@@ -88,7 +88,7 @@ namespace ServerMonitor.Util
 		private String GetContent(SiteModel siteModel )
 		{
 			int id = siteModel.Id;//站点id
-			int time = siteModel.Request_interval;//时间
+			int time = siteModel.Request_TimeCost;//时间
 			string name = siteModel.Site_name;//站点name
 			var code = siteModel.Status_code;//状态码
 			string content = "#" + id +" "+ name + " Error in " + time + " ms";

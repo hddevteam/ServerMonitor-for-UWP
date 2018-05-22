@@ -67,13 +67,13 @@ namespace ServerMonitor.DAOImpl
         /// </summary>
         /// <param name="SiteId">指定站点的ID</param>
         /// <returns>指定ID的站点的绑定记录的集合</returns>
-        public List<ContactSiteModel> GetConnectsBySiteId(int SiteId)
+        public List<SiteContactModel> GetConnectsBySiteId(int SiteId)
         {
-            List<ContactSiteModel> resultList;
+            List<SiteContactModel> resultList;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
-                resultList = conn.Table<ContactSiteModel>().Where(s=>s.SiteId == 
-                SiteId).ToList<ContactSiteModel>();
+                resultList = conn.Table<SiteContactModel>().Where(s=>s.SiteId == 
+                SiteId).ToList<SiteContactModel>();
             }
             return resultList;
         }
@@ -98,7 +98,7 @@ namespace ServerMonitor.DAOImpl
         /// </summary>
         /// <param name="connects">绑定记录集合</param>
         /// <returns>此次操作影响的数据行数</returns>
-        public int InsertListConnects(List<ContactSiteModel> connects)
+        public int InsertListConnects(List<SiteContactModel> connects)
         {
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
@@ -107,20 +107,20 @@ namespace ServerMonitor.DAOImpl
             }
             return result;
         }
-        //根据siteid的id从contactsite表里查找contactid
-        public List<ContactSiteModel> GetContactSiteBySiteId(int siteid)
+        //根据 siteid 的 id 从 contactsite 表里查找 contactid
+        public List<SiteContactModel> GetContactSiteBySiteId(int siteid)
         {
 
-            List<ContactSiteModel> contactsiteList;
+            List<SiteContactModel> contactsiteList;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
                 try
                 {
-                    contactsiteList = conn.Table<ContactSiteModel>().Where(v => v.SiteId == siteid).ToList<ContactSiteModel>();
+                    contactsiteList = conn.Table<SiteContactModel>().Where(v => v.SiteId == siteid).ToList<SiteContactModel>();
                 }
                 catch
                 {
-                    contactsiteList = new List<ContactSiteModel>();
+                    contactsiteList = new List<SiteContactModel>();
                 }
             }
             return contactsiteList;

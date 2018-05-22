@@ -151,7 +151,7 @@ namespace ServerMonitor.ViewModels
             List<LogModel> logs = new List<LogModel>();
             logs = DBHelper.GetAllLog();
             //数据排序，便于图表按序显示
-            logs = logs.OrderBy(o => o.Create_time).ToList();
+            logs = logs.OrderBy(o => o.Create_Time).ToList();
             return logs;
         }
 
