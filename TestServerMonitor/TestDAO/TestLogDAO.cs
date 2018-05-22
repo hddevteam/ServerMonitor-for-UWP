@@ -47,20 +47,20 @@ namespace TestServerMonitor.TestDAO
                 //Id = 66,
                 Site_id = 88,
                 Status_code = "200",
-                Request_time = 200,
-                Create_time = DateTime.Now,
+                TimeCost = 200,
+                Create_Time = DateTime.Now,
                 Is_error = false,
-                Log_record = ""
+                Log_Record = ""
             };
             LogModel logModel2 = new LogModel()
             {
                 //Id = 67,
                 Site_id = 88,
                 Status_code = "200",
-                Request_time = 200,
-                Create_time = DateTime.Now,
+                TimeCost = 200,
+                Create_Time = DateTime.Now,
                 Is_error = true,
-                Log_record = ""
+                Log_Record = ""
             };
             logModels.Add(logModel1);
             logModels.Add(logModel2);
@@ -69,10 +69,10 @@ namespace TestServerMonitor.TestDAO
                 //Id = 69,
                 Site_id = 89,
                 Status_code = "200",
-                Request_time = 200,
-                Create_time = DateTime.Now,
+                TimeCost = 200,
+                Create_Time = DateTime.Now,
                 Is_error = false,
-                Log_record = ""
+                Log_Record = ""
             };
         }
         ///<summary>
@@ -138,10 +138,10 @@ namespace TestServerMonitor.TestDAO
             {
                 Site_id = 888,
                 Status_code = "200",
-                Request_time = 200,
-                Create_time = DateTime.Now,
+                TimeCost = 200,
+                Create_Time = DateTime.Now,
                 Is_error = false,
-                Log_record = ""
+                Log_Record = ""
             };
             logDAO.InsertOneLog(testlog);
             Assert.AreEqual(testlog.Id, logDAO.GetLogsBySiteId(testlog.Site_id)[0].Id);
@@ -157,10 +157,10 @@ namespace TestServerMonitor.TestDAO
             {
                 Site_id = 666,
                 Status_code = "200",
-                Request_time = 200,
-                Create_time = DateTime.Now,
+                TimeCost = 200,
+                Create_Time = DateTime.Now,
                 Is_error = false,
-                Log_record = ""
+                Log_Record = ""
             };
             logDAO.InsertOneLog(testlog);
             Assert.AreEqual(1, logDAO.DeleteOneLog(testlog.Id));
@@ -190,10 +190,10 @@ namespace TestServerMonitor.TestDAO
             {
                 Site_id = 666,
                 Status_code = "200",
-                Request_time = 200,
-                Create_time = DateTime.Now,
+                TimeCost = 200,
+                Create_Time = DateTime.Now,
                 Is_error = false,
-                Log_record = ""
+                Log_Record = ""
             };
             logDAO.InsertOneLog(testlog);//将testlog插入
             testlog.Is_error = true;//改变testlog的Is_error为true
@@ -208,9 +208,9 @@ namespace TestServerMonitor.TestDAO
         public void TestLogDAO_UpdateListLog()
         {
             logDAO.InsertListLog(logModels);
-            logModels[0].Log_record = "ok";//将插入的logmodel[0]的Log_record字段改为ok
+            logModels[0].Log_Record = "ok";//将插入的logmodel[0]的Log_Record字段改为ok
             logDAO.UpdateListLog(logModels);
-            Assert.AreEqual("ok", logDAO.GetLogById(logModels[0].Id).Log_record);//对比Log_record字段是否发生改变
+            Assert.AreEqual("ok", logDAO.GetLogById(logModels[0].Id).Log_Record);//对比Log_Record字段是否发生改变
 
         }
         /// <summary>
