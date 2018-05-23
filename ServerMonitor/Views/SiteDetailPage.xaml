@@ -297,9 +297,9 @@
                         </telerik:BarSeries>-->
 
                         <telerik:RadCartesianChart.SeriesProvider >
-                            <telerik:ChartSeriesProvider x:Name="provider" Source="{x:Bind ViewModel.Infos.LogCollections,Mode=TwoWay}">
+                            <telerik:ChartSeriesProvider x:Name="provider" Source="{x:Bind ViewModel.Infos.LogCollections,Mode=OneWay}">
                                 <telerik:ChartSeriesProvider.SeriesDescriptors>
-                                    <telerik:CategoricalSeriesDescriptor ValuePath="Request_time" CategoryPath="Create_time">
+                                    <telerik:CategoricalSeriesDescriptor ValuePath="TimeCost" CategoryPath="Create_Time">
                                         <telerik:CategoricalSeriesDescriptor.Style>
                                             <Style TargetType="telerik:BarSeries">
                                                 <Setter Property="CombineMode" Value="Cluster"/>

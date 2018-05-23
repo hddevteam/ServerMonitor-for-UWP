@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.Services.RequestServices
 {
-    class ICMPRequest
+    public class ICMPRequest
     {
         public static Dictionary<string, string> backData = new Dictionary<string, string>();
 
@@ -224,10 +224,11 @@ namespace ServerMonitor.Services.RequestServices
                 return false;
             }
         }
+
         public IPAddress MyIPAddress { get; set; }//请求的ip地址
         public List<RequestObj> Requests = new List<RequestObj>();
     }
-    class RequestObj :BasicRequest{
+    public class RequestObj :BasicRequest{
         //请求对象
         //一个请求对象包括  一次请求 的 创建时间、花费时间、请求结果等信息
         public String Color { get; set; }

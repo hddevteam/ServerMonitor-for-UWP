@@ -180,6 +180,36 @@ namespace ServerMonitor.ViewModels.BLL
             return null;
         }
         /// <summary>
+        /// 使用ICMP 与服务器建立连接
+        /// </summary>
+        /// <returns></returns>
+        public async Task<LogModel> ConnectToServerWithICMP(SiteModel site, ICMPRequest request)
+        {
+            //#region 初始化log
+            //LogModel log = new LogModel
+            //{
+            //    Site_id = site.Id,
+            //    Create_Time = DateTime.Now
+            //};
+            //#endregion
+            //bool icmpFlag = request.DoRequest();
+            ////请求完毕
+            //RequestObj requestObj;//用于存储icmp请求结果的对象              
+            //requestObj = DataHelper.GetProperty(request);
+            //log.Is_error = !icmpFlag;
+            //log.Status_code = 
+
+            //site.Is_success = int.Parse(requestObj.Color);
+            //site.Request_count += 1;
+            //site.Request_TimeCost = requestObj.TimeCost;
+            //if (icmpFlag == false)
+            //{
+            //    site.Is_success = 0;                
+            //}
+            await Task.CompletedTask;
+            return new LogModel();
+        }
+        /// <summary>
         /// 使用Socket 与服务器建立连接
         /// </summary>
         /// <returns></returns>
@@ -404,5 +434,7 @@ namespace ServerMonitor.ViewModels.BLL
             }
             return null;
         }
+
+        
     }
 }
