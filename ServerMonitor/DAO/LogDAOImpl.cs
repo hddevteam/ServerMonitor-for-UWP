@@ -13,7 +13,7 @@ using SQLite.Net.Platform.WinRT;
 
 namespace ServerMonitor.LogDb
 {
-    public class LogDaoImpl : LogDAO
+    public class LogDaoImpl : ILogDAO
     {
         /// <summary>
         /// 执行有返回对象(Log)的命令

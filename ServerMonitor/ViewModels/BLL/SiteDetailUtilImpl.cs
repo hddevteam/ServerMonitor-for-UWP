@@ -9,13 +9,34 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ServerMonitor.Controls;
+using ServerMonitor.LogDb;
 using ServerMonitor.Models;
 using ServerMonitor.Services.RequestServices;
+using ServerMonitor.SiteDb;
 
 namespace ServerMonitor.ViewModels.BLL
 {
     public class SiteDetailUtilImpl : ISiteDetailUtil
     {
+        #region 变量声明
+        /// <summary>
+        /// 封装的SiteDetailViewModel使用的工具类
+        /// </summary>
+        private static ISiteDetailUtil utilObject;
+        /// <summary>
+        /// 站点DAO
+        /// </summary>
+        private static ISiteDAO siteDao;
+        /// <summary>
+        /// 请求记录DAO
+        /// </summary>
+        private static ILogDAO logDao;
+        #endregion
+        static SiteDetailUtilImpl() {
+            utilObject = new SiteDetailUtilImpl();
+            siteDao = new SiteDaoImpl();
+            logDao = new LogDaoImpl();
+        }
         /// <summary>
         /// 请求服务器状态
         /// </summary>
@@ -370,7 +391,7 @@ namespace ServerMonitor.ViewModels.BLL
             site.Request_count++;
             site.Last_response = string.IsNullOrEmpty(log.Log_Record) ? "" : log.Log_Record;
             // 更新数据库中的站点的信息
-            DBHelper.UpdateSite(site);
+            siteDao.UpdateSite(site);
             Debug.WriteLine("请求了一次服务器!");
         }
         /// <summary>
@@ -437,8 +458,6 @@ namespace ServerMonitor.ViewModels.BLL
                 return log;
             }
             return null;
-        }
-
-        
+        }        
     }
 }

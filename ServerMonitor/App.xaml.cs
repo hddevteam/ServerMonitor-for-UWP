@@ -70,8 +70,9 @@ namespace ServerMonitor
             XElement root = document.Root;
             // 加载数据库名称
             XElement dbName = root.Element("DBFilename");
-            DBHelper.InitDB(dbName.Value);
-            DataBaseControlImpl.Instance.SetDBFilename(dbName.Value);
+            //DBHelper.InitDB(dbName.Value);
+            DBHelper.SetDBFilename(dbName.Value);
+            DataBaseControlImpl.Instance.InitDB(dbName.Value);
             #endregion
             await NavigationService.NavigateAsync(typeof(Views.MainPage));
         }
@@ -154,7 +155,7 @@ namespace ServerMonitor
                             }
                             else
                             {
-                                SiteDetailViewModel util = new SiteDetailViewModel();//用于查看状态码
+                                SiteDetailUtilImpl util = new SiteDetailUtilImpl();//用于查看状态码
                                 bool match = util.SuccessCodeMatch(si, hTTPs.Status);//匹配用户设定状态码
                                 if (match)//匹配为成功  否则为失败
                                 {

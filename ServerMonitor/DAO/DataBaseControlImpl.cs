@@ -1,4 +1,5 @@
-﻿using ServerMonitor.Controls;
+﻿using Newtonsoft.Json.Linq;
+using ServerMonitor.Controls;
 using ServerMonitor.DAOImpl;
 using ServerMonitor.Models;
 using ServerMonitor.SiteDb;
@@ -20,7 +21,7 @@ namespace ServerMonitor.SiteDb
         /// <summary>
         /// 持有SiteDAO对象实现对Site的操作
         /// </summary>
-        private SiteDAO siteDao;
+        private ISiteDAO siteDao;
         /// <summary>
         /// 数据库名称
         /// </summary>
@@ -154,7 +155,8 @@ namespace ServerMonitor.SiteDb
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
                             Request_succeed_code = "1000",
-                            Is_success = 2
+                            Is_success = 2,
+                            Protocol_content =JObject.Parse("{'recordType':'A','lookup':'localhost','expectedResults':'127.0.0.1'}").ToString()
                         }
                     };
                     //for (int i = 0; i < 30; i++)
