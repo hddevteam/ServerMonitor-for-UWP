@@ -403,7 +403,7 @@ namespace ServerMonitor.ViewModels
             }
             else if(site.Protocol_type.Equals("DNS"))
             {
-                site.ProtocolIdentification = GetJson(RecordType, Lookup, ExpectedResults);
+                site.Protocol_content = GetJson(RecordType, Lookup, ExpectedResults);
             }
 
             List<SiteContactModel> contactSiteModels = new List<SiteContactModel>();
@@ -554,7 +554,7 @@ namespace ServerMonitor.ViewModels
             }
             else if(ProtocolType == 4)
             {
-                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
+                JObject js = (JObject)JsonConvert.DeserializeObject(site.Protocol_content);
                 RecordType = GetRecordType(js["recordType"].ToString());
                 Lookup = js["lookup"].ToString();
                 ExpectedResults = js["expectedResults"].ToString();
