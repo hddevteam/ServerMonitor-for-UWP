@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Heijden.DNS;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ServerMonitor.Controls;
@@ -69,7 +70,7 @@ namespace ServerMonitor.ViewModels.BLL
                 try
                 {
                     // 赋值请求类型
-                    request.RecordType = DNSRequest.GetQTypeWithIndex(int.Parse(js["recordType"].ToString()));
+                    request.RecordType = DNSRequest.GetQTypeWithStringTypeName(js["recordType"].ToString());
                 }
                 catch (Exception)
                 {

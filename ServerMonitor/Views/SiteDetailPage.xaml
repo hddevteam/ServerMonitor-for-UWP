@@ -396,7 +396,7 @@
                         <TextBox Text="URL: " BorderThickness="0" FontSize="20" IsReadOnly="True"/>
                         <HyperlinkButton IsEnabled="{x:Bind ViewModel.Infos.IsWebSite}"
                                          Grid.ColumnSpan="3" HorizontalAlignment="Center"                                          
-                                         VerticalAlignment="Center" NavigateUri="{Binding Infos.Detail_Site.Site_address}" 
+                                         VerticalAlignment="Center" NavigateUri="{Binding Infos.Site_Address}" 
                                          Content="{x:Bind ViewModel.Infos.Detail_Site.Site_address}" FontSize="20" Foreground="#FFE61D1D"/>
                         <!-- {x:Bind ViewModel.Infos.Detail_Site.Site_address} -->
                     </StackPanel>

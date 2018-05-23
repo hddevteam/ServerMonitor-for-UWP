@@ -131,6 +131,7 @@ namespace ServerMonitor.ViewModels
             Infos.ContactCollection = new ObservableCollection<ContactModel>();
             Infos.IsMonitor = Infos.Detail_Site.Is_Monitor;
             Infos.IsWebSite = !Infos.Detail_Site.Is_server;
+            Infos.Site_Address = new Uri(Infos.Detail_Site.Site_address, UriKind.RelativeOrAbsolute);
 
             // 初始化下面两个图表数据
             ClearSiteRequestCount();
@@ -1085,6 +1086,7 @@ namespace ServerMonitor.ViewModels
         private bool loadAsyncStat = false;
         private bool requestAsyncStat = true;
         private ObservableCollection<ObservableCollection<LogModel>> logCollections;
+        private Uri site_Address;
 
         // 对应界面上的toggledSwitch 按钮的值，表示此站点是否正在监测
         public bool IsMonitor
@@ -1281,6 +1283,10 @@ namespace ServerMonitor.ViewModels
                 RaisePropertyChanged(() => LogCollections);
             }
         }
+        /// <summary>
+        /// 标识站点的Uri地址
+        /// </summary>
+        public Uri Site_Address { get => site_Address; set => site_Address = value; }
     }
 
     /// <summary>

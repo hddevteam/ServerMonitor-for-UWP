@@ -138,7 +138,8 @@ namespace ServerMonitor.SiteDb
                             Update_time = DateTime.Now,
                             Is_pre_check = true,
                             Request_succeed_code = "1000",
-                            Is_success = 2
+                            Is_success = 2,
+                            Protocol_content =JObject.Parse("{'recordType':'A','lookup':'localhost','expectedResults':'127.0.0.1'}").ToString()
                         },
                         new SiteModel()
                         {
@@ -155,8 +156,7 @@ namespace ServerMonitor.SiteDb
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
                             Request_succeed_code = "1000",
-                            Is_success = 2,
-                            Protocol_content =JObject.Parse("{'recordType':'A','lookup':'localhost','expectedResults':'127.0.0.1'}").ToString()
+                            Is_success = 2,                           
                         }
                     };
                     //for (int i = 0; i < 30; i++)
