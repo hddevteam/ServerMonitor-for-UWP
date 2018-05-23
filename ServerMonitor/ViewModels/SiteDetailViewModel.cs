@@ -256,7 +256,7 @@ namespace ServerMonitor.ViewModels
                     #endregion
                 }
                 // 更新上次请求记录
-                Infos.LastRequest = Infos.Logs.First<LogModel>();
+                Infos.LastRequest = Infos.Logs.Last<LogModel>();
                 Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
             }
         }
