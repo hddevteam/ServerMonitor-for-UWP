@@ -65,7 +65,7 @@ namespace ServerMonitor.ViewModels.BLL
                 };
                 #endregion
                 // 获取存储的请求预处理信息
-                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
+                JObject js = (JObject)JsonConvert.DeserializeObject(site.Protocol_content);
                 try
                 {
                     // 赋值请求类型
