@@ -405,6 +405,8 @@ namespace ServerMonitor.ViewModels
                             break;
                         case "ICMP":
                             log = await utilObject.ConnectToServerWithSocket(infos.Detail_Site, new SocketRequest());
+                            ICMPRequest icmp = new ICMPRequest(IPAddress.Parse(Infos.Detail_Site.Site_address));
+                            log = await utilObject.ConnectToServerWithICMP(infos.Detail_Site, icmp);
                             break;
                         default:
                             log = null;

@@ -185,27 +185,31 @@ namespace ServerMonitor.ViewModels.BLL
         /// <returns></returns>
         public async Task<LogModel> ConnectToServerWithICMP(SiteModel site, ICMPRequest request)
         {
-            //#region 初始化log
-            //LogModel log = new LogModel
-            //{
-            //    Site_id = site.Id,
-            //    Create_Time = DateTime.Now
-            //};
-            //#endregion
-            //bool icmpFlag = request.DoRequest();
-            ////请求完毕
-            //RequestObj requestObj;//用于存储icmp请求结果的对象              
-            //requestObj = DataHelper.GetProperty(request);
-            //log.Is_error = !icmpFlag;
-            //log.Status_code = 
+            #region 初始化log
+            LogModel log = new LogModel
+            {
+                Site_id = site.Id,
+                Create_Time = DateTime.Now
+            };
+            #endregion
 
-            //site.Is_success = int.Parse(requestObj.Color);
-            //site.Request_count += 1;
-            //site.Request_TimeCost = requestObj.TimeCost;
-            //if (icmpFlag == false)
-            //{
-            //    site.Is_success = 0;                
-            //}
+            #region 暂时修改的   --xb
+            bool icmpFlag = request.DoRequest();
+            //请求完毕
+            RequestObj requestObj;//用于存储icmp请求结果的对象              
+            requestObj = DataHelper.GetProperty(request); // 处理下请求对象的数据
+            site.Is_success = int.Parse(requestObj.Color);
+            site.Request_count += 1;
+            site.Request_TimeCost = requestObj.TimeCost;
+            site.Last_response = requestObj.Others ?? "";
+            if (icmpFlag == false)
+            {
+                site.Is_success = 0;
+            }
+            log.Is_error = !icmpFlag;
+            log.Log_Record = requestObj.Others ?? "";
+            log.TimeCost = requestObj.TimeCost;
+            #endregion
             await Task.CompletedTask;
             return new LogModel();
         }
