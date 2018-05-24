@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ServerMonitor.Controls;
+using ServerMonitor.DAO;
 using ServerMonitor.Models;
 using SQLite.Net;
 using SQLite.Net.Platform.WinRT;
@@ -146,7 +147,20 @@ namespace ServerMonitor.SiteDb
             }
             return result;
         }
-
-       
+        /// <summary>
+        /// 修改所有站点的状态
+        /// </summary>
+        /// <param name="statusCode"></param>
+        /// <returns></returns>
+        public int SetAllSiteStatus(int statusCode)
+        {
+            int result = -1;
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
+            {
+                SQLiteCommand cmd = conn.CreateCommand("update Site set Last_request_result = ?;", statusCode);
+                result = cmd.ExecuteNonQuery();
+            }
+            return result;
+        }
     }
 }

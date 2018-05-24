@@ -107,7 +107,7 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Text="200,"/>
+                        <TextBox Text="200," IsEnabled="False"/>
                         <TextBox Grid.Column="1" Text="{Binding StatusCodes, Mode=TwoWay}" PlaceholderText="The expected status codes,separated by comma(,)"
                                  Tag="2" TextChanged="{x:Bind ViewModel.Domain_TextChanged}"/>
                     </Grid>
@@ -127,20 +127,12 @@
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Margin="0,8,8,8">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="*"/>
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="360"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{Binding Contact_name}" FontWeight="Bold"/>
                                     <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                        <TextBlock Text="{Binding Contact_name}" FontWeight="Bold" Width="120" TextTrimming="CharacterEllipsis"/>
+                                        <Image Source="/Images/phone.png" Width="16" Height="16" Margin="8,0,4,0"/>
+                                        <TextBlock Text="{Binding Telephone}" Width="120"/>
                                         <Image Source="/Images/e-mail.png" Width="16" Height="16" Margin="0,0,8,0"/>
-                                        <TextBlock Text="{Binding Contact_email}" Width="180"/>
-                                        <Image Source="/Images/phone.png" Width="16" Height="16" Margin="0,0,4,0"/>
-                                        <TextBlock Text="{Binding Telephone}"/>
+                                        <TextBlock Text="{Binding Contact_email}" TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
                                 </Grid>
                             </DataTemplate>
@@ -171,26 +163,17 @@
                           Foreground="White" IsItemClickEnabled="True">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <!--<StackPanel Orientation="Vertical" Margin="8">
-                                <TextBlock Text="{Binding Contact_name}" FontWeight="Bold"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <Image Source="/Images/e-mail.png" Width="16" Height="16" Margin="0,0,4,0"/>
-                                    <TextBlock Text="{Binding Contact_email}" Width="132"/>
-                                    <Image Source="/Images/phone.png" Width="16" Height="16" Margin="0,0,4,0"/>
-                                    <TextBlock Text="{Binding Telephone}"/>
-                                </StackPanel>
-                            </StackPanel>-->
                             <Grid Margin="8">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="{Binding Contact_name}" FontWeight="Bold"/>
-                                <StackPanel Orientation="Horizontal" Grid.Row="1">
-                                    <Image Source="/Images/e-mail.png" Width="16" Height="16" Margin="0,0,8,0"/>
-                                    <TextBlock Text="{Binding Contact_email}" Width="180"/>
+                                <TextBlock Text="{Binding Contact_name}" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
+                                <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,4,0,0">
                                     <Image Source="/Images/phone.png" Width="16" Height="16" Margin="0,0,4,0"/>
-                                    <TextBlock Text="{Binding Telephone}"/>
+                                    <TextBlock Text="{Binding Telephone}" Width="120"/>
+                                    <Image Source="/Images/e-mail.png" Width="16" Height="16" Margin="0,0,8,0"/>
+                                    <TextBlock Text="{Binding Contact_email}" Width="180" TextTrimming="CharacterEllipsis"/>
                                 </StackPanel>
                             </Grid>
                         </DataTemplate>

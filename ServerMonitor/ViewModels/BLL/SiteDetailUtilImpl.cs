@@ -6,6 +6,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ServerMonitor.Controls;
 using ServerMonitor.Models;
 using ServerMonitor.Services.RequestServices;
@@ -19,53 +21,192 @@ namespace ServerMonitor.ViewModels.BLL
         /// </summary>
         /// <param name="serverProtocol"></param>
         /// <returns></returns>
-        public async Task<LogModel> AccessDNSServer(SiteModel site,DNSRequest request)
+        public async Task<LogModel> AccessDNSServer(SiteModel site, DNSRequest request)
         {
             // 作为返回参数的请求结果记录
-            LogModel log = null;           
+            LogModel log = null;
             if (null != site.Site_address && !("".Equals(site.Site_address)))
             {
                 // 检测并赋值DNS服务器IP
                 IPAddress ip = await GetIPAddressAsync(site.Site_address);
+                // ip 不合法
                 if (null == ip)
                 {
-                    try
-                    {
-                        // 获取请求站点的地址
-                        ip = IPAddress.Parse(site.Site_address);
-                    }
-                    catch (ArgumentException e)
-                    {
-                        Debug.WriteLine(e.ToString());
-                        DBHelper.InsertErrorLog(e);
-                        return null;
-                    }
+                    return null;
                 }
                 request.DnsServer = ip;
                 #region 初始化log
                 log = new LogModel
                 {
                     Site_id = site.Id,
-                    Create_time = DateTime.Now
+                    Create_Time = DateTime.Now
 
                 };
                 #endregion
-                // 赋值请求站点预计的请求结果
-                // 这里待定！！！！！因为保存用于测试的域名不知道存储在哪？
-                request.DomainName = site.ProtocolIdentification;
+                // 获取存储的请求预处理信息
+                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
+                try
+                {
+                    // 赋值请求类型
+                    request.RecordType = DNSRequest.GetQTypeWithIndex(int.Parse(js["recordType"].ToString()));
+                }
+                catch (Exception)
+                {
+                    request.RecordType = 0;//出错 默认选第一个
+                }
+                // 赋值用于测试的域名
+                request.DomainName = js["lookup"].ToString();
                 // 开始请求
                 bool result = await request.MakeRequest();
 
                 // 处理请求记录
                 CreateLogWithRequestServerResult(log, request);
                 // 补充额外添加的判断
-                log.Log_record = request.RequestInfos;
-                // 这里待定！！！！！因为用于保存期待结果的变量暂时不知道是如何存储的
-                request.IsMatchResult(request.ActualResult.First(), new HashSet<string>() { "127.0.0.1" });
+                log.Log_Record = request.RequestInfos;
+                log.Is_error = !request.IsMatchResult(request.ActualResult.First(),
+                    new HashSet<string>() {
+                        // 赋值保存的期待返回值
+                        js["expectedResults"].ToString()
+                    });
+                if (log.Is_error)
+                {
+                    log.Status_code = "1001";
+                }
                 // 更新站点信息
                 UpdateSiteStatus(site, log);
             }
             return log;
+        }
+        /// <summary>
+        /// 请求FTP服务器的状态
+        /// </summary>
+        /// <param name="site">待请求的站点</param>
+        /// <param name="request">请求对象</param>
+        public async Task<LogModel> AccessFTPServer(SiteModel site, FTPRequest request)
+        {
+            if (null != site.Site_address && !("".Equals(site.Site_address)))
+            {
+                // 检测并赋值DNS服务器IP
+                IPAddress ip = await GetIPAddressAsync(site.Site_address);
+                // IP 不合法
+                if (null == ip)
+                {
+                    return null;
+                }
+                request.FtpServer = IPAddress.Parse(site.Site_address);
+                // 获取保存的用户验证的信息
+                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
+                request.Identification = new IdentificationInfo() { Username = js["useaname"].ToString(), Password = js["password"].ToString() };
+                #region 初始化log
+                LogModel log = new LogModel
+                {
+                    Site_id = site.Id,
+                    Create_Time = DateTime.Now
+
+                };
+                #endregion                
+                // 开始请求
+                bool result = await request.MakeRequest();
+                // 处理请求记录
+                CreateLogWithRequestServerResult(log, request);
+                // 补充额外添加的判断
+                log.Log_Record = request.ProtocalInfo;
+                // 更新站点信息
+                UpdateSiteStatus(site, log);
+                return log;
+            }
+            return null;
+        }
+        /// <summary>
+        /// 请求SSH服务器的状态
+        /// </summary>
+        /// <param name="site">待请求的站点</param>
+        /// <param name="request">请求对象</param>
+        public async Task<LogModel> AccessSSHServer(SiteModel site, SSHRequest request)
+        {
+            if (null != site.Site_address && !("".Equals(site.Site_address)))
+            {
+                request.IPAddress = site.Site_address;
+                // 获取保存的用户验证的信息
+                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
+                request.Identification = new SshIdentificationInfo() { Username = js["useaname"].ToString(), Password = js["password"].ToString() };
+                #region 初始化log
+                LogModel log = new LogModel
+                {
+                    Site_id = site.Id,
+                    Create_Time = DateTime.Now
+                };
+                #endregion                
+                // 开始请求
+                bool result = await request.MakeRequest();
+                // 处理请求记录
+                CreateLogWithRequestServerResult(log, request);
+                // 补充额外添加的判断
+                log.Log_Record = request.ProtocolInfo;
+                // 更新站点信息
+                UpdateSiteStatus(site, log);
+                return log;
+            }
+            return null;
+        }
+        /// <summary>
+        /// 请求SMTP服务器的状态
+        /// </summary>
+        /// <param name="site">待请求的站点</param>
+        /// <param name="request">请求对象</param>
+        public async Task<LogModel> AccessSMTPServer(SiteModel site, SMTPRequest request)
+        {
+            if (null != site.Site_address && !("".Equals(site.Site_address)))
+            {
+                request.DomainName = site.Site_address;
+                #region 初始化log
+                LogModel log = new LogModel
+                {
+                    Site_id = site.Id,
+                    Create_Time = DateTime.Now
+
+                };
+                #endregion                
+                // 开始请求
+                bool result = await request.MakeRequest();
+                // 处理请求记录
+                CreateLogWithRequestServerResult(log, request);
+                // 补充额外添加的判断
+                log.Log_Record = request.ActualResult;
+                // 更新站点信息
+                UpdateSiteStatus(site, log);
+                return log;
+            }
+            return null;
+        }
+        /// <summary>
+        /// 使用Socket 与服务器建立连接
+        /// </summary>
+        /// <returns></returns>
+        public async Task<LogModel> ConnectToServerWithSocket(SiteModel site, SocketRequest request)
+        {
+            IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(site.Site_address), site.Server_port);
+            if (null != endPoint.Address && !("".Equals(endPoint.Address)))
+            {
+                request.TargetEndPoint = endPoint;
+                #region 初始化log
+                LogModel log = new LogModel
+                {
+                    Site_id = site.Id,
+                    Create_Time = DateTime.Now
+                };
+                #endregion                
+                // 开始请求
+                bool result = await request.MakeRequest();
+                // 处理请求记录
+                CreateLogWithRequestServerResult(log, request);
+                // 补充额外添加的判断
+                log.Log_Record = request.ProtocolInfo;
+                // 更新站点信息
+                UpdateSiteStatus(site, log);
+                return log;
+            }
+            return null;
         }
         /// <summary>
         /// 处理请求记录
@@ -76,7 +217,7 @@ namespace ServerMonitor.ViewModels.BLL
         {
             // 请求成功
             log.Status_code = request.Status;
-            log.Request_time = request.TimeCost;
+            log.TimeCost = request.TimeCost;
             // 请求失败
             switch (log.Status_code)
             {
@@ -115,7 +256,7 @@ namespace ServerMonitor.ViewModels.BLL
             }
             else
             {
-                reIP = null;
+                reIP = IPAddress.Parse(url);
             }
             return reIP;
         }
@@ -183,46 +324,70 @@ namespace ServerMonitor.ViewModels.BLL
             // 更新站点变量的信息
             site.Status_code = log.Status_code;
             site.Update_time = DateTime.Now;
-            site.Last_request_result = log.Is_error ? 0 : 1;
-            site.Request_interval = (int)log.Request_time;
+            if (log.Is_error)
+            {
+                site.Is_success = "1002".Equals(log.Status_code) ? -1 : 0;
+            }
+            else
+            {
+                site.Is_success = 1;
+            }
+            site.Request_TimeCost = (int)log.TimeCost;
             site.Request_count++;
+            site.Last_response = string.IsNullOrEmpty(log.Log_Record) ? "" : log.Log_Record;
             // 更新数据库中的站点的信息
             DBHelper.UpdateSite(site);
             Debug.WriteLine("请求了一次服务器!");
         }
         /// <summary>
-        /// 请求FTP服务器的状态
+        /// 查看是否满足用户提出的成功Code
         /// </summary>
-        /// <param name="site">待请求的站点</param>
-        /// <param name="request">请求对象</param>
-        public async Task AccessFTPServer(SiteModel site, FTPRequest request)
+        /// <param name="site"></param>
+        /// <param name="statusCode"></param>
+        /// <returns></returns>
+        public bool SuccessCodeMatch(SiteModel site, string statusCode)
+        {
+            string[] successCodes = getSuccStatusCode(site);
+            foreach (var i in successCodes)
+            {
+                if (i.Equals(statusCode))
+                {
+                    return true;
+
+                }
+            }
+            return false;
+        }
+        /// <summary>
+        /// 获取服务器状态成功的状态码列表
+        /// </summary>
+        /// <param name="site"></param>
+        /// <returns></returns>
+        public string[] getSuccStatusCode(SiteModel site)
+        {
+            if (site.Request_succeed_code.Contains(','))
+            {
+                return site.Request_succeed_code.Split(',');
+            }
+            else
+            {
+                return new string[] { site.Request_succeed_code };
+            }
+        }
+        /// <summary>
+        /// 请求网站，并存入一条记录
+        /// </summary>
+        /// <returns></returns>
+        public async Task<LogModel> RequestHTTPSite(SiteModel site, HTTPRequest request)
         {
             if (null != site.Site_address && !("".Equals(site.Site_address)))
             {
-                // 检测并赋值DNS服务器IP
-                IPAddress ip = await GetIPAddressAsync(site.Site_address);
-                if (null == ip)
-                {
-                    try
-                    {
-                        // 获取请求站点的地址
-                        ip = IPAddress.Parse(site.Site_address);
-                    }
-                    catch (ArgumentException e)
-                    {
-                        Debug.WriteLine(e.ToString());
-                        DBHelper.InsertErrorLog(e);
-                        
-                    }
-                }
-                request.FtpServer = IPAddress.Parse(site.Site_address);
-                // 这里待定！！！！！因为用于保存用户身份识别信息的变量未知！！
-                request.Identification = new IdentificationInfo() { Username = site.ProtocolIdentification, Password = site.ProtocolIdentification };
+                request.Uri = site.Site_address;
                 #region 初始化log
                 LogModel log = new LogModel
                 {
                     Site_id = site.Id,
-                    Create_time = DateTime.Now
+                    Create_Time = DateTime.Now
 
                 };
                 #endregion                
@@ -231,20 +396,13 @@ namespace ServerMonitor.ViewModels.BLL
                 // 处理请求记录
                 CreateLogWithRequestServerResult(log, request);
                 // 补充额外添加的判断
-                log.Log_record = request.ProtocalInfo;               
+                log.Log_Record = request.RequestInfo;
+                log.Is_error = !SuccessCodeMatch(site, log.Status_code);
                 // 更新站点信息
                 UpdateSiteStatus(site, log);
+                return log;
             }
-        }
-
-        public Task AccessSSHServer(SiteModel site, SSHRequest requuest)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task AccessSMTPServer(SiteModel site, SSHRequest requuest)
-        {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

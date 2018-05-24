@@ -157,6 +157,8 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <RelativePanel Margin="12,20,12,12">
                         <TextBlock Text="{Binding ElementName=ServerList,Path=SelectedItem.Site_type}" FontWeight="SemiBold"
@@ -168,33 +170,42 @@
                                 Foreground="#0063B1" Click = "{x:Bind ViewModel.EditFlyoutItem_Click}"/>
                     </RelativePanel>
 
-                    <ListBox SelectionMode="Single" SelectedValue="0" Margin="0,0,12,12" Grid.Row="1">
-                        <ListBoxItem Background="White">
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock Text="Address"
-                                   Foreground="Gray" FontSize="16"/>
-                                <TextBlock Text="{Binding ElementName=ServerList,Path=SelectedItem.Site_address}" 
+                    <StackPanel Grid.Row="1" Margin="12,0,0,12">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Address" Foreground="Gray" FontSize="16"/>
+                            <TextBlock Text="{Binding ElementName=ServerList,Path=SelectedItem.Site_address}" 
                                            FontWeight="SemiBold" Foreground="Black" FontSize="16"/>
-                            </StackPanel>
-                        </ListBoxItem>
-                        <ListBoxItem Background="White">
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock Text="Status code"
-                                   Foreground="Gray" FontSize="16"/>
-                                <TextBlock Text="{Binding ElementName=ServerList,Path=SelectedItem.Site_status_codes}"
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="0,12,0,0">
+                            <TextBlock Text="Status code" Foreground="Gray" FontSize="16"/>
+                            <TextBlock Text="{Binding ElementName=ServerList,Path=SelectedItem.Site_status_codes}"
                                            FontWeight="SemiBold" Foreground="Black" FontSize="16"/>
-                            </StackPanel>
-                        </ListBoxItem>
-                        <ListBoxItem Background="White">
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock Text="Contact"
-                                   Foreground="Gray" FontSize="16"/>
-                                <TextBlock Text="{Binding ElementName=ServerList,Path=SelectedItem.Contact}"
-                                           FontWeight="SemiBold" Foreground="Black" FontSize="16"/>
-                            </StackPanel>
-                        </ListBoxItem>
-                    </ListBox>
-                    <MenuFlyoutSeparator Grid.Row="2"></MenuFlyoutSeparator>
+                        </StackPanel>
+                    </StackPanel>
+                    <TextBlock Text="Contact" Foreground="Gray" FontSize="16" Grid.Row="2" Margin="12,0,0,8"/>
+                    <ListBox Grid.Row="0" Height="0"/>
+                    <ListView x:Name="contactList" SelectionMode="Single" Grid.Row="3" Margin="0,0,0,12"
+                          ItemsSource="{Binding BindingContact}" Foreground="White">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,8,8,8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="{Binding Contact_name}" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
+                                    <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,4,0,0">
+                                        <Image Source="/Images/phone.png" Width="16" Height="16" Margin="0,0,4,0"/>
+                                        <TextBlock Text="{Binding Telephone}" Width="120"/>
+                                        <Image Source="/Images/e-mail.png" Width="16" Height="16" Margin="0,0,8,0"/>
+                                        <TextBlock Text="{Binding Contact_email}" Width="180" TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    
+                    <MenuFlyoutSeparator Grid.Row="4"></MenuFlyoutSeparator>
                 </Grid>
             </ScrollViewer>
             <Grid Grid.Row="3" Margin="24,0,24,48">

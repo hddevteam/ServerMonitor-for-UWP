@@ -173,7 +173,7 @@ namespace ServerMonitor.ViewModels
             logs.Add(new LogModel() { Site_id = 2, Create_time = DateTime.Now.AddHours(-18), Request_time = 1000, Is_error = false, Status_code = "1001" });
             logs.Add(new LogModel() { Site_id = 2, Create_time = DateTime.Now.AddHours(-22), Request_time = 2005, Is_error = false, Status_code = "1000" });
             //数据排序，便于图表按序显示
-            logs = logs.OrderBy(o => o.Create_time).ToList();
+            logs = logs.OrderBy(o => o.Create_Time).ToList();
             return logs;
         }
 

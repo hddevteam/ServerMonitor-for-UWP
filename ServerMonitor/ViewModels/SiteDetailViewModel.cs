@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ServerMonitor.Controls;
+using ServerMonitor.DAO;
 using ServerMonitor.Models;
 using ServerMonitor.Services.RequestServices;
 using ServerMonitor.ViewModels.BLL;
@@ -18,16 +19,18 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Telerik.Charting;
+using Telerik.UI.Xaml.Controls.Chart;
 using Template10.Mvvm;
 using Template10.Services.NavigationService;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace ServerMonitor.ViewModels
 {
-    class SiteDetailViewModel : Template10.Mvvm.ViewModelBase
+    public class SiteDetailViewModel : Template10.Mvvm.ViewModelBase
     {
 
         #region 变量声明
@@ -37,12 +40,22 @@ namespace ServerMonitor.ViewModels
         private ViewInfo infos;
         // 传进来的站点id    属性
         private string _SiteId = "Default";
+        /// <summary>
+        /// 接口 -> 联系人操作
+        /// </summary>
+        private IContactDAO ContactImpl;
         // 点击查看详情的站点的ID   字段  ->  _SiteId
         public string SiteId { get { return _SiteId; } set { Set(ref _SiteId, value); RaisePropertyChanged(() => SiteId); } }
         // 界面的信息  字段   ->  infos
         public ViewInfo Infos { get => infos; set => infos = value; }
         // 字段  ->  refresh_log
         public LogModel Refresh_log { get => refresh_log; set { Set(ref refresh_log, value); RaisePropertyChanged(() => Refresh_log); } }
+
+        public List<FirstChartLengend> LogType = new List<FirstChartLengend>() {
+            new FirstChartLengend(){Title="SUCCESS",Fill = ChartPalettes.DefaultLight.FillEntries.Brushes[0]},
+            new FirstChartLengend(){Title="OVERTIME",Fill = ChartPalettes.DefaultLight.FillEntries.Brushes[1]},
+            new FirstChartLengend(){Title="ERROR",Fill = ChartPalettes.DefaultLight.FillEntries.Brushes[2]}
+        };
         // 临时变量  站点id  ->  由字符串转换来的
         public int id = 0;
         /// <summary>
@@ -51,6 +64,7 @@ namespace ServerMonitor.ViewModels
         private ISiteDetailUtil utilObject;
         #endregion
 
+        #region 构造以及析构
         // 构造函数
         public SiteDetailViewModel()
         {
@@ -59,20 +73,20 @@ namespace ServerMonitor.ViewModels
             {
                 // 初始化记录变量
                 Logs = new ObservableCollection<LogModel>(),
-                RequestTimeList = new ObservableCollection<LogModel>()
+                //RequestTimeList = new ObservableCollection<LogModel>(),
+                LogCollections = new ObservableCollection<ObservableCollection<LogModel>>()
             };
             // 初始化工具接口
             utilObject = new SiteDetailUtilImpl();
 
             Debug.WriteLine("Construction function => SiteDetailViewModel();");
         }
-
         // 析构函数
         ~SiteDetailViewModel()
         {
             //testMessageDailog();
         }
-
+        #endregion
         #region 界面跳转的方法
         // 别的界面跳转到这个界面的时候调用的方法
         public override async Task OnNavigatedToAsync(object parameter, NavigationMode mode, IDictionary<string, object> suspensionState)
@@ -116,7 +130,7 @@ namespace ServerMonitor.ViewModels
         /// <summary>
         /// 测试提示框的方法
         /// </summary>
-        public async void testMessageDailog()
+        public async void TestMessageDailog()
         {
             var messageBox = new Windows.UI.Popups.MessageDialog("提示框xxx") { Title = "提示框标题" };
             messageBox.Commands.Add(new Windows.UI.Popups.UICommand("第一个按钮的文字", uicommand =>
@@ -125,7 +139,6 @@ namespace ServerMonitor.ViewModels
             }));
             await messageBox.ShowAsync();
         }
-
         /// <summary>
         /// 初始化第二个图表的键值（纵坐标值以及横坐标值）
         /// </summary>
@@ -142,7 +155,6 @@ namespace ServerMonitor.ViewModels
             };
             return r;
         }
-
         /// <summary>
         /// 初始化饼图的坐标轴信息
         /// </summary>
@@ -151,13 +163,12 @@ namespace ServerMonitor.ViewModels
         {
             ObservableCollection<PieChartInfo> pi = new ObservableCollection<PieChartInfo>
             {
-                new PieChartInfo() { Ry = RequestType.Succeed, Count = 0 },
-                new PieChartInfo() { Ry = RequestType.Error, Count = 0 },
-                new PieChartInfo() { Ry = RequestType.OverTime, Count = 0 }
+                new PieChartInfo() { Ry = RequestType.SUCCESS, Count = 0 },
+                new PieChartInfo() { Ry = RequestType.OVERTIME, Count = 0 },
+                new PieChartInfo() { Ry = RequestType.ERROR, Count = 0 }
             };
             return pi;
         }
-
         /// <summary>
         /// 计算平均请求时间以及请求时间中位值
         /// </summary>
@@ -165,13 +176,16 @@ namespace ServerMonitor.ViewModels
         /// <returns></returns>
         public Tuple<double, double> CountAverageMax(ObservableCollection<LogModel> logs)
         {
+            if (logs.Count == 0) {
+                return Tuple.Create<double, double>(0,0);
+            }
             // 构建一个存储请求时间的数组
             double[] request_array = new double[logs.Count];
             // 初始化数组
             request_array.Initialize();
             foreach (var l in logs)
             {
-                request_array[logs.IndexOf(l)] = l.Request_time;
+                request_array[logs.IndexOf(l)] = l.TimeCost;
             }
             // 对数组进行排序
             utilObject.QuickSort(ref request_array, 0, request_array.Length - 1);
@@ -182,9 +196,9 @@ namespace ServerMonitor.ViewModels
             double Middle = request_array[request_array.Length / 2];
 
             var t = Tuple.Create<double, double>(Average, Middle);
+            
             return t;
         }
-
         /// <summary>
         /// 初始化生成数据
         /// </summary>
@@ -215,12 +229,19 @@ namespace ServerMonitor.ViewModels
             InitChartData();
             await Task.CompletedTask;
         }
-
         /// <summary>
         /// 初始化载入记录数据
         /// </summary>
         public void InitLogsData()
         {
+            // 新建三个存储集合，分别存储成功记录、失败记录、超时记录
+            ObservableCollection<LogModel> SuccessLogs = new ObservableCollection<LogModel>();
+            ObservableCollection<LogModel> ErrorLogs = new ObservableCollection<LogModel>();
+            ObservableCollection<LogModel> OverTimeLogs = new ObservableCollection<LogModel>();
+            // 将其添加至总的记录变量中
+            infos.LogCollections.Add(SuccessLogs);
+            infos.LogCollections.Add(OverTimeLogs);
+            infos.LogCollections.Add(ErrorLogs);
             List<LogModel> l = DBHelper.GetLogsBySiteId(id);
             if (l.Count == 0)
             {
@@ -231,27 +252,76 @@ namespace ServerMonitor.ViewModels
             {
                 foreach (var log in l)
                 {
+                    // 这里加上这句话是为把数据库里的Utc时间转换为LocalTime
+                    log.Create_Time = log.Create_Time.ToLocalTime();
                     Infos.Logs.Add(log);
-                    var log_temp = new LogModel
-                    {
-                        Create_time = log.Create_time,
-                        Request_time = Math.Log10(log.Request_time)
-                    };
-                    Infos.RequestTimeList.Add(log_temp);
+                    #region 将数据分为三类   新添加
+                    InsertLogWithCategory(infos.LogCollections, log);
+                    #endregion
+                    #region 对数据做log处理   暂时不做处理
+                    //var log_temp = new LogModel
+                    //{
+                    //    Create_time = log.Create_time,
+                    //    //Request_time = Math.Log10(log.Request_time)
+                    //    Request_time = log.Request_time
+                    //};
+                    //Infos.RequestTimeList.Add(log_temp);
+                    #endregion
                 }
-                Infos.LastRequest = l.First<LogModel>();
-                infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.Request_time);
+                Infos.LastRequest = l.Last<LogModel>();
+                infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
             }
         }
-
+        /// <summary>
+        /// 带有分类地插入日志
+        /// </summary>
+        /// <param name="logs"></param>
+        /// <param name="log"></param>
+        public void InsertLogWithCategory(ObservableCollection<ObservableCollection<LogModel>> logs, LogModel log) {
+            // logs[i] i-> 0 : Success ,1 : OverTime, 2 : Error
+            if (infos.IsWebSite)
+            {
+                if (log.Is_error)
+                {
+                    if ("1002".Equals(log.Status_code))
+                    {
+                        logs[1].Add(log);
+                    }
+                    else
+                    {
+                        logs[2].Add(log);
+                    }
+                }
+                else
+                {
+                    logs[0].Add(log);
+                }
+            }
+            else
+            {
+                switch (log.Status_code)
+                {
+                    case "1000":
+                        logs[0].Add(log);
+                        break;
+                    case "1001":
+                        logs[2].Add(log);
+                        break;
+                    case "1002":
+                        logs[1].Add(log);
+                        break;
+                }
+            }
+        }
         /// <summary>
         /// 初始化载入联系人数据
         /// </summary>
         public void InitContactData()
         {
+            ContactImpl = new ContactDAOImpl();
             // 初始化封装的信息集合
             Infos.ContactCollection = new ObservableCollection<ContactModel>();
-            List<ContactModel> contactList = DBHelper.GetContactBySiteId(id);
+            List<ContactModel> contactList = ContactImpl.GetContactModelsBySiteId(infos.Detail_Site.Id);
             if (contactList.Count == 0)
             {
                 Debug.WriteLine("无联系人!");
@@ -265,7 +335,6 @@ namespace ServerMonitor.ViewModels
                 }
             }
         }
-
         /// <summary>
         /// 用来清空第二个图表所用的计数数据
         /// </summary>
@@ -277,7 +346,6 @@ namespace ServerMonitor.ViewModels
             Infos.Pieinfo = InitPieChartData();
             #endregion
         }
-
         /// <summary>
         /// 初始化平均值与中位数
         /// </summary>
@@ -294,9 +362,6 @@ namespace ServerMonitor.ViewModels
                 Infos.AverageValue = 0;
             }
         }
-
-        
-
         /// <summary>
         /// 发起请求主体
         /// </summary>
@@ -308,7 +373,7 @@ namespace ServerMonitor.ViewModels
             {
                 try
                 {
-                    log = await RequestWebsite();
+                    log = await utilObject.RequestHTTPSite(infos.Detail_Site, HTTPRequest.Instance);
                 }
                 catch (Exception ex)
                 {
@@ -323,21 +388,28 @@ namespace ServerMonitor.ViewModels
                     switch (Infos.Detail_Site.Protocol_type)
                     {
                         case "DNS":
-                            log = utilObject.AccessDNSServer(infos.Detail_Site,DNSRequest.Instance).Result;
+                            // 这里需要简单处理下请求的内容
+                            log = await utilObject.AccessDNSServer(infos.Detail_Site, DNSRequest.Instance);
                             break;
                         case "FTP":
-
+                            log = await utilObject.AccessFTPServer(infos.Detail_Site, FTPRequest.Instance);
                             break;
                         case "SSH":
+                            log = await utilObject.AccessSSHServer(infos.Detail_Site, new SSHRequest(infos.Detail_Site.Site_address, SshLoginType.Anonymous));
                             break;
                         case "SMTP":
+                            log = await utilObject.AccessSMTPServer(infos.Detail_Site, new SMTPRequest(infos.Detail_Site.Site_address,infos.Detail_Site.Server_port));
                             break;
-                        case "Socket":
+                        case "SOCKET":
+                            log = await utilObject.ConnectToServerWithSocket(infos.Detail_Site, new SocketRequest());
+                            break;
+                        case "ICMP":
+                            log = await utilObject.ConnectToServerWithSocket(infos.Detail_Site, new SocketRequest());
                             break;
                         default:
+                            log = null;
                             break;
                     }
-                    log = null;
                 }
                 catch (Exception ex)
                 {
@@ -347,271 +419,17 @@ namespace ServerMonitor.ViewModels
             }
             return log;
         }
-
         /// <summary>
         /// 更新绑定的中位数以及平均数
         /// </summary>
         public void UpdateBindLine()
         {
-            Tuple<double, double> t = CountAverageMax(Infos.Logs);
-            Infos.AverageValue = Math.Log10(t.Item1);
-            Infos.MedianValue = Math.Log10(t.Item2);
-        }
-
-        /// <summary>
-        /// 请求服务器状态
-        /// </summary>
-        /// <param name="serverProtocol"></param>
-        /// <returns></returns>
-        public async Task<LogModel> RequestServerIcmp(SiteModel site)
-        {
-            LogModel log = null;
-            try
-            {
-                log = new LogModel();
-                IPAddress ip = await GetIPAddress(site.Site_address);
-                Dictionary<string, string> datas = Request.IcmpRequest(ip);
-
-                if (datas.Count == 1)
-                {
-                    Debug.WriteLine("异常返回");
-                    throw new Exception("服务器请求失败！");
-                }
-                else
-                {
-                    log.Create_time = DateTime.Now;
-                    log.Site_id = site.Id;
-
-                    Debug.WriteLine("");
-                }
-            }
-            catch (ArgumentNullException e)
-            {
-                log = null;
-                Debug.WriteLine("获取服务器状态失败！原因是：未获取到返回信息");
-                DBHelper.InsertErrorLog(e);
-            }
-            // 捕获超时异常!
-            catch (SocketException e)
-            {
-                log = null;
-                Debug.WriteLine(e.ToString());
-                DBHelper.InsertErrorLog(e);
-                return log;
-            }
-            catch (Exception e)
-            {
-                log = null;
-                Debug.WriteLine("获取服务器状态失败！原因是：" + e.Message);
-                DBHelper.InsertErrorLog(e);
-            }
-            return log;
-        }
-
-        /// <summary>
-        /// 请求服务器状态  没有使用!
-        /// </summary>
-        /// <param name="serverProtocol"></param>
-        /// <returns></returns>
-        public async Task<LogModel> RequestDNSServer(SiteModel site)
-        {
-            LogModel log = null;
-
-            if (null != site.Site_address && !("".Equals(site.Site_address)))
-            {
-                IPAddress ip = await utilObject.GetIPAddressAsync(site.Site_address);
-                if (null == ip)
-                {
-                    try
-                    {
-                        ip = IPAddress.Parse(site.Site_address);
-                    }
-                    catch (ArgumentException e)
-                    {
-                        Debug.WriteLine(e.ToString());
-                        DBHelper.InsertErrorLog(e);
-                        return null;
-                    }
-                }
-                IPEndPoint iPEndPoint = new IPEndPoint(ip, 53);
-                Tuple<string, string, string, string> tuple = await Request.SocketRequest(iPEndPoint);
-                #region 赋值log
-                log = new LogModel
-                {
-                    Site_id = site.Id,
-                    Create_time = DateTime.Now
-                };
-                if ("200".Equals(tuple.Item1))
-                {
-                    log.Is_error = false;
-                }
-                else
-                {
-                    log.Is_error = true;
-                }
-                log.Request_time = int.Parse(tuple.Item2);
-                log.Status_code = tuple.Item1;
-                log.Log_record = tuple.Item4;
-                #endregion
-
-                // 更新站点信息
-                Infos.Detail_Site.Status_code = log.Status_code;
-                Infos.Detail_Site.Update_time = DateTime.Now;
-                Infos.Detail_Site.Last_request_result = log.Is_error ? 0 : 1;
-                Infos.Detail_Site.Request_interval = int.Parse(tuple.Item2);
-                Infos.Detail_Site.Request_count++;
-                DBHelper.UpdateSite(infos.Detail_Site);
-                Debug.WriteLine("请求了一次服务器!");
-            }
-            return log;
-        }
-
-        /// <summary>
-        /// 截取url部分判断是否能转换成ip
-        /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
-        public async Task<IPAddress> GetIPAddress(string url)
-        {
-            if (!IPAddress.TryParse(url, out IPAddress reIP))
-            {
-                //如果输入的不是ip地址               
-                //通过域名解析ip地址
-                url = url.Substring(url.IndexOf('w'));//网址截取从以第一w
-                IPAddress[] hostEntry = await Dns.GetHostAddressesAsync(url);
-                for (int m = 0; m < hostEntry.Length; m++)
-                {
-                    if (hostEntry[m].AddressFamily == AddressFamily.InterNetwork)
-                    {
-                        reIP = hostEntry[m];
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                reIP = null;
-            }
-            return reIP;
-        }
-
-        /// <summary>
-        /// 请求网站，并存入一条记录
-        /// </summary>
-        /// <returns></returns>
-        public async Task<LogModel> RequestWebsite()
-        {
-            // 定义需要的变量
-            LogModel newLog = new LogModel();
-            JObject result = null;
-            string httpRequestStatus = "";
-            int httpRequestInterval = 0;
-            // 获取JSON格式的请求结果
-            string httpResult = await Request.HttpRequest(infos.Detail_Site.Site_address);
-            // 处理请求结果的数据
-            try
-            {
-                result = JObject.Parse(httpResult);
-                httpRequestStatus = result["StatusCode"].ToString();
-                httpRequestInterval = int.Parse(result["RequestTime"].ToString());
-
-                newLog.Status_code = httpRequestStatus;
-                newLog.Site_id = id;
-                newLog.Request_time = httpRequestInterval;
-                newLog.Create_time = DateTime.Now;
-                // 更新站点信息           
-                Infos.Detail_Site.Status_code = httpRequestStatus;
-                // 判断获取到的请求结果是不是请求成功
-                newLog.Is_error = SuccessCodeMatch(Infos.Detail_Site, Infos.Detail_Site.Status_code);
-                // 更新站点信息
-                Infos.Detail_Site.Update_time = DateTime.Now;
-                Infos.Detail_Site.Last_request_result = newLog.Is_error ? 0 : 1;
-                Infos.Detail_Site.Request_interval = httpRequestInterval;
-                Infos.Detail_Site.Request_count++;
-            }
-            catch (JsonReaderException e)
-            {
-                DBHelper.InsertErrorLog(e);
-                Debug.WriteLine(httpResult);
-                // 返回值为自定义的错误内容
-                CatchCustomReturned(httpResult);
-
-            }
-            catch (Exception e)
-            {
-                DBHelper.InsertErrorLog(e);
-                Debug.WriteLine(httpResult);
-                newLog = null;
-            }
-            finally
-            {
-                // 更新站点
-                DBHelper.UpdateSite(Infos.Detail_Site);
-            }
-
-            return newLog;
-        }
-
-        /// <summary>
-        /// 接收自定义的错误返回并新增错误日志信息
-        /// </summary>
-        /// <param name="customResult"></param>
-        public void CatchCustomReturned(string customResult)
-        {
-            switch (customResult)
-            {
-                case "请求超时":
-                    Infos.Detail_Site.Last_request_result = -1;
-                    Infos.Detail_Site.Update_time = DateTime.Now;
-                    Infos.Detail_Site.Request_interval = 5000;
-                    break;
-                case "请求失败":
-                    Infos.Detail_Site.Last_request_result = 0;
-                    Infos.Detail_Site.Update_time = DateTime.Now;
-                    Infos.Detail_Site.Request_interval = 5000;
-                    break;
-                default:
-                    throw new ArgumentException("返回参数不合法!");
-            }
-        }
-
-        /// <summary>
-        /// 查看是否满足用户提出的成功Code
-        /// </summary>
-        /// <param name="site"></param>
-        /// <param name="statusCode"></param>
-        /// <returns></returns>
-        public bool SuccessCodeMatch(SiteModel site, string statusCode)
-        {
-            string[] successCodes = getSuccStatusCode(Infos.Detail_Site);
-            foreach (var i in successCodes)
-            {
-                if (i.Equals(statusCode))
-                {
-                    return false;
-
-                }
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// 获取服务器状态成功的状态码列表
-        /// </summary>
-        /// <param name="site"></param>
-        /// <returns></returns>
-        public string[] getSuccStatusCode(SiteModel site)
-        {
-            if (site.Request_succeed_code.Contains(','))
-            {
-                return site.Request_succeed_code.Split(',');
-            }
-            else
-            {
-                return new string[] { site.Request_succeed_code };
-            }
-        }
-
+            Tuple<double, double> t = CountAverageMax(Infos.LogCollections[0]);
+            //Infos.AverageValue = Math.Log10(t.Item1);
+            //Infos.MedianValue = Math.Log10(t.Item2);
+            Infos.AverageValue = t.Item1;
+            Infos.MedianValue = t.Item2;
+        }       
         /// <summary>
         /// 更新下面两个图表的数据
         /// </summary>
@@ -643,10 +461,9 @@ namespace ServerMonitor.ViewModels
                 }
                 // 更新上次请求记录
                 Infos.LastRequest = Infos.Logs.First<LogModel>();
-                Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.Request_time);
+                Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
             }
         }
-
         /// <summary>
         /// 界面数据添加一条新的记录
         /// </summary>
@@ -657,12 +474,16 @@ namespace ServerMonitor.ViewModels
             {
                 Debug.WriteLine("成功插入一条日志数据! 日志内容为：" + log.ToString());
                 Infos.Logs.Add(log);
-                var log_temp = new LogModel
-                {
-                    Create_time = log.Create_time,
-                    Request_time = Math.Log10(log.Request_time)
-                };
-                Infos.RequestTimeList.Add(log_temp);
+                InsertLogWithCategory(infos.LogCollections, log);
+                #region 暂时不适用的取对数的部分
+                //var log_temp = new LogModel
+                //{
+                //    Create_time = log.Create_time,
+                //    //Request_time = Math.Log10(log.Request_time)
+                //    Request_time = log.Request_time
+                //};
+                //Infos.RequestTimeList.Add(log_temp);
+                #endregion
             }
             else
             {
@@ -672,7 +493,6 @@ namespace ServerMonitor.ViewModels
 
             UpdateChart(log);
         }
-
         /// <summary>
         /// 插入一条记录的时候更新下面两个图表的信息
         /// </summary>
@@ -680,19 +500,19 @@ namespace ServerMonitor.ViewModels
         public void UpdateChart(LogModel log)
         {
             #region 添加第二个表格需要的数据
-            if (!"200".Equals(log.Status_code))
+            if (log.Is_error)
             {
-                Infos.Re[3].Count++;
+                Infos.Re[4].Count++;
             }
-            else if (log.Request_time <= 1)
+            else if (log.TimeCost <= 1)
             {
                 Infos.Re[0].Count++;
             }
-            else if (log.Request_time <= 30)
+            else if (log.TimeCost <= 30)
             {
                 Infos.Re[1].Count++;
             }
-            else if (log.Request_time <= 100)
+            else if (log.TimeCost <= 100)
             {
                 Infos.Re[2].Count++;
             }
@@ -707,17 +527,16 @@ namespace ServerMonitor.ViewModels
             {
                 Infos.Pieinfo[0].Count++;
             }
-            else if (log.Status_code.Equals("超时"))
-            {
-                Infos.Pieinfo[2].Count++;
-            }
-            else
+            else if ("1002".Equals(log.Status_code))
             {
                 Infos.Pieinfo[1].Count++;
             }
+            else
+            {
+                Infos.Pieinfo[2].Count++;
+            }
             #endregion
         }
-              
         /// <summary>
         /// 响应式修改第一个图表的属性
         /// </summary>
@@ -727,28 +546,34 @@ namespace ServerMonitor.ViewModels
             switch (index)
             {
                 case 0:
-                    Infos.FirstChartAxisProperties.Min.MajorStep = 6;
+                    Infos.FirstChartAxisProperties.Min.MajorStep = 3;
                     Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Hour;
-                    Infos.FirstChartAxisProperties.Mid.MajorStep = 4;
-                    Infos.FirstChartAxisProperties.Mid.MajorStepUnit1 = TimeInterval.Hour;
-                    Infos.FirstChartAxisProperties.Max.MajorStep = 2;
-                    Infos.FirstChartAxisProperties.Max.MajorStepUnit1 = TimeInterval.Hour;
+                    //Infos.FirstChartAxisProperties.Min.MajorStep = 6;
+                    //Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Hour;
+                    //Infos.FirstChartAxisProperties.Mid.MajorStep = 4;
+                    //Infos.FirstChartAxisProperties.Mid.MajorStepUnit1 = TimeInterval.Hour;
+                    //Infos.FirstChartAxisProperties.Max.MajorStep = 2;
+                    //Infos.FirstChartAxisProperties.Max.MajorStepUnit1 = TimeInterval.Hour;
                     break;
                 case 1:
-                    Infos.FirstChartAxisProperties.Min.MajorStep = 1.5;
-                    Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Day;
-                    Infos.FirstChartAxisProperties.Mid.MajorStep = 1;
-                    Infos.FirstChartAxisProperties.Mid.MajorStepUnit1 = TimeInterval.Day;
-                    Infos.FirstChartAxisProperties.Max.MajorStep = 12;
-                    Infos.FirstChartAxisProperties.Max.MajorStepUnit1 = TimeInterval.Hour;
+                    Infos.FirstChartAxisProperties.Min.MajorStep = 12;
+                    Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Hour;
+                    //Infos.FirstChartAxisProperties.Min.MajorStep = 1.5;
+                    //Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Day;
+                    //Infos.FirstChartAxisProperties.Mid.MajorStep = 1;
+                    //Infos.FirstChartAxisProperties.Mid.MajorStepUnit1 = TimeInterval.Day;
+                    //Infos.FirstChartAxisProperties.Max.MajorStep = 12;
+                    //Infos.FirstChartAxisProperties.Max.MajorStepUnit1 = TimeInterval.Hour;
                     break;
                 case 2:
-                    Infos.FirstChartAxisProperties.Min.MajorStep = 3;
+                    Infos.FirstChartAxisProperties.Min.MajorStep = 1;
                     Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Day;
-                    Infos.FirstChartAxisProperties.Mid.MajorStep = 2;
-                    Infos.FirstChartAxisProperties.Mid.MajorStepUnit1 = TimeInterval.Day;
-                    Infos.FirstChartAxisProperties.Max.MajorStep = 1;
-                    Infos.FirstChartAxisProperties.Max.MajorStepUnit1 = TimeInterval.Day;
+                    //Infos.FirstChartAxisProperties.Min.MajorStep = 3;
+                    //Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Day;
+                    //Infos.FirstChartAxisProperties.Mid.MajorStep = 2;
+                    //Infos.FirstChartAxisProperties.Mid.MajorStepUnit1 = TimeInterval.Day;
+                    //Infos.FirstChartAxisProperties.Max.MajorStep = 1;
+                    //Infos.FirstChartAxisProperties.Max.MajorStepUnit1 = TimeInterval.Day;
                     break;
                 default:
                     break;
@@ -762,7 +587,7 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        public void load_Loading(FrameworkElement sender, object args)
+        public void Load_Loading(FrameworkElement sender, object args)
         {
             Infos.FirstChartAxisProperties = new FirstChartAxisProperties();
             ChangeStepUnitStep(0);
@@ -824,7 +649,11 @@ namespace ServerMonitor.ViewModels
             DBHelper.UpdateSite(Infos.Detail_Site);
             // 重新获取界面信息
             Infos.Logs.Clear();
-            Infos.RequestTimeList.Clear();
+            foreach (var item in infos.LogCollections)
+            {
+                item.Clear();
+            }
+            //Infos.RequestTimeList.Clear();
             #region 清空Re和PieInfo集合每一项的值
             foreach (var item in Infos.Re)
             {
@@ -861,7 +690,7 @@ namespace ServerMonitor.ViewModels
                 UpdateBindLine();
                 // 更新上次请求记录
                 Infos.LastRequest = Infos.Logs.Last();
-                Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.Request_time);
+                Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
             }
             else
             {
@@ -873,7 +702,274 @@ namespace ServerMonitor.ViewModels
             // V操作 启用刷新按钮
             Infos.RequestAsyncStat = true;
         }
+        /// <summary>
+        /// 点击编辑按钮跳转至编辑界面
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void NavigateIntoEditPart(object sender, RoutedEventArgs e) {
+            if (infos.IsWebSite)
+            {
+                NavigationService.Navigate(typeof(Views.AddWebsitePage), "2," + infos.Detail_Site.Id);
+            }
+            else {
+                NavigationService.Navigate(typeof(Views.AddServerPage), "2," + infos.Detail_Site.Id);
+            }
+        }
+        #endregion
+        #region 没有用到方法集
+        /// <summary>
+        /// 请求服务器状态  没有用到
+        /// </summary>
+        /// <param name="serverProtocol"></param>
+        /// <returns></returns>
+        public async Task<LogModel> RequestServerIcmp(SiteModel site)
+        {
+            LogModel log = null;
+            try
+            {
+                log = new LogModel();
+                IPAddress ip = await utilObject.GetIPAddressAsync(site.Site_address);
+                Dictionary<string, string> datas = Request.IcmpRequest(ip);
 
+                if (datas.Count == 1)
+                {
+                    Debug.WriteLine("异常返回");
+                    throw new Exception("服务器请求失败！");
+                }
+                else
+                {
+                    log.Create_Time = DateTime.Now;
+                    log.Site_id = site.Id;
+
+                    Debug.WriteLine("");
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                log = null;
+                Debug.WriteLine("获取服务器状态失败！原因是：未获取到返回信息");
+                DBHelper.InsertErrorLog(e);
+            }
+            // 捕获超时异常!
+            catch (SocketException e)
+            {
+                log = null;
+                Debug.WriteLine(e.ToString());
+                DBHelper.InsertErrorLog(e);
+                return log;
+            }
+            catch (Exception e)
+            {
+                log = null;
+                Debug.WriteLine("获取服务器状态失败！原因是：" + e.Message);
+                DBHelper.InsertErrorLog(e);
+            }
+            return log;
+        }
+        /// <summary>
+        /// 请求服务器状态  没有使用!
+        /// </summary>
+        /// <param name="serverProtocol"></param>
+        /// <returns></returns>
+        public async Task<LogModel> RequestDNSServer(SiteModel site)
+        {
+            LogModel log = null;
+
+            if (null != site.Site_address && !("".Equals(site.Site_address)))
+            {
+                IPAddress ip = await utilObject.GetIPAddressAsync(site.Site_address);
+                if (null == ip)
+                {
+                    try
+                    {
+                        ip = IPAddress.Parse(site.Site_address);
+                    }
+                    catch (ArgumentException e)
+                    {
+                        Debug.WriteLine(e.ToString());
+                        DBHelper.InsertErrorLog(e);
+                        return null;
+                    }
+                }
+                IPEndPoint iPEndPoint = new IPEndPoint(ip, 53);
+                Tuple<string, string, string, string> tuple = await Request.SocketRequest(iPEndPoint);
+                #region 赋值log
+                log = new LogModel
+                {
+                    Site_id = site.Id,
+                    Create_Time = DateTime.Now
+                };
+                if ("200".Equals(tuple.Item1))
+                {
+                    log.Is_error = false;
+                }
+                else
+                {
+                    log.Is_error = true;
+                }
+                log.TimeCost = int.Parse(tuple.Item2);
+                log.Status_code = tuple.Item1;
+                log.Log_Record = tuple.Item4;
+                #endregion
+
+                // 更新站点信息
+                Infos.Detail_Site.Status_code = log.Status_code;
+                Infos.Detail_Site.Update_time = DateTime.Now;
+                Infos.Detail_Site.Is_success = log.Is_error ? 0 : 1;
+                Infos.Detail_Site.Request_TimeCost = int.Parse(tuple.Item2);
+                Infos.Detail_Site.Request_count++;
+                DBHelper.UpdateSite(infos.Detail_Site);
+                Debug.WriteLine("请求了一次服务器!");
+            }
+            return log;
+        }
+
+        /// <summary>
+        /// 截取url部分判断是否能转换成ip  没有用到
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public async Task<IPAddress> GetIPAddress(string url)
+        {
+            if (!IPAddress.TryParse(url, out IPAddress reIP))
+            {
+                //如果输入的不是ip地址               
+                //通过域名解析ip地址
+                url = url.Substring(url.IndexOf('w'));//网址截取从以第一w
+                IPAddress[] hostEntry = await Dns.GetHostAddressesAsync(url);
+                for (int m = 0; m < hostEntry.Length; m++)
+                {
+                    if (hostEntry[m].AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        reIP = hostEntry[m];
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                reIP = null;
+            }
+            return reIP;
+        }
+
+        /// <summary>
+        /// 请求网站，并存入一条记录  没有使用到
+        /// </summary>
+        /// <returns></returns>
+        public async Task<LogModel> RequestWebsite()
+        {
+            // 定义需要的变量
+            LogModel newLog = new LogModel();
+            JObject result = null;
+            string httpRequestStatus = "";
+            int httpRequestInterval = 0;
+            // 获取JSON格式的请求结果
+            string httpResult = await Request.HttpRequest(infos.Detail_Site.Site_address);
+            // 处理请求结果的数据
+            try
+            {
+                result = JObject.Parse(httpResult);
+                httpRequestStatus = result["StatusCode"].ToString();
+                httpRequestInterval = int.Parse(result["RequestTime"].ToString());
+
+                newLog.Status_code = httpRequestStatus;
+                newLog.Site_id = id;
+                newLog.TimeCost = httpRequestInterval;
+                newLog.Create_Time = DateTime.Now;
+                // 更新站点信息           
+                Infos.Detail_Site.Status_code = httpRequestStatus;
+                // 判断获取到的请求结果是不是请求成功
+                newLog.Is_error = SuccessCodeMatch(Infos.Detail_Site, Infos.Detail_Site.Status_code);
+                // 更新站点信息
+                Infos.Detail_Site.Update_time = DateTime.Now;
+                Infos.Detail_Site.Is_success = newLog.Is_error ? 0 : 1;
+                Infos.Detail_Site.Request_TimeCost = httpRequestInterval;
+                Infos.Detail_Site.Request_count++;
+            }
+            catch (JsonReaderException e)
+            {
+                DBHelper.InsertErrorLog(e);
+                Debug.WriteLine(httpResult);
+                // 返回值为自定义的错误内容
+                CatchCustomReturned(httpResult);
+
+            }
+            catch (Exception e)
+            {
+                DBHelper.InsertErrorLog(e);
+                Debug.WriteLine(httpResult);
+                newLog = null;
+            }
+            finally
+            {
+                // 更新站点
+                DBHelper.UpdateSite(Infos.Detail_Site);
+            }
+
+            return newLog;
+        }
+
+        /// <summary>
+        /// 接收自定义的错误返回并新增错误日志信息  没有用到
+        /// </summary>
+        /// <param name="customResult"></param>
+        public void CatchCustomReturned(string customResult)
+        {
+            switch (customResult)
+            {
+                case "请求超时":
+                    Infos.Detail_Site.Is_success = -1;
+                    Infos.Detail_Site.Update_time = DateTime.Now;
+                    Infos.Detail_Site.Request_TimeCost = 5000;
+                    break;
+                case "请求失败":
+                    Infos.Detail_Site.Is_success = 0;
+                    Infos.Detail_Site.Update_time = DateTime.Now;
+                    Infos.Detail_Site.Request_TimeCost = 5000;
+                    break;
+                default:
+                    throw new ArgumentException("返回参数不合法!");
+            }
+        }
+
+        /// <summary>
+        /// 查看是否满足用户提出的成功Code  没有使用到
+        /// </summary>
+        /// <param name="site"></param>
+        /// <param name="statusCode"></param>
+        /// <returns></returns>
+        public bool SuccessCodeMatch(SiteModel site, string statusCode)
+        {
+            string[] successCodes = GetSuccStatusCode(site);
+            foreach (var i in successCodes)
+            {
+                if (i.Equals(statusCode))
+                {
+                    return false;
+
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 获取服务器状态成功的状态码列表  没有使用到
+        /// </summary>
+        /// <param name="site"></param>
+        /// <returns></returns>
+        public string[] GetSuccStatusCode(SiteModel site)
+        {
+            if (site.Request_succeed_code.Contains(','))
+            {
+                return site.Request_succeed_code.Split(',');
+            }
+            else
+            {
+                return new string[] { site.Request_succeed_code };
+            }
+        }
         #endregion
     }
 
@@ -881,7 +977,7 @@ namespace ServerMonitor.ViewModels
     /// <summary>
     /// 请求类别
     /// </summary>
-    public enum RequestType { Succeed, Error, OverTime };
+    public enum RequestType { SUCCESS, ERROR, OVERTIME };
 
     /// <summary>
     /// 封装用于第三个图表(饼图)的信息结构
@@ -957,11 +1053,12 @@ namespace ServerMonitor.ViewModels
         private string lastRequestWords;
         private double medianValue;
         private double averageValue;
-        private ObservableCollection<LogModel> requestTimeList;
+        //private ObservableCollection<LogModel> requestTimeList;
         private FirstChartAxisProperties firstChartAxisProperties;
         private ObservableCollection<ContactModel> contactCollection;
         private bool loadAsyncStat = false;
         private bool requestAsyncStat = true;
+        private ObservableCollection<ObservableCollection<LogModel>> logCollections;
 
         // 对应界面上的toggledSwitch 按钮的值，表示此站点是否正在监测
         public bool IsMonitor
@@ -1082,18 +1179,18 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        /// <summary>
-        /// 请求时间列表
-        /// </summary>
-        public ObservableCollection<LogModel> RequestTimeList
-        {
-            get => requestTimeList;
-            set
-            {
-                requestTimeList = value;
-                RaisePropertyChanged(() => RequestTimeList);
-            }
-        }
+        ///// <summary>
+        ///// 请求时间列表
+        ///// </summary>
+        //public ObservableCollection<LogModel> RequestTimeList
+        //{
+        //    get => requestTimeList;
+        //    set
+        //    {
+        //        requestTimeList = value;
+        //        RaisePropertyChanged(() => RequestTimeList);
+        //    }
+        //}
 
         /// <summary>
         /// 第一个图表使用的数据
@@ -1144,6 +1241,18 @@ namespace ServerMonitor.ViewModels
             {
                 requestAsyncStat = value;
                 RaisePropertyChanged(() => RequestAsyncStat);
+            }
+        }
+
+        /// <summary>
+        /// 封装多个请求序列的变量
+        /// </summary>
+        public ObservableCollection<ObservableCollection<LogModel>> LogCollections {
+            get => logCollections;
+            set
+            {
+                logCollections = value;
+                RaisePropertyChanged(() => LogCollections);
             }
         }
     }
@@ -1232,6 +1341,83 @@ namespace ServerMonitor.ViewModels
             MajorStepUnit = TimeInterval.Hour;
         }
     }
+
+    public class FirstChartLengend : ObservableObject
+    {
+        private string title;
+
+        public string Title
+        {
+            get { return title; }
+            set { title = value; RaisePropertyChanged(() => Title); }
+        }
+        private Brush fill;
+
+        public Brush Fill
+        {
+            get { return fill; }
+            set { fill = value; RaisePropertyChanged(() => Fill); }
+        }
+
+    }
+    #endregion
+
+    #region 图表标签格式化类
+    //对数轴标签格式化
+    public class CustomLogOperatorAxisLabelFormatter : IContentFormatter
+    {
+        public object Format(object owner, object content)
+        {
+            // The owner parameter is the Axis instance which labels are currently formatted
+            var axis = owner as Axis;
+            var con = content == null ? 0:int.Parse(content.ToString());
+            if (con >= 1000)
+            {
+                content = con / 1000 + "s";
+            }
+            else
+            {
+                content = con + "ms";
+            }
+            return content.ToString();
+        }
+    }
+    //时间轴标签格式化
+    public class CustomOperatorDateTimeAxisLabelFormatter : IContentFormatter
+    {
+        public object Format(object owner, object content)
+        {
+            // The owner parameter is the Axis instance which labels are currently formatted
+            var axis = owner as DateTimeContinuousAxis;
+            var con = Convert.ToDateTime(content);
+
+            if (axis.MajorStepUnit != TimeInterval.Hour||axis.MajorStep>=12) //当时间间隔为天时，格式化显示天
+            {
+                var con_str = String.Format("{0:MM-dd HH:mm}", con);
+                return con_str;
+            }
+            else //否则只显示小时
+            {
+                var con_str = String.Format("{0:HH:mm}", con);
+                return con_str;
+            }
+        }
+    }
+    //分类轴标签格式化（柱状图）
+    public class CustomOperatorCategoricalAxisLabelFormatter : IContentFormatter
+    {
+        public object Format(object owner, object content)
+        {
+            // The owner parameter is the Axis instance which labels are currently formatted
+            var axis = owner as DateTimeContinuousAxis;
+            var siteId = Convert.ToInt32(content == null ? "" : content.ToString());
+            foreach (var item in ChartPageViewModel.siteModels.Where(i => i.Id == siteId).Select(i => i))
+            {
+                return item.Site_name;
+            }
+            return "UnkUtcNownID" + content.ToString();
+        }
+    }
     #endregion
 
     #region 转换器
@@ -1259,7 +1445,7 @@ namespace ServerMonitor.ViewModels
         {
             string typeOfValue = parameter as string;
             double _value = double.Parse(value.ToString());
-            return string.Format("{0}：{1} ms", typeOfValue, (int)Math.Pow(10, _value));
+            return string.Format("{0}：{1} ms", typeOfValue,  (int)_value);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)

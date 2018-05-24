@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ServerMonitor.Controls;
 using ServerMonitor.DAO;
+using ServerMonitor.DAOImpl;
 using ServerMonitor.Models;
 using ServerMonitor.SiteDb;
 using SQLite.Net;
@@ -29,27 +30,6 @@ namespace ServerMonitor.DAO
             return r;
         }
 
-        /// <summary>
-        /// 通过站点Id查询关联管理员
-        /// </summary>
-        /// <param name="siteId"></param>
-        /// <returns></returns>
-        public List<ContactModel> GetContactBySiteId(int siteId)
-        {
-            List<ContactModel> contactList;
-            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
-            {
-                try
-                {
-                    contactList = conn.Table<ContactModel>().Where(v => v.SiteId == siteId).ToList<ContactModel>();
-                }
-                catch
-                {
-                    contactList = new List<ContactModel>();
-                }
-            }
-            return contactList;
-        }
 
         /// <summary>
         /// 插入一条联系人
@@ -106,7 +86,36 @@ namespace ServerMonitor.DAO
             }
             return result;
         }
+        //根据contactid输出contact信息
+        private ContactModel GetContactByContactId(int ContactId)
+        {
 
+            List<ContactModel> contactList;
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
+            {
+                try
+                {
+                    contactList = conn.Table<ContactModel>().Where(v => v.Id == ContactId).ToList<ContactModel>();
+                }
+                catch
+                {
+                    contactList = new List<ContactModel>();
+                }
+            }
+            return contactList[0];
+        }
+        public List<ContactModel> GetContactModelsBySiteId(int siteid)
+        {
+            List<ContactModel> contactModels = new List<ContactModel>();
+            IContactSiteDao k = ContactSiteDAOImpl.Instance;
+            List<SiteContactModel> contactSiteModels = k.GetConnectsBySiteId(siteid);
+            foreach (SiteContactModel m in contactSiteModels)
+            {
+                ContactModel tmp = GetContactByContactId(m.ContactId);
+                contactModels.Add(tmp);
+            }
+            return contactModels;
+        }
         private void InsertErrorLog(SQLiteException e)
         {
             throw new NotImplementedException();

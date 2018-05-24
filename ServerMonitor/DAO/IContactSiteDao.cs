@@ -7,12 +7,23 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.DAO
 {
-    interface IContactSiteDao
-    {
-        
-        int InsertConnect(ContactModel contact);
-        
-        List<ContactSiteModel> GetConnectsBySiteId(int SiteId);
+    /// <summary>
+    /// Author:xb
+    /// </summary>
+    public interface IContactSiteDao
+    {        
+        /// <summary>
+        /// 插入一条绑定记录
+        /// </summary>
+        /// <param name="contact"></param>
+        /// <returns></returns>
+        int InsertConnect(ContactModel contact);    
+        /// <summary>
+        /// 根据站点的id获取绑定记录
+        /// </summary>
+        /// <param name="SiteId"></param>
+        /// <returns></returns>
+        List<SiteContactModel> GetConnectsBySiteId(int SiteId);
         /// <summary>
         /// 根据单个站点ID删除此站点与指定ID联系人的记录
         /// </summary>
@@ -26,6 +37,12 @@ namespace ServerMonitor.DAO
         /// <param name="SiteId">指定站点的ID</param>
         /// <returns>此操作影响的数据行数</returns>
         int DeletSiteAllConnect(int SiteId);
-        int InsertListConnects(List<ContactSiteModel> connects);
+        /// <summary>
+        /// 插入一系列绑定记录
+        /// </summary>
+        /// <param name="connects"></param>
+        /// <returns></returns>
+        int InsertListConnects(List<SiteContactModel> connects);
+        List<SiteContactModel> GetContactSiteBySiteId(int siteid);
     }
 }

@@ -18,7 +18,7 @@
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
     <PackageCertificateKeyFile>ServerMonitor_TemporaryKey.pfx</PackageCertificateKeyFile>
-    <PackageCertificateThumbprint>B33ECE88E89244B5E6A08EB073EADFF75A871094</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>5DEF1C559E74AEA92BD34F58A695E60A3A96E39A</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
@@ -107,7 +107,7 @@
     <Compile Include="DAO\IContactSiteDao.cs" />
     <Compile Include="DAO\IDatbaBaseControl.cs" />
     <Compile Include="DAO\ISiteDAO.cs" />
-    <Compile Include="Models\ContactSiteModel.cs" />
+    <Compile Include="Models\SiteContactModel.cs" />
     <Compile Include="Services\RequestServices\BasicRequest.cs" />
     <Compile Include="Common\DataHelper.cs" />
     <Compile Include="Controls\DBHelper.cs" />
@@ -116,6 +116,7 @@
     <Compile Include="Common\IcmpPacket.cs" />
     <Compile Include="Controls\Request.cs" />
     <Compile Include="Services\RequestServices\HTTPRequest.cs" />
+    <Compile Include="Services\RequestServices\ICMPRequest.cs" />
     <Compile Include="Services\RequestServices\IRequest.cs" />
     <Compile Include="Services\RequestServices\SMTPRequest.cs" />
     <Compile Include="CustomConverter.cs" />
@@ -128,6 +129,7 @@
     <Compile Include="Models\LogModel.cs" />
     <Compile Include="Models\SiteModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\RequestServices\SocketRequest.cs" />
     <Compile Include="Services\RequestServices\SSHRequest.cs" />
     <Compile Include="Services\SettingsServices\SettingsService.cs" />
     <Compile Include="Util\MessageRemind.cs" />
@@ -136,14 +138,15 @@
     <Compile Include="ViewModels\AddWebsitePageViewModel.cs" />
     <Compile Include="ViewModels\AllServerViewModel.cs" />
     <Compile Include="ViewModels\AllServer_addserverViewModel.cs" />
+    <Compile Include="ViewModels\BLL\AddServerUtilImpl.cs" />
     <Compile Include="ViewModels\BLL\ChartUtilImpl.cs" />
+    <Compile Include="ViewModels\BLL\IAddServerUtil.cs" />
     <Compile Include="ViewModels\BLL\IChartUtil.cs" />
     <Compile Include="ViewModels\BLL\ISiteDetailUtil.cs" />
     <Compile Include="ViewModels\BLL\SiteDetailUtilImpl.cs" />
     <Compile Include="ViewModels\ChartPageViewModel.cs" />
     <Compile Include="ViewModels\ContactPageViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
-    <Compile Include="ViewModels\DetailPageViewModel.cs" />
     <Compile Include="ViewModels\SettingsPageViewModel.cs" />
     <Compile Include="ViewModels\SiteDetailViewModel.cs" />
     <Compile Include="Views\AddMonitor.xaml.cs">
@@ -172,9 +175,6 @@
     </Compile>
     <Compile Include="Views\ContactPage.xaml.cs">
       <DependentUpon>ContactPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\DetailPage.xaml.cs">
-      <DependentUpon>DetailPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -282,10 +282,6 @@
     <Page Include="Views\ContactPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\DetailPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
