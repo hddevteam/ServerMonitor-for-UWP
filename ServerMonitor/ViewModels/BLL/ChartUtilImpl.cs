@@ -92,6 +92,7 @@ namespace ServerMonitor.ViewModels.BLL
             //对每个站点进行统计
             foreach (var site in sites)
             {
+                //为站点创建序列数据
                 ObservableCollection<Chart1> chart1Series = new ObservableCollection<Chart1>();
                 //站点各项请求结果统计
                 int successCount = 0, errorCount = 0, overtimeCount = 0;
@@ -115,7 +116,7 @@ namespace ServerMonitor.ViewModels.BLL
                             //超时
                             overtimeCount++;
                             result = "OverTime";
-                            chart1Series.Add(new Chart1() { RequestTime = log.Create_Time, Result = result, ResponseTime = log.TimeCost });
+                            chart1Series.Add(new Chart1() { RequestTime = log.Create_Time, Result = result, ResponseTime = OVERTIME });
                         }
                         else
                         {

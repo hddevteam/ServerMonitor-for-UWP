@@ -88,7 +88,7 @@
                 <!--区间切换-->
                 <Pivot x:Name="period" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Width="400" HorizontalAlignment="Left"
                        SelectedIndex="{Binding PivotIndex,Mode=TwoWay}" SelectionChanged="{x:Bind ViewModel.PivotSelectionChanged}">
-                    <PivotItem Header="Today" FontSize="8">
+                    <PivotItem Header="Today">
                     </PivotItem>
                     <PivotItem Header="Three Days">
                     </PivotItem>
@@ -329,7 +329,15 @@
                             </DataTemplate>
                         </telerikGrid:DataGridTemplateColumn.CellContentTemplate>
                     </telerikGrid:DataGridTemplateColumn>
-                    <telerikGrid:DataGridTextColumn PropertyName="SiteType" Header="TYPE"/>
+                    <telerikGrid:DataGridTemplateColumn Header="ADDRESS">
+                        <telerikGrid:DataGridTemplateColumn.CellContentTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Padding="5" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Site.Site_address}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </telerikGrid:DataGridTemplateColumn.CellContentTemplate>
+                    </telerikGrid:DataGridTemplateColumn>
                     <telerikGrid:DataGridTemplateColumn Header="ISCHECKED">
                         <telerikGrid:DataGridTemplateColumn.CellContentTemplate>
                             <DataTemplate>
