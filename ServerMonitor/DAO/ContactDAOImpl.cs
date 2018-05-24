@@ -86,10 +86,13 @@ namespace ServerMonitor.DAO
             }
             return result;
         }
-        //根据contactid输出contact信息
+        /// <summary>
+        /// 根据contactid输出contact信息
+        /// </summary>
+        /// <param name="ContactId"></param>
+        /// <returns></returns>
         private ContactModel GetContactByContactId(int ContactId)
         {
-
             List<ContactModel> contactList;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
@@ -103,18 +106,22 @@ namespace ServerMonitor.DAO
                 }
             }
             return contactList[0];
+            //Id是一个主码，所以获得的是一条信息，只需要取第一条就行
         }
+       
+
         public List<ContactModel> GetContactModelsBySiteId(int siteid)
         {
-            List<ContactModel> contactModels = new List<ContactModel>();
-            IContactSiteDao k = ContactSiteDAOImpl.Instance;
-            List<SiteContactModel> contactSiteModels = k.GetConnectsBySiteId(siteid);
-            foreach (SiteContactModel m in contactSiteModels)
+            List<ContactModel> contactModels = new List<ContactModel>();   //新建一个ContactModel表格用于储存获取到的信息
+            IContactSiteDao ISCD= ContactSiteDAOImpl.Instance;    //调用IContactSiteDao里面的接口
+            List<ContactSiteModel> contactSiteModels = ISCD.GetConnectsBySiteId(siteid);
+            //调用了ContactDAOImpl里面的GetConnectsBySiteId类，该类是通过输入的siteId从ContactSite表里的相对应的ContactId
+            foreach (ContactSiteModel m in contactSiteModels)//遍历所获得的contactSiteModels表里的信息，如果contactSiteModels里的ContactId与Contact表里的Id相对应，则输出Contact的信息，并加入 List<ContactModel> contactModels
             {
-                ContactModel tmp = GetContactByContactId(m.ContactId);
-                contactModels.Add(tmp);
+                ContactModel CM= GetContactByContactId(m.ContactId);
+                contactModels.Add(CM);
             }
-            return contactModels;
+            return contactModels; 
         }
         private void InsertErrorLog(SQLiteException e)
         {
