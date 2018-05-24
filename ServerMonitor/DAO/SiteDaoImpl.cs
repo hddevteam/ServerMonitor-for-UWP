@@ -13,7 +13,7 @@ using SQLite.Net.Platform.WinRT;
 namespace ServerMonitor.SiteDb
 {
     
-    class SiteDaoImpl : SiteDAO
+    class SiteDaoImpl : ISiteDAO
     {
         /// <summary>
         /// 执行有返回对象(Site)的命令

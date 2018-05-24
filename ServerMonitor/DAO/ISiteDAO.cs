@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.SiteDb
 {
-    public interface SiteDAO
+    public interface ISiteDAO
     {
         /// <summary>
         /// 返回所有的站点

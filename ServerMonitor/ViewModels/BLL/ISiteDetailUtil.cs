@@ -67,6 +67,11 @@ namespace ServerMonitor.ViewModels.BLL
         /// <returns></returns>
         Task<LogModel> ConnectToServerWithSocket(SiteModel site, SocketRequest request);
         /// <summary>
+        /// 使用ICMP 与服务器建立连接
+        /// </summary>
+        /// <returns></returns>
+        Task<LogModel> ConnectToServerWithICMP(SiteModel site, ICMPRequest request);
+        /// <summary>
         /// 请求网站，并存入一条记录
         /// </summary>
         /// <returns></returns>
