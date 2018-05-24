@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ServerMonitor.Controls;
+using ServerMonitor.DAO;
 using ServerMonitor.Models;
 using ServerMonitor.Services.RequestServices;
 using ServerMonitor.ViewModels.BLL;
@@ -39,6 +40,10 @@ namespace ServerMonitor.ViewModels
         private ViewInfo infos;
         // 传进来的站点id    属性
         private string _SiteId = "Default";
+        /// <summary>
+        /// 接口 -> 联系人操作
+        /// </summary>
+        private IContactDAO ContactImpl;
         // 点击查看详情的站点的ID   字段  ->  _SiteId
         public string SiteId { get { return _SiteId; } set { Set(ref _SiteId, value); RaisePropertyChanged(() => SiteId); } }
         // 界面的信息  字段   ->  infos
@@ -180,7 +185,7 @@ namespace ServerMonitor.ViewModels
             request_array.Initialize();
             foreach (var l in logs)
             {
-                request_array[logs.IndexOf(l)] = l.Request_time;
+                request_array[logs.IndexOf(l)] = l.TimeCost;
             }
             // 对数组进行排序
             utilObject.QuickSort(ref request_array, 0, request_array.Length - 1);
@@ -248,7 +253,7 @@ namespace ServerMonitor.ViewModels
                 foreach (var log in l)
                 {
                     // 这里加上这句话是为把数据库里的Utc时间转换为LocalTime
-                    log.Create_time = log.Create_time.ToLocalTime();
+                    log.Create_Time = log.Create_Time.ToLocalTime();
                     Infos.Logs.Add(log);
                     #region 将数据分为三类   新添加
                     InsertLogWithCategory(infos.LogCollections, log);
@@ -264,7 +269,7 @@ namespace ServerMonitor.ViewModels
                     #endregion
                 }
                 Infos.LastRequest = l.Last<LogModel>();
-                infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.Request_time);
+                infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
             }
         }
         /// <summary>
@@ -313,9 +318,10 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public void InitContactData()
         {
+            ContactImpl = new ContactDAOImpl();
             // 初始化封装的信息集合
             Infos.ContactCollection = new ObservableCollection<ContactModel>();
-            List<ContactModel> contactList = DBHelper.GetContactBySiteId(id);
+            List<ContactModel> contactList = ContactImpl.GetContactModelsBySiteId(infos.Detail_Site.Id);
             if (contactList.Count == 0)
             {
                 Debug.WriteLine("无联系人!");
@@ -454,8 +460,8 @@ namespace ServerMonitor.ViewModels
                     #endregion
                 }
                 // 更新上次请求记录
-                Infos.LastRequest = Infos.Logs.Last<LogModel>();
-                Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.Request_time);
+                Infos.LastRequest = Infos.Logs.First<LogModel>();
+                Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
             }
         }
         /// <summary>
@@ -498,15 +504,15 @@ namespace ServerMonitor.ViewModels
             {
                 Infos.Re[4].Count++;
             }
-            else if (log.Request_time <= 1)
+            else if (log.TimeCost <= 1)
             {
                 Infos.Re[0].Count++;
             }
-            else if (log.Request_time <= 30)
+            else if (log.TimeCost <= 30)
             {
                 Infos.Re[1].Count++;
             }
-            else if (log.Request_time <= 100)
+            else if (log.TimeCost <= 100)
             {
                 Infos.Re[2].Count++;
             }
@@ -684,7 +690,7 @@ namespace ServerMonitor.ViewModels
                 UpdateBindLine();
                 // 更新上次请求记录
                 Infos.LastRequest = Infos.Logs.Last();
-                Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.Request_time);
+                Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
             }
             else
             {
@@ -702,7 +708,13 @@ namespace ServerMonitor.ViewModels
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public void NavigateIntoEditPart(object sender, RoutedEventArgs e) {
-            NavigationService.Navigate(typeof(Views.AddServerPage), "2,"+infos.Detail_Site.Id);
+            if (infos.IsWebSite)
+            {
+                NavigationService.Navigate(typeof(Views.AddWebsitePage), "2," + infos.Detail_Site.Id);
+            }
+            else {
+                NavigationService.Navigate(typeof(Views.AddServerPage), "2," + infos.Detail_Site.Id);
+            }
         }
         #endregion
         #region 没有用到方法集
@@ -727,7 +739,7 @@ namespace ServerMonitor.ViewModels
                 }
                 else
                 {
-                    log.Create_time = DateTime.Now;
+                    log.Create_Time = DateTime.Now;
                     log.Site_id = site.Id;
 
                     Debug.WriteLine("");
@@ -786,7 +798,7 @@ namespace ServerMonitor.ViewModels
                 log = new LogModel
                 {
                     Site_id = site.Id,
-                    Create_time = DateTime.Now
+                    Create_Time = DateTime.Now
                 };
                 if ("200".Equals(tuple.Item1))
                 {
@@ -796,16 +808,16 @@ namespace ServerMonitor.ViewModels
                 {
                     log.Is_error = true;
                 }
-                log.Request_time = int.Parse(tuple.Item2);
+                log.TimeCost = int.Parse(tuple.Item2);
                 log.Status_code = tuple.Item1;
-                log.Log_record = tuple.Item4;
+                log.Log_Record = tuple.Item4;
                 #endregion
 
                 // 更新站点信息
                 Infos.Detail_Site.Status_code = log.Status_code;
                 Infos.Detail_Site.Update_time = DateTime.Now;
-                Infos.Detail_Site.Last_request_result = log.Is_error ? 0 : 1;
-                Infos.Detail_Site.Request_interval = int.Parse(tuple.Item2);
+                Infos.Detail_Site.Is_success = log.Is_error ? 0 : 1;
+                Infos.Detail_Site.Request_TimeCost = int.Parse(tuple.Item2);
                 Infos.Detail_Site.Request_count++;
                 DBHelper.UpdateSite(infos.Detail_Site);
                 Debug.WriteLine("请求了一次服务器!");
@@ -864,16 +876,16 @@ namespace ServerMonitor.ViewModels
 
                 newLog.Status_code = httpRequestStatus;
                 newLog.Site_id = id;
-                newLog.Request_time = httpRequestInterval;
-                newLog.Create_time = DateTime.Now;
+                newLog.TimeCost = httpRequestInterval;
+                newLog.Create_Time = DateTime.Now;
                 // 更新站点信息           
                 Infos.Detail_Site.Status_code = httpRequestStatus;
                 // 判断获取到的请求结果是不是请求成功
                 newLog.Is_error = SuccessCodeMatch(Infos.Detail_Site, Infos.Detail_Site.Status_code);
                 // 更新站点信息
                 Infos.Detail_Site.Update_time = DateTime.Now;
-                Infos.Detail_Site.Last_request_result = newLog.Is_error ? 0 : 1;
-                Infos.Detail_Site.Request_interval = httpRequestInterval;
+                Infos.Detail_Site.Is_success = newLog.Is_error ? 0 : 1;
+                Infos.Detail_Site.Request_TimeCost = httpRequestInterval;
                 Infos.Detail_Site.Request_count++;
             }
             catch (JsonReaderException e)
@@ -908,14 +920,14 @@ namespace ServerMonitor.ViewModels
             switch (customResult)
             {
                 case "请求超时":
-                    Infos.Detail_Site.Last_request_result = -1;
+                    Infos.Detail_Site.Is_success = -1;
                     Infos.Detail_Site.Update_time = DateTime.Now;
-                    Infos.Detail_Site.Request_interval = 5000;
+                    Infos.Detail_Site.Request_TimeCost = 5000;
                     break;
                 case "请求失败":
-                    Infos.Detail_Site.Last_request_result = 0;
+                    Infos.Detail_Site.Is_success = 0;
                     Infos.Detail_Site.Update_time = DateTime.Now;
-                    Infos.Detail_Site.Request_interval = 5000;
+                    Infos.Detail_Site.Request_TimeCost = 5000;
                     break;
                 default:
                     throw new ArgumentException("返回参数不合法!");

@@ -17,6 +17,7 @@ using ServerMonitor.Views;
 using Template10.Services.NavigationService;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Shapes;
+using ServerMonitor.DAO;
 
 namespace ServerMonitor.ViewModels
 {
@@ -51,6 +52,10 @@ namespace ServerMonitor.ViewModels
         //编辑，新建绑定站点
         public ServerItem RightServer { get => rightServer; set => rightServer = value; }
         private ServerItem rightServer = new ServerItem();
+
+        //站点绑定的联系人
+        private ObservableCollection<ContactModel> bindingContact = new ObservableCollection<ContactModel>();
+        public ObservableCollection<ContactModel> BindingContact { get => bindingContact; set => bindingContact = value; }
 
         private string openOrClose;//新建/编辑
         public string OpenOrClose
@@ -150,6 +155,13 @@ namespace ServerMonitor.ViewModels
                 {
                     OpenOrClose = "Open";
                 }
+            }
+
+            BindingContact.Clear();
+            var list = (new ContactDAOImpl()).GetContactModelsBySiteId(ServerContext.Site_id);
+            foreach (var item in list)
+            {
+                BindingContact.Add(item);
             }
         }
         
@@ -285,14 +297,14 @@ namespace ServerMonitor.ViewModels
             {
                 q = (from t in sites
                      where t.Is_Monitor == true
-                     where t.Last_request_result == 1
+                     where t.Is_success == 1
                      select t).ToList();
             }
             else
             {
                 q = (from t in sites
                      where t.Is_Monitor == true
-                     where t.Last_request_result != 1
+                     where t.Is_success != 1
                      select t).ToList();
             }
             switch (order)  //1:id As 2:id De 3:Al As 4:Al De

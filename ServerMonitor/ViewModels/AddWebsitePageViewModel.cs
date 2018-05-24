@@ -259,7 +259,7 @@ namespace ServerMonitor.ViewModels
                     Server_port = 1,
                     Create_time = DateTime.Now,
                     Update_time = DateTime.Now,
-                    Last_request_result = 2,  //代表unknown
+                    Is_success = 2,  //代表unknown
                     //Status_code = "1000/0",
                     Request_succeed_code = "200",
                 };
@@ -273,8 +273,13 @@ namespace ServerMonitor.ViewModels
             //将界面数据保存下来
             site.Protocol_type = GetProtocolType(ProtocolType);
             site.Site_address = (ProtocolType == 0 ? "http://" : "https://") + SiteAddress;
-            site.Status_code = "200," + StatusCodes;
-
+            if (StatusCodes==null||"".Equals(StatusCodes))
+            {
+                site.Status_code = "200";
+            }else
+            {
+                site.Status_code = "200," + StatusCodes;
+            }
             if (SiteName == null || SiteName.Equals(""))
             {
                 site.Site_name = SiteAddress;
@@ -285,12 +290,12 @@ namespace ServerMonitor.ViewModels
             }
 
             //生成可存进数据库的绑定联系人list数据
-            List<ContactSiteModel> contactSiteModels = new List<ContactSiteModel>();
+            List<SiteContactModel> contactSiteModels = new List<SiteContactModel>();
             foreach (var item in vs)
             {
                 if (item.Value)
                 {
-                    contactSiteModels.Add(new ContactSiteModel()
+                    contactSiteModels.Add(new SiteContactModel()
                     {
                         SiteId = siteId,
                         ContactId = item.Key,

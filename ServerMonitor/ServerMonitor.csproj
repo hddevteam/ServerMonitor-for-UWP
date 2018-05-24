@@ -107,7 +107,7 @@
     <Compile Include="DAO\IContactSiteDao.cs" />
     <Compile Include="DAO\IDatbaBaseControl.cs" />
     <Compile Include="DAO\ISiteDAO.cs" />
-    <Compile Include="Models\ContactSiteModel.cs" />
+    <Compile Include="Models\SiteContactModel.cs" />
     <Compile Include="Services\RequestServices\BasicRequest.cs" />
     <Compile Include="Common\DataHelper.cs" />
     <Compile Include="Controls\DBHelper.cs" />
@@ -116,7 +116,7 @@
     <Compile Include="Common\IcmpPacket.cs" />
     <Compile Include="Controls\Request.cs" />
     <Compile Include="Services\RequestServices\HTTPRequest.cs" />
-    <Compile Include="Services\RequestServices\IcmpRequest.cs" />
+    <Compile Include="Services\RequestServices\ICMPRequest.cs" />
     <Compile Include="Services\RequestServices\IRequest.cs" />
     <Compile Include="Services\RequestServices\SMTPRequest.cs" />
     <Compile Include="CustomConverter.cs" />
@@ -138,7 +138,9 @@
     <Compile Include="ViewModels\AddWebsitePageViewModel.cs" />
     <Compile Include="ViewModels\AllServerViewModel.cs" />
     <Compile Include="ViewModels\AllServer_addserverViewModel.cs" />
+    <Compile Include="ViewModels\BLL\AddServerUtilImpl.cs" />
     <Compile Include="ViewModels\BLL\ChartUtilImpl.cs" />
+    <Compile Include="ViewModels\BLL\IAddServerUtil.cs" />
     <Compile Include="ViewModels\BLL\IChartUtil.cs" />
     <Compile Include="ViewModels\BLL\ISiteDetailUtil.cs" />
     <Compile Include="ViewModels\BLL\SiteDetailUtilImpl.cs" />

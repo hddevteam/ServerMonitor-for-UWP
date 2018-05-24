@@ -365,7 +365,7 @@ namespace ServerMonitor.ViewModels
                     Monitor_interval = 5,
                     Is_Monitor = true,
                     Create_time = DateTime.Now,
-                    Last_request_result = 2,
+                    Is_success = 2,
                     Status_code = "1000/0",
                     Request_succeed_code = "1000",
                 };
@@ -403,15 +403,15 @@ namespace ServerMonitor.ViewModels
             }
             else if(site.Protocol_type.Equals("DNS"))
             {
-                site.ProtocolIdentification = GetJson(RecordType, Lookup, ExpectedResults);
+                site.Protocol_content = GetJson(RecordType, Lookup, ExpectedResults);
             }
 
-            List<ContactSiteModel> contactSiteModels = new List<ContactSiteModel>();
+            List<SiteContactModel> contactSiteModels = new List<SiteContactModel>();
             foreach (var item in vs)  //生成可存进数据库的list数据
             {
                 if (item.Value)
                 {
-                    contactSiteModels.Add(new ContactSiteModel()
+                    contactSiteModels.Add(new SiteContactModel()
                     {
                         SiteId = siteId,
                         ContactId = item.Key,
@@ -554,7 +554,7 @@ namespace ServerMonitor.ViewModels
             }
             else if(ProtocolType == 4)
             {
-                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
+                JObject js = (JObject)JsonConvert.DeserializeObject(site.Protocol_content);
                 RecordType = GetRecordType(js["recordType"].ToString());
                 Lookup = js["lookup"].ToString();
                 ExpectedResults = js["expectedResults"].ToString();
@@ -591,7 +591,7 @@ namespace ServerMonitor.ViewModels
                     //                        + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)$");//是ip
                     //Regex rg = new Regex("^[\u4e00-\u9fa5]+$");//是中文
                     //Boolean _domaincheck = rg.IsMatch(domain);
-                    if (_ipcheck|| _domaincheck)
+                    if (_ipcheck || _domaincheck)
                     {
                         return true;
                     }

@@ -13,23 +13,34 @@ namespace ServerMonitor.Models
     public class ContactModel : ObservableObject
     {
         private int id;
-        // 姓名
+        /// <summary>
+        /// 姓名
+        /// </summary>
         private string contact_name;
-        // 邮箱
+        /// <summary>
+        /// 邮箱
+        /// </summary>
         private string contact_email;
-        // 创建时间
+        /// <summary>
+        /// 创建时间
+        /// </summary>
         private DateTime create_time;
-        // 修改时间
+        /// <summary>
+        /// 修改时间
+        /// </summary>
         private DateTime update_time;
-        // 补充信息
+        /// <summary>
+        /// 补充信息
+        /// </summary>
         private string others;
-        //电话
+        /// <summary>
+        /// 电话
+        /// </summary>
         private string telephone;
-        // 关联站点
-        private int siteId;
 
-        [PrimaryKey, AutoIncrement]
+        [PrimaryKey, AutoIncrement,Column("id")]
         public int Id { get => id; set => id = value; }
+        [Column("contact_name")]
         public string Contact_name
         {
             get => contact_name;
@@ -39,6 +50,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Contact_name);
             }
         }
+        [Column("contact_email")]
         public string Contact_email
         {
             get => contact_email;
@@ -48,6 +60,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Contact_email);
             }
         }
+        [Column("create_time"), Default(true)]
         public DateTime Create_time
         {
             get => create_time;
@@ -57,6 +70,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Create_time);
             }
         }
+        [Column("update_time"), Default(true)]
         public DateTime Update_time
         {
             get => update_time;
@@ -66,6 +80,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Update_time);
             }
         }
+        [Column("others")]
         public string Others
         {
             get => others;
@@ -75,6 +90,7 @@ namespace ServerMonitor.Models
                 RaisePropertyChanged(() => Others);
             }
         }
+        [Column("telephone")]
         public string Telephone
         {
             get => telephone;
@@ -83,12 +99,6 @@ namespace ServerMonitor.Models
                 telephone = value;
                 RaisePropertyChanged(() => Telephone);
             }
-        }
-
-        [NotNull]
-        public int SiteId {
-            get => siteId;
-            set => siteId = value;
         }
     }
 }
