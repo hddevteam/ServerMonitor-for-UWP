@@ -41,6 +41,7 @@ namespace ServerMonitor.ViewModels
 
         private string _Value = "Default";  //保存传过来的信息  为 "page,siteId"
         public string Value { get { return _Value; } set { Set(ref _Value, value); } }
+        private bool contactChange = false;  //true 绑定联系人改变了
         #endregion
 
         #region 系统函数
@@ -201,8 +202,8 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        private int port;
-        public int Port
+        private string port;
+        public string Port
         {
             get => port;
             set
@@ -331,6 +332,7 @@ namespace ServerMonitor.ViewModels
                     SelectedContacts.Add(Contacts[i]);
                 }
             }
+            contactChange = true;
         }
         
         /// <summary>
@@ -347,8 +349,19 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public void Domain_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string domain = (sender as TextBox).Text.ToString();
-            IsEnabled = CheckDomain(domain);
+            bool flag = false;
+            var textBox = sender as TextBox;
+            if (textBox.Tag.Equals("1"))  //检查站点地址
+            {
+                string domain = textBox.Text.ToString();
+                flag = CheckDomain(domain);
+            }
+            else   //检查状态码
+            {
+                string port = textBox.Text.ToString();
+                flag = CheckPort(port);
+            }
+            IsEnabled = flag;
         }
 
         /// <summary>
@@ -373,13 +386,22 @@ namespace ServerMonitor.ViewModels
             else    //Edit site
             {
                 site = DBHelper.GetSiteById(siteId);
+                site.Protocol_content = null;
+                site.ProtocolIdentification = null;
             }
             site.Update_time = DateTime.Now;
 
             //将界面数据保存下来
             site.Protocol_type = GetProtocolType(ProtocolType);
             site.Site_address = SiteAddress;
-            site.Server_port = Port;
+            try
+            {
+                site.Server_port = int.Parse(Port);
+            }
+            catch (Exception)
+            {
+                site.Server_port = 0;
+            }
             if (SiteName == null|| SiteName.Equals(""))
             {
                 site.Site_name = SiteAddress;
@@ -421,7 +443,7 @@ namespace ServerMonitor.ViewModels
             //数据库操作
             if (siteId == -1)
             {
-                if (DBHelper.InsertOneSite(site) == 1) 
+                if (DBHelper.InsertOneSite(site) == 1)
                 {
                     var contactS = ContactSiteDAOImpl.Instance.InsertListConnects(contactSiteModels);
                     Jump(); //返回原界面
@@ -431,8 +453,11 @@ namespace ServerMonitor.ViewModels
             {
                 if (DBHelper.UpdateSite(site) == 1)
                 {
-                    var in1 = ContactSiteDAOImpl.Instance.DeletSiteAllConnect(siteId);
-                    var contactS = ContactSiteDAOImpl.Instance.InsertListConnects(contactSiteModels);
+                    if (contactChange)
+                    {
+                        var in1 = ContactSiteDAOImpl.Instance.DeletSiteAllConnect(siteId);
+                        var contactS = ContactSiteDAOImpl.Instance.InsertListConnects(contactSiteModels);
+                    }
                     Jump();
                 }
             }
@@ -486,40 +511,42 @@ namespace ServerMonitor.ViewModels
                     DiePort = false;
                     NeedUser = false;
                     NeedRecord = false;
+                    Port = null;
                     break;
                 case 1:     //SOCKET
                     LivePort = true;
                     DiePort = false;
                     NeedUser = false;
                     NeedRecord = false;
+                    Port = null;
                     break;
                 case 2:    //SSH
                     LivePort = false;
                     DiePort = true;
                     NeedUser = true;
                     NeedRecord = false;
-                    Port = 22;
+                    Port = "22";
                     break;
                 case 3:   //FTP
                     LivePort = false;
                     DiePort = true;
                     NeedUser = true;
                     NeedRecord = false;
-                    Port = 21;
+                    Port = "21";
                     break;
                 case 4:    //DNS
                     LivePort = false;
                     DiePort = true;
                     NeedUser = false;
                     NeedRecord = true;
-                    Port = 53;
+                    Port = "53";
                     break;
                 case 5:    //SMTP
                     LivePort = true;
                     DiePort = false;
                     NeedUser = false;
                     NeedRecord = false;
-                    Port = 25;
+                    Port = "25";
                     break;
                 default:
                     break;
@@ -536,7 +563,7 @@ namespace ServerMonitor.ViewModels
             ProtocolType = GetProtocolType(site.Protocol_type);
             SiteAddress = site.Site_address;
             SiteName = site.Site_name;
-            Port = site.Server_port;
+            Port = site.Server_port+"";
             
             if (ProtocolType == 2 || ProtocolType == 3)
             {
@@ -604,6 +631,20 @@ namespace ServerMonitor.ViewModels
                 {
                     return false;
                 }
+            }
+        }
+
+        private bool CheckPort(string port)
+        {
+            Regex regPort = new Regex(@"^[0-9]{0,5}$");
+            Boolean check = regPort.IsMatch(port);
+            if (check)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
