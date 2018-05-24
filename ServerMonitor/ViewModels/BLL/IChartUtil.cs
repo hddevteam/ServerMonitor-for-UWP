@@ -17,7 +17,6 @@ namespace ServerMonitor.ViewModels.BLL
 
         ObservableCollection<BarChartData> BarChart { get; set; }
 
-        void testmethod();
         Task<Tuple<ObservableCollection<SelectSite>, List<SiteModel>>> SelectSitesAsync(List<SiteModel> sites);
 
         Task<ObservableCollection<ChartLengend>> ChartLengendAsync(List<SiteModel> sites);
