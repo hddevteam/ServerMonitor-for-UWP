@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.LogDb
 {
-    public interface LogDAO
+    public interface ILogDAO
     {
         /// <summary>
         /// 返回所有的日志

@@ -6,16 +6,38 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Heijden.DNS;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ServerMonitor.Controls;
+using ServerMonitor.LogDb;
 using ServerMonitor.Models;
 using ServerMonitor.Services.RequestServices;
+using ServerMonitor.SiteDb;
 
 namespace ServerMonitor.ViewModels.BLL
 {
     public class SiteDetailUtilImpl : ISiteDetailUtil
     {
+        #region 变量声明
+        /// <summary>
+        /// 封装的SiteDetailViewModel使用的工具类
+        /// </summary>
+        private static ISiteDetailUtil utilObject;
+        /// <summary>
+        /// 站点DAO
+        /// </summary>
+        private static ISiteDAO siteDao;
+        /// <summary>
+        /// 请求记录DAO
+        /// </summary>
+        private static ILogDAO logDao;
+        #endregion
+        static SiteDetailUtilImpl() {
+            utilObject = new SiteDetailUtilImpl();
+            siteDao = new SiteDaoImpl();
+            logDao = new LogDaoImpl();
+        }
         /// <summary>
         /// 请求服务器状态
         /// </summary>
@@ -44,11 +66,11 @@ namespace ServerMonitor.ViewModels.BLL
                 };
                 #endregion
                 // 获取存储的请求预处理信息
-                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
+                JObject js = (JObject)JsonConvert.DeserializeObject(site.Protocol_content);
                 try
                 {
                     // 赋值请求类型
-                    request.RecordType = DNSRequest.GetQTypeWithIndex(int.Parse(js["recordType"].ToString()));
+                    request.RecordType = DNSRequest.GetQTypeWithStringTypeName(js["recordType"].ToString());
                 }
                 catch (Exception)
                 {
@@ -178,6 +200,40 @@ namespace ServerMonitor.ViewModels.BLL
                 return log;
             }
             return null;
+        }
+        /// <summary>
+        /// 使用ICMP 与服务器建立连接
+        /// </summary>
+        /// <returns></returns>
+        public async Task<LogModel> ConnectToServerWithICMP(SiteModel site, ICMPRequest request)
+        {
+            #region 初始化log
+            LogModel log = new LogModel
+            {
+                Site_id = site.Id,
+                Create_Time = DateTime.Now
+            };
+            #endregion
+
+            #region 暂时修改的   --xb
+            bool icmpFlag = request.DoRequest();
+            //请求完毕
+            RequestObj requestObj;//用于存储icmp请求结果的对象              
+            requestObj = DataHelper.GetProperty(request); // 处理下请求对象的数据
+            site.Is_success = int.Parse(requestObj.Color);
+            site.Request_count += 1;
+            site.Request_TimeCost = requestObj.TimeCost;
+            site.Last_response = requestObj.Others ?? "";
+            if (icmpFlag == false)
+            {
+                site.Is_success = 0;
+            }
+            log.Is_error = !icmpFlag;
+            log.Log_Record = requestObj.Others ?? "";
+            log.TimeCost = requestObj.TimeCost;
+            #endregion
+            await Task.CompletedTask;
+            return new LogModel();
         }
         /// <summary>
         /// 使用Socket 与服务器建立连接
@@ -336,7 +392,7 @@ namespace ServerMonitor.ViewModels.BLL
             site.Request_count++;
             site.Last_response = string.IsNullOrEmpty(log.Log_Record) ? "" : log.Log_Record;
             // 更新数据库中的站点的信息
-            DBHelper.UpdateSite(site);
+            siteDao.UpdateSite(site);
             Debug.WriteLine("请求了一次服务器!");
         }
         /// <summary>
@@ -403,6 +459,6 @@ namespace ServerMonitor.ViewModels.BLL
                 return log;
             }
             return null;
-        }
+        }        
     }
 }

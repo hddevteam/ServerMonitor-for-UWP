@@ -281,7 +281,7 @@ namespace ServerMonitor.ViewModels
                             }
                             else
                             {
-                                SiteDetailViewModel util = new SiteDetailViewModel();//用于查看状态码
+                                SiteDetailUtilImpl util = new SiteDetailUtilImpl();//用于查看状态码
                                 bool match = util.SuccessCodeMatch(si, hTTPs.Status);//匹配用户设定状态码
                                 if (match)//匹配为成功  否则为失败
                                 {
