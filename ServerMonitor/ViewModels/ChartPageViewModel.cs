@@ -158,20 +158,6 @@ namespace ServerMonitor.ViewModels
             await Task.CompletedTask;
             List<LogModel> logs = new List<LogModel>();
             logs = logDao.GetAllLog();
-            logs.Add(new LogModel() { Site_id = 1, Create_Time = DateTime.Now, TimeCost = 2000, Is_error = false, Status_code = "1001" });
-            logs.Add(new LogModel() { Site_id = 1, Create_Time = DateTime.Now.AddMinutes(-6), TimeCost = 2000, Is_error = true, Status_code = "1001" });//null
-            logs.Add(new LogModel() { Site_id = 1, Create_Time = DateTime.Now.AddMinutes(-12), TimeCost = 2040, Is_error = false, Status_code = "1000" });
-            logs.Add(new LogModel() { Site_id = 1, Create_Time = DateTime.Now.AddMinutes(-13), TimeCost = 2200, Is_error = false, Status_code = "1001" });
-            logs.Add(new LogModel() { Site_id = 1, Create_Time = DateTime.Now.AddMinutes(-16), TimeCost = 2600, Is_error = true, Status_code = "1001" });//null
-            logs.Add(new LogModel() { Site_id = 1, Create_Time = DateTime.Now.AddMinutes(-18), TimeCost = 3000, Is_error = false, Status_code = "1001" });
-            logs.Add(new LogModel() { Site_id = 1, Create_Time = DateTime.Now.AddMinutes(-22), TimeCost = 200, Is_error = false, Status_code = "1000" });
-            logs.Add(new LogModel() { Site_id = 2, Create_Time = DateTime.Now, TimeCost = 3000, Is_error = false, Status_code = "1001" });
-            logs.Add(new LogModel() { Site_id = 2, Create_Time = DateTime.Now.AddHours(-6), TimeCost = 2050, Is_error = true, Status_code = "1001" });//null
-            logs.Add(new LogModel() { Site_id = 2, Create_Time = DateTime.Now.AddHours(-12), TimeCost = 2007, Is_error = false, Status_code = "1000" });
-            logs.Add(new LogModel() { Site_id = 2, Create_Time = DateTime.Now.AddHours(-13), TimeCost = 2000, Is_error = false, Status_code = "1001" });
-            logs.Add(new LogModel() { Site_id = 2, Create_Time = DateTime.Now.AddHours(-16), TimeCost = 500, Is_error = true, Status_code = "1001" });//null
-            logs.Add(new LogModel() { Site_id = 2, Create_Time = DateTime.Now.AddHours(-18), TimeCost = 1000, Is_error = false, Status_code = "1001" });
-            logs.Add(new LogModel() { Site_id = 2, Create_Time = DateTime.Now.AddHours(-22), TimeCost = 2005, Is_error = false, Status_code = "1000" });
             //数据排序，便于图表按序显示
             logs = logs.OrderBy(o => o.Create_Time).ToList();
             return logs;

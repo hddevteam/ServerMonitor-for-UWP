@@ -102,26 +102,26 @@ namespace ServerMonitor.ViewModels.BLL
                     {
                         //该条记录结果统计
                         string result = "";
-                        Double responseTime = 0;
                         //判断并记录该条log是成功，失败，还是超时
                         if (!log.Is_error)
                         {
                             //成功
-                            successCount++; result = "Success";
-                            responseTime = log.TimeCost;
-                            chart1Series.Add(new Chart1() { RequestTime = log.Create_Time, Result = result, ResponseTime = responseTime });
+                            successCount++;
+                            result = "Success";
+                            chart1Series.Add(new Chart1() { RequestTime = log.Create_Time, Result = result, ResponseTime = log.TimeCost });
                         }
                         else if (log.Status_code == "1002") //状态码为1002时表示请求超时
                         {
                             //超时
-                            overtimeCount++; result = "OverTime";
-                            responseTime = log.TimeCost;
-                            chart1Series.Add(new Chart1() { RequestTime = log.Create_Time, Result = result, ResponseTime = responseTime });
+                            overtimeCount++;
+                            result = "OverTime";
+                            chart1Series.Add(new Chart1() { RequestTime = log.Create_Time, Result = result, ResponseTime = log.TimeCost });
                         }
                         else
                         {
                             //失败
-                            errorCount++; result = "Error";
+                            errorCount++;
+                            result = "Error";
                             chart1Series.Add(new Chart1() { RequestTime = log.Create_Time, Result = result, ResponseTime = null });
                         }
                     }
