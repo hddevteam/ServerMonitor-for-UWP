@@ -126,7 +126,6 @@ namespace ServerMonitor.ViewModels.BLL
                             chart1Series.Add(new Chart1() { RequestTime = log.Create_time, Result = result, ResponseTime = null });
                             responseTime = 0;
                         }
-                        //chart1Series.Add(new Chart1() { RequestTime = log.Create_time, Result = result, ResponseTime = null });
                     }
                     #endregion
                 }
@@ -139,7 +138,7 @@ namespace ServerMonitor.ViewModels.BLL
                     Success = successCount,
                     Error = errorCount,
                     Overtime = overtimeCount,
-                    Type = site.Is_server ? "SERVER" : "WEBSITE"
+                    Address = site.Site_address
                 });
             }
             await Task.CompletedTask;

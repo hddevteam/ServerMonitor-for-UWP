@@ -17,6 +17,9 @@
         <vm1:ChartPageViewModel x:Name="ViewModel"></vm1:ChartPageViewModel>
     </Page.DataContext>
 
+    <Page.Resources>
+        <vm1:DataPointToBrushConverter x:Key="BrushConverter"/>
+    </Page.Resources>
     <!--主体-->
     <RelativePanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <VisualStateManager.VisualStateGroups>
@@ -108,7 +111,19 @@
 
                 <StackPanel x:Name="LineChart" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Padding="0,0,24,0">
                     <!--线形图-->
-                    <telerik:RadCartesianChart x:Name="RequestTimeLineChar" PaletteName="DefaultLight" MinZoom="5,1" MinHeight="325" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                    <telerik:RadCartesianChart x:Name="RequestTimeLineChar" PaletteName="DefaultLight" MinHeight="325" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                        <telerik:RadCartesianChart.Resources>
+                            <DataTemplate x:Key="PointTemplate">
+                                <Rectangle Width="3" Height="3" RadiusX="3" RadiusY="3">
+                                    <Rectangle.Fill>
+                                        <Binding Converter="{StaticResource BrushConverter}"/>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                            </DataTemplate>
+                            <Style x:Key="BorderStyle" TargetType="Border">
+                                <Setter Property="Background" Value="#028CFD" />
+                            </Style>
+                        </telerik:RadCartesianChart.Resources>
                         <telerik:RadCartesianChart.VerticalAxis>
                             <telerik:LogarithmicAxis x:Name="logarithmicAxis" TickThickness="0" Title="RequestTime" FontWeight="Medium">
                                 <telerik:LogarithmicAxis.LabelFormatter>
@@ -117,37 +132,31 @@
                             </telerik:LogarithmicAxis>
                         </telerik:RadCartesianChart.VerticalAxis>
                         <telerik:RadCartesianChart.HorizontalAxis>
-                            <telerik:CategoricalAxis  x:Name="dateTimeContinuousAxis" Title="{x:Bind ViewModel.Infos.HAxisProperties.ChartTitle,Mode=OneWay}"
+                            <telerik:DateTimeContinuousAxis x:Name="dateTimeContinuousAxis" Title="{x:Bind ViewModel.Infos.HAxisProperties.ChartTitle,Mode=OneWay}"
                                                             LabelFitMode="MultiLine"
                                                             FontWeight="Medium">
-                                <telerik:CategoricalAxis.LabelFormatter>
+                                <telerik:DateTimeContinuousAxis.LabelFormatter>
                                     <vm1:CustomDateTimeAxisLabelFormatter/>
-                                </telerik:CategoricalAxis.LabelFormatter>
-                            </telerik:CategoricalAxis>
+                                </telerik:DateTimeContinuousAxis.LabelFormatter>
+                            </telerik:DateTimeContinuousAxis>
                         </telerik:RadCartesianChart.HorizontalAxis>
                         <telerik:RadCartesianChart.Grid>
                             <telerik:CartesianChartGrid MajorLinesVisibility="Y"/>
                         </telerik:RadCartesianChart.Grid>
 
-                        <telerik:RadCartesianChart.SeriesProvider >
+                        <!--<telerik:RadCartesianChart.SeriesProvider >
                             <telerik:ChartSeriesProvider x:Name="provider" Source="{x:Bind ViewModel.Infos.Chart1CollectionCopy,Mode=TwoWay}">
                                 <telerik:ChartSeriesProvider.SeriesDescriptors>
                                     <telerik:CategoricalSeriesDescriptor ValuePath="ResponseTime" CategoryPath="RequestTime">
                                         <telerik:CategoricalSeriesDescriptor.Style>
                                             <Style TargetType="telerik:LineSeries">
-                                                <Setter Property="PointTemplate">
-                                                    <Setter.Value>
-                                                        <DataTemplate>
-                                                            <Ellipse Height="8" Width="8" Stroke="White" StrokeThickness="1" />
-                                                        </DataTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
+                                                <Setter Property="PointTemplate" Value="{StaticResource PointTemplate}"/>
                                             </Style>
                                         </telerik:CategoricalSeriesDescriptor.Style>
                                     </telerik:CategoricalSeriesDescriptor>
                                 </telerik:ChartSeriesProvider.SeriesDescriptors>
                             </telerik:ChartSeriesProvider>
-                        </telerik:RadCartesianChart.SeriesProvider>
+                        </telerik:RadCartesianChart.SeriesProvider>-->
 
                         <telerik:RadCartesianChart.Behaviors>
                             <telerik:ChartPanAndZoomBehavior ZoomMode="Horizontal" PanMode="Horizontal"/>
@@ -246,7 +255,7 @@
                                          AutoGenerateColumns="False" VerticalAlignment="Center" HorizontalAlignment="Center" 
                                          IsTabStop="True" IsHitTestVisible="True" UserGroupMode="Disabled">
                         <telerikGrid:RadDataGrid.Columns>
-                            <telerikGrid:DataGridTextColumn PropertyName="SiteName" Header="Site" CanUserFilter="False">
+                            <telerikGrid:DataGridTextColumn PropertyName="SiteName" Header="SITE" CanUserFilter="False">
                                 <telerikGrid:DataGridTextColumn.HeaderStyle>
                                     <Style TargetType="gridPrimitives:DataGridColumnHeader">
                                         <Setter Property="Background" Value="AliceBlue"/>
@@ -254,7 +263,7 @@
                                 </telerikGrid:DataGridTextColumn.HeaderStyle>
                             </telerikGrid:DataGridTextColumn>
 
-                            <telerikGrid:DataGridTextColumn PropertyName="Type" Header="TYPE" CanUserFilter="False">
+                            <telerikGrid:DataGridTextColumn PropertyName="Address" Header="ADDRESS" CanUserFilter="False">
                                 <telerikGrid:DataGridTextColumn.HeaderStyle>
                                     <Style TargetType="gridPrimitives:DataGridColumnHeader">
                                         <Setter Property="Background" Value="AliceBlue"/>

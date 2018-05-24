@@ -15,6 +15,9 @@ using Telerik.UI.Xaml.Controls.Chart;
 using GalaSoft.MvvmLight.Threading;
 using ServerMonitor.ViewModels.BLL;
 using Windows.UI.Xaml.Data;
+using ServerMonitor.SiteDb;
+using ServerMonitor.LogDb;
+using System.ComponentModel;
 
 namespace ServerMonitor.ViewModels
 {
@@ -28,6 +31,8 @@ namespace ServerMonitor.ViewModels
         const int ERROR_CODE = 4;
 
         public IChartUtil ChartDao { get; set; }
+        public SiteDAO siteDao { get; set; }
+        public LogDAO logDao { get; set; }
 
         //为柱状图绑定的站点ID提供显示的站点名
         public static List<SiteModel> siteModels = new List<SiteModel>();
@@ -108,12 +113,12 @@ namespace ServerMonitor.ViewModels
             var log = await LoadDbLogAsync();
             var site = await LoadDbSiteAsync();
             var selectResult = await ChartDao.SelectSitesAsync(site);
-            Infos.Sites =  selectResult.Item2;
+            Infos.Sites = selectResult.Item2;
             Infos.Logs = log;
             Infos.SelectSites = selectResult.Item1;
 
             //计算图表数据
-            var getResult = await Task.Run(() => ChartDao.CacuChartAsync(Infos.Sites, Infos.Logs));
+            var getResult = Task.Run(() => ChartDao.CacuChartAsync(Infos.Sites, Infos.Logs)).Result;
             Chart1Collection = getResult.Item1;
             Infos.BarChart = getResult.Item2;
             Lengend = await ChartDao.ChartLengendAsync(Infos.Sites);
@@ -130,6 +135,8 @@ namespace ServerMonitor.ViewModels
         {
             Lengend = new ObservableCollection<ChartLengend>();
             ChartDao = new ChartUtilImpl();
+            siteDao = new SiteDaoImpl();
+            logDao = new LogDaoImpl();
             Chart1Collection = new ObservableCollection<ObservableCollection<Chart1>>();
             Infos.Chart1CollectionCopy = new ObservableCollection<ObservableCollection<Chart1>>();
             Infos.SelectSites = new ObservableCollection<SelectSite>();
@@ -143,21 +150,28 @@ namespace ServerMonitor.ViewModels
         public async Task<List<SiteModel>> LoadDbSiteAsync()
         {
             await Task.CompletedTask;
-            siteModels = DBHelper.GetAllSite();
+            siteModels = siteDao.GetAllSite();
             return siteModels;
         }
         public async Task<List<LogModel>> LoadDbLogAsync()
         {
             await Task.CompletedTask;
             List<LogModel> logs = new List<LogModel>();
-            //logs = DBHelper.GetAllLog();
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now, Request_time = 2000, Is_error = true, Status_code = "1001" });
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-12), Request_time = 2000, Is_error = true, Status_code = "1002" });
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-22), Request_time = 2040, Is_error = false, Status_code = "1000" });
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-16), Request_time = 2200, Is_error = true, Status_code = "1001" });
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-18), Request_time = 2600, Is_error = true, Status_code = "1002" });
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-13), Request_time = 3000, Is_error = true, Status_code = "1002" });
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddHours(-6), Request_time = 200, Is_error = false, Status_code = "1000" });
+            logs = logDao.GetAllLog();
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now, Request_time = 2000, Is_error = false, Status_code = "1001" });
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddMinutes(-6), Request_time = 2000, Is_error = true, Status_code = "1001" });//null
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddMinutes(-12), Request_time = 2040, Is_error = false, Status_code = "1000" });
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddMinutes(-13), Request_time = 2200, Is_error = false, Status_code = "1001" });
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddMinutes(-16), Request_time = 2600, Is_error = true, Status_code = "1001" });//null
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddMinutes(-18), Request_time = 3000, Is_error = false, Status_code = "1001" });
+            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddMinutes(-22), Request_time = 200, Is_error = false, Status_code = "1000" });
+            logs.Add(new LogModel() { Site_id = 2, Create_time = DateTime.Now, Request_time = 3000, Is_error = false, Status_code = "1001" });
+            logs.Add(new LogModel() { Site_id = 2, Create_time = DateTime.Now.AddHours(-6), Request_time = 2050, Is_error = true, Status_code = "1001" });//null
+            logs.Add(new LogModel() { Site_id = 2, Create_time = DateTime.Now.AddHours(-12), Request_time = 2007, Is_error = false, Status_code = "1000" });
+            logs.Add(new LogModel() { Site_id = 2, Create_time = DateTime.Now.AddHours(-13), Request_time = 2000, Is_error = false, Status_code = "1001" });
+            logs.Add(new LogModel() { Site_id = 2, Create_time = DateTime.Now.AddHours(-16), Request_time = 500, Is_error = true, Status_code = "1001" });//null
+            logs.Add(new LogModel() { Site_id = 2, Create_time = DateTime.Now.AddHours(-18), Request_time = 1000, Is_error = false, Status_code = "1001" });
+            logs.Add(new LogModel() { Site_id = 2, Create_time = DateTime.Now.AddHours(-22), Request_time = 2005, Is_error = false, Status_code = "1000" });
             //数据排序，便于图表按序显示
             logs = logs.OrderBy(o => o.Create_time).ToList();
             return logs;
@@ -280,7 +294,30 @@ namespace ServerMonitor.ViewModels
         }
         #endregion
     }
+    public class DataPointToBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            DataPoint point = value as DataPoint;
+            if (point == null)
+            {
+                return value;
+            }
 
+            var series = point.Presenter as LineSeries;
+            if (point.Parent == null || series == null)
+            {
+                return value;
+            }
+
+            return series.Stroke;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
     #region 图表标签格式化类
     //对数轴标签格式化
     public class CustomLogarithmicAxisLabelFormatter : IContentFormatter
@@ -307,7 +344,7 @@ namespace ServerMonitor.ViewModels
         public object Format(object owner, object content)
         {
             // The owner parameter is the Axis instance which labels are currently formatted
-            var axis = owner as CategoricalAxis;
+            var axis = owner as DateTimeContinuousAxis;
             var con = Convert.ToDateTime(content);
 
             if(axis.Title.ToString().Contains("three days") || axis.Title.ToString().Contains("week"))
@@ -467,12 +504,12 @@ namespace ServerMonitor.ViewModels
     public class BarChartData : ObservableObject
     {
         //站点类型
-        private string type;
+        private string address;
 
-        public string Type
+        public string Address
         {
-            get { return type; }
-            set { type = value; RaisePropertyChanged(() => Type); }
+            get { return address; }
+            set { address = value; RaisePropertyChanged(() => Address); }
         }
         //站点id
         private string siteId;
