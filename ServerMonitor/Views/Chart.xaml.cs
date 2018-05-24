@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Telerik.UI.Xaml.Controls.Chart;
 using Template10.Common;
 using Template10.Services.NavigationService;
 using Windows.ApplicationModel.Core;
@@ -29,12 +30,41 @@ namespace ServerMonitor.Views
     /// </summary>
     public sealed partial class Chart : Page
     {
-        
+        public ChartPalette DefaultPalette { get { return ChartPalettes.DefaultLight; } }
+
         public Chart()
         {   
             this.InitializeComponent();
             NavigationCacheMode = NavigationCacheMode.Disabled;
+            CreateSeries();
         }
-        
+
+        public void CreateSeries()
+        {
+            RadCartesianChart chart = this.RequestTimeLineChar as RadCartesianChart;
+            chart.Series.Clear();
+            //指定建立五个序列
+            for (int i = 0; i < 5; i++)
+            {
+                CategoricalSeries series = null;
+                if (chart == null)//若图表为null
+                {
+                    return;
+                }
+                //创建指定类型的序列
+                series = new LineSeries()
+                {
+                    Stroke = DefaultPalette.FillEntries.Brushes[i],
+                    StrokeThickness = 3,
+                    PointTemplate = chart.Resources["PointTemplate"] as DataTemplate
+                };
+                series.CategoryBinding = new PropertyNameDataPointBinding("RequestTime");
+                series.ValueBinding = new PropertyNameDataPointBinding("ResponseTime");
+                series.SetBinding(ChartSeries.ItemsSourceProperty, new Binding() { Path = new PropertyPath("Infos.Chart1CollectionCopy[" + i + "]") });
+                series.ClipToPlotArea = false;
+                //序列添加到图表
+                chart.Series.Add(series);
+            }
+        }
     }
 }
