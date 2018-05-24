@@ -31,8 +31,8 @@ namespace ServerMonitor.ViewModels
         const int ERROR_CODE = 4;
 
         public IChartUtil ChartDao { get; set; }
-        public SiteDAO siteDao { get; set; }
-        public LogDAO logDao { get; set; }
+        public ISiteDAO siteDao { get; set; }
+        public ILogDAO logDao { get; set; }
 
         //为柱状图绑定的站点ID提供显示的站点名
         public static List<SiteModel> siteModels = new List<SiteModel>();
