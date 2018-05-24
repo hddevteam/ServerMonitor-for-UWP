@@ -55,7 +55,7 @@ namespace ServerMonitor.Services.RequestServices
                 IPHostEntry hostInfo = await Dns.GetHostEntryAsync(DomainName);
                 IPAddress[] IPaddresses = hostInfo.AddressList;
                 IPAddress hostAddress = IPaddresses[0];// 主机IP地址
-                IPEndPoint hostEndPoint = new IPEndPoint(hostAddress, port);// get our end point主机端点 IP地址+端口
+                IPEndPoint hostEndPoint = new IPEndPoint(hostAddress, Port);// get our end point主机端点 IP地址+端口
                 //用他来建立连接，发送信息 prepare the socket
                 Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
@@ -66,6 +66,8 @@ namespace ServerMonitor.Services.RequestServices
                 Task queryTask = Task.Run(async () =>
                 {
                     await s.ConnectAsync(hostEndPoint);
+                    //接收建立连接时的返回信息 port不对时，会超时接收
+                    s.Receive(RecvFullMessage);//交代自己认证SMTP服务器的域名 然后发送 接收信息存在RecvFullMessage
                 }, cts.Token);
                 // 开启另一个任务同时进行用于记录是否超时
                 var ranTask = Task.WaitAny(queryTask, Task.Delay(OverTime));
@@ -85,8 +87,6 @@ namespace ServerMonitor.Services.RequestServices
 
                 if (s.Connected && queryTask.IsCompleted) // 请求成功，获取到了解析结果
                 {
-                    //接收建立连接时的返回信息
-                    s.Receive(RecvFullMessage);//交代自己认证SMTP服务器的域名 然后发送 接收信息存在RecvFullMessage
                     stopwatch.Start();  //开始计时
                     ByteCommand = ASCII.GetBytes("HELO " + DomainName + "\r\n"); //规定的HELO请求格式
                     s.Send(ByteCommand, ByteCommand.Length, 0);

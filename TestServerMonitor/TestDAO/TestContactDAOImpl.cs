@@ -43,14 +43,13 @@ namespace TestServerMonitor.TestDAO
                 Update_time = DateTime.Now,
                 Others = null,
                 Telephone = null,
-                SiteId = 1
             };
             ICD.InsertOneContact(l_CL);
             //为了防止数据库起初没数据，为表插入一条Contact信息，使测试通过
             IContactSiteDao contactSiteDao = ContactSiteDAOImpl.Instance;
-            contactSiteDao.InsertListConnects(new List<ContactSiteModel>()
+            contactSiteDao.InsertListConnects(new List<SiteContactModel>()
             {
-                new ContactSiteModel()
+                new SiteContactModel()
                 {
                     SiteId=1,
                     ContactId=l_CL.Id

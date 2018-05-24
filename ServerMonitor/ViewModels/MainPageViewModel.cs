@@ -183,26 +183,26 @@ namespace ServerMonitor.ViewModels
             if ("1000".Equals(pre.Status))
             {
                 //dns正常
-                _preCheckSite.Last_request_result = 1;
+                _preCheckSite.Is_success = 1;
             }
             else if ("1001".Equals(pre.Status))
             {
                 //unknown
-                _preCheckSite.Last_request_result = 2;
+                _preCheckSite.Is_success = 2;
             }
             else if ("1002".Equals(pre.Status))
             {
                 //timeout
-                _preCheckSite.Last_request_result = -1;
+                _preCheckSite.Is_success = -1;
             }
-            _preCheckSite.Request_interval = pre.TimeCost;
+            _preCheckSite.Request_TimeCost = pre.TimeCost;
             _preCheckSite.Request_count += 1;
             if (dnsFlag == false)
             {
                 SiteDaoImpl impl = new SiteDaoImpl();
                 impl.SetAllSiteStatus(2);///所有站点置为unknown
                 //消息提醒
-                _preCheckSite.Last_request_result = 0;
+                _preCheckSite.Is_success = 0;
                 toast.ShowToast(_preCheckSite);                          
             }
             DBHelper.UpdateSite(_preCheckSite);
@@ -272,12 +272,12 @@ namespace ServerMonitor.ViewModels
                             bool httpsFlag = await hTTPs.MakeRequest();
                             //请求完毕
                             //处理数据
-                            si.Request_interval = hTTPs.TimeCost;
+                            si.Request_TimeCost = hTTPs.TimeCost;
                             si.Request_count += 1;
                             if ("1002".Equals(hTTPs.Status))//定义的超时状态码
                             {
                                 //请求超时
-                                si.Last_request_result = -1;
+                                si.Is_success = -1;
                             }
                             else
                             {
@@ -285,11 +285,11 @@ namespace ServerMonitor.ViewModels
                                 bool match = util.SuccessCodeMatch(si, hTTPs.Status);//匹配用户设定状态码
                                 if (match)//匹配为成功  否则为失败
                                 {
-                                    si.Last_request_result = 1;
+                                    si.Is_success = 1;
                                 }
                                 else
                                 {
-                                    si.Last_request_result = 0;
+                                    si.Is_success = 0;
                                     toast.ShowToast(si);
                                 }
                             }
@@ -301,12 +301,12 @@ namespace ServerMonitor.ViewModels
                             bool httpFlag = await hTTP.MakeRequest();
                             //请求完毕
                             //处理数据
-                            si.Request_interval = hTTP.TimeCost;
+                            si.Request_TimeCost = hTTP.TimeCost;
                             si.Request_count += 1;
                             if ("1002".Equals(hTTP.Status))
                             {
                                 //请求超时
-                                si.Last_request_result = -1;
+                                si.Is_success = -1;
                             }
                             else
                             {
@@ -314,17 +314,17 @@ namespace ServerMonitor.ViewModels
                                 bool match = util.SuccessCodeMatch(si, hTTP.Status);//匹配用户设定状态码
                                 if (match)
                                 {
-                                    si.Last_request_result = 1;
+                                    si.Is_success = 1;
                                 }
                                 else
                                 {
-                                    si.Last_request_result = 0;
+                                    si.Is_success = 0;
                                 }
                             }
                             if (httpFlag == false)
                             {
                                 toast.ShowToast(si);
-                                si.Last_request_result = 0;
+                                si.Is_success = 0;
                             }
                             break;
                         case "DNS":
@@ -335,39 +335,39 @@ namespace ServerMonitor.ViewModels
                             if ("1000".Equals(dNS.Status))
                             {
                                 //dns正常
-                                si.Last_request_result = 1;
+                                si.Is_success = 1;
                             }
                             else if ("1001".Equals(dNS.Status))
                             {
                                 //unknown
-                                si.Last_request_result = 2;
+                                si.Is_success = 2;
                             }
                             else if ("1002".Equals(dNS.Status))
                             {
                                 //timeout
-                                si.Last_request_result = -1;
+                                si.Is_success = -1;
                             }
-                            si.Request_interval = dNS.TimeCost;
+                            si.Request_TimeCost = dNS.TimeCost;
                             si.Request_count += 1;
                             if (dnsFlag == false)
                             {
                                 //消息提醒
-                                si.Last_request_result = 0;
+                                si.Is_success = 0;
                                 toast.ShowToast(si);
                             }
                             break;
                         case "ICMP":
-                            IcmpRequest icmp = new IcmpRequest(reIP);
+                            ICMPRequest icmp = new ICMPRequest(reIP);
                             bool icmpFlag = icmp.DoRequest();
                             //请求完毕
                             RequestObj requestObj;//用于存储icmp请求结果的对象              
                             requestObj = DataHelper.GetProperty(icmp);
-                            si.Last_request_result = int.Parse(requestObj.Color);
+                            si.Is_success = int.Parse(requestObj.Color);
                             si.Request_count += 1;
-                            si.Request_interval = requestObj.TimeCost;
+                            si.Request_TimeCost = requestObj.TimeCost;
                             if (icmpFlag == false)
                             {
-                                si.Last_request_result = 0;
+                                si.Is_success = 0;
                                 toast.ShowToast(si);
                             }
                             break;
@@ -386,23 +386,23 @@ namespace ServerMonitor.ViewModels
                             if ("1001".Equals(fTP.Status))
                             {
                                 //置为错误
-                                si.Last_request_result = 0;
+                                si.Is_success = 0;
                             }
                             else if ("1000".Equals(fTP.Status))
                             {
                                 //置为成功
-                                si.Last_request_result = 1;
+                                si.Is_success = 1;
                             }
                             else if ("1002".Equals(fTP.Status))
                             {
                                 //超时异常
-                                si.Last_request_result = -1;
+                                si.Is_success = -1;
                             }
                             si.Request_count += 1;
-                            si.Request_interval = fTP.TimeCost;
+                            si.Request_TimeCost = fTP.TimeCost;
                             if (ftpFlag == false)
                             {
-                                si.Last_request_result = 0;
+                                si.Is_success = 0;
                                 toast.ShowToast(si);
                             }
                             break;
@@ -413,21 +413,21 @@ namespace ServerMonitor.ViewModels
 
                             if ("1000".Equals(sMTP.Status))
                             {
-                                si.Last_request_result = 1;
+                                si.Is_success = 1;
                             }
                             else if ("1001".Equals(sMTP.Status))
                             {
-                                si.Last_request_result = 0;
+                                si.Is_success = 0;
                             }
                             else if ("1002".Equals(sMTP.Status))
                             {
-                                si.Last_request_result = -1;
+                                si.Is_success = -1;
                             }
                             si.Request_count += 1;
-                            si.Request_interval = sMTP.TimeCost;
+                            si.Request_TimeCost = sMTP.TimeCost;
                             if (smtpFlag == false)
                             {
-                                si.Last_request_result = 0;
+                                si.Is_success = 0;
                                 toast.ShowToast(si);
                             }
                             break;
@@ -439,7 +439,7 @@ namespace ServerMonitor.ViewModels
                 }
             }
         }
-        
+
         /// <summary>
         /// add server点击事件
         /// </summary>
@@ -448,12 +448,6 @@ namespace ServerMonitor.ViewModels
         public void Add_Server(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(typeof(Views.AddServerPage), "1,-1"); //1MainPage, 2 AllServerPage; -1没有id是新建site
-            ShowAddServerPage();
-        }
-        private void ShowAddServerPage()
-        {
-            //var msgPopup = new AddServerPage();
-            //AddServerPage.ShowWindow();
         }
 
         /// <summary>
@@ -463,12 +457,7 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public void Add_Website(object sender, RoutedEventArgs e)
         {
-            ShowAddWebsitePage();
-        }
-        private void ShowAddWebsitePage()
-        {
-            var msgPopup = new AddWebsitePage();
-            //AddWebsitePage.ShowWindow();
+            NavigationService.Navigate(typeof(Views.AddWebsitePage), "1,-1"); //1MainPage, 2 AllServerPage; -1没有id是新建site
         }
 
         /// <summary>
@@ -524,15 +513,17 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public void CopyFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var q = from t in SiteItems
-                    where t.Id == rightTapped_SiteId
-                    select t;
             var q1 = from t in sites
                      where t.Id == rightTapped_SiteId
                      select t;
-            SiteModel site = CloneSite(q1.First());
+            SiteModel site = q1.First();
             site.Site_name = site.Site_name + " Copy";
-            site.Last_request_result = 2;
+            site.Is_success = 2;
+
+            site.Create_time = DateTime.Now;
+            site.Update_time = DateTime.Now;
+            site.Is_pre_check = false;
+
             if (DBHelper.InsertOneSite(site) == 1)
             {
                 GetListSite();
@@ -623,14 +614,14 @@ namespace ServerMonitor.ViewModels
             GetSitePerformance(sites);
 
             //PreCheck：针对其显示做处理
-            PreCheckColor = GetSiteItemColor(preCheck.Last_request_result);
+            PreCheckColor = GetSiteItemColor(preCheck.Is_success);
             PreCheckResult = GetSiteItemLastResult(preCheck);
             PreCheckName = preCheck.Site_name;
 
             //循环把数据添加在SiteItems（列表）中
             for (int i = 0; i < q.Count; i++)
             {
-                string color = GetSiteItemColor(q[i].Last_request_result); //得到在UI上对应站点颜色
+                string color = GetSiteItemColor(q[i].Is_success); //得到在UI上对应站点颜色
                 string result = GetSiteItemLastResult(q[i]);              //得到在UI上对应站点信息
                 if (q[i].Is_server)
                 {
@@ -645,7 +636,7 @@ namespace ServerMonitor.ViewModels
                         Protocol_type = q[i].Protocol_type,
                         Site_address = q[i].Site_address,
                     });
-                    ChangeSiteResult(q[i].Last_request_result);//在for循环内累加站点统计信息
+                    ChangeSiteResult(q[i].Is_success);//在for循环内累加站点统计信息
                 }
                 else
                 {
@@ -660,7 +651,7 @@ namespace ServerMonitor.ViewModels
                         Protocol_type = q[i].Protocol_type,
                         Site_address = q[i].Site_address,
                     });
-                    ChangeSiteResult(q[i].Last_request_result);
+                    ChangeSiteResult(q[i].Is_success);
                 }
             }
         }
@@ -683,14 +674,14 @@ namespace ServerMonitor.ViewModels
             {
                 q = (from t in list
                      where t.Is_Monitor == true
-                     where t.Last_request_result == 1
+                     where t.Is_success == 1
                      select t).ToList();
             }
             else
             {
                 q = (from t in list
                      where t.Is_Monitor == true
-                     where t.Last_request_result != 1
+                     where t.Is_success != 1
                      select t).ToList();
             }
             switch (order)  //1:id As 2:id De 3:字母 As 4:字母 De 排序
@@ -742,7 +733,7 @@ namespace ServerMonitor.ViewModels
 
             //排除不监听和precheck，再只留错误和超时的
             List<SiteModel> q = (from t in list
-                            where t.Is_Monitor == true && t.Is_pre_check == false && (t.Last_request_result == 0 || t.Last_request_result == -1)
+                            where t.Is_Monitor == true && t.Is_pre_check == false && (t.Is_success == 0 || t.Is_success == -1)
                             orderby t.Update_time descending
                             select t).ToList();
             // 循环判断站点超时还是错误
@@ -750,7 +741,7 @@ namespace ServerMonitor.ViewModels
             {
                 //Red：0错误，Orange：-1超时，Gray：2未知，Blue：1成功
                 //#D13438 #4682B4 #5D5A58 #f7630c，红蓝灰橙
-                if (q[i].Last_request_result == 0)
+                if (q[i].Is_success == 0)
                 {
                     OutageSites.Add(new OutageSite()
                     {
@@ -798,7 +789,7 @@ namespace ServerMonitor.ViewModels
                     continue;
                 }
                 var w = from t in logList   //总的采样 距现在3天内
-                        where DateTime.Now.Subtract(t.Create_time).Days < 3
+                        where DateTime.Now.Subtract(t.Create_Time).Days < 3
                         select t;
                 int total = w.Count(); //总的采样个数
                 if (total == 0)
@@ -812,12 +803,12 @@ namespace ServerMonitor.ViewModels
                 }
 
                 var x = from t in w
-                        where t.Request_time <= T
+                        where t.TimeCost <= T
                         select t;
                 int satis = x.Count();   //满意的样本个数
 
                 var y = from t in w
-                        where t.Request_time <= 4 * T && t.Request_time > T
+                        where t.TimeCost <= 4 * T && t.TimeCost > T
                         select t;
                 int toler = y.Count();          //可忍受样本个数
                 container.Add(new SitePerformance()
@@ -923,19 +914,19 @@ namespace ServerMonitor.ViewModels
             string result = "";
             if (site.Is_server)  //判断是不是服务器
             {
-                switch (site.Last_request_result) //0错误，-1超时，2未知，1成功
+                switch (site.Is_success) //0错误，-1超时，2未知，1成功
                 {
                     case 0:
-                        result = "Error in " + site.Request_interval + "ms";
+                        result = "Error in " + site.Request_TimeCost + "ms";
                         break;
                     case 1:
-                        result = "Port" + site.Server_port + " (open) in " + site.Request_interval + "ms";
+                        result = "Port" + site.Server_port + " (open) in " + site.Request_TimeCost + "ms";
                         break;
                     case 2:
                         result = "Unknown";
                         break;
                     case -1:
-                        result = "Timeout in " + site.Request_interval + "ms";
+                        result = "Timeout in " + site.Request_TimeCost + "ms";
                         break;
                     default:
                         break;
@@ -943,19 +934,19 @@ namespace ServerMonitor.ViewModels
             }
             else
             {
-                switch (site.Last_request_result)
+                switch (site.Is_success)
                 {
                     case 0:
-                        result = "Error in " + site.Request_interval + "ms";
+                        result = "Error in " + site.Request_TimeCost + "ms";
                         break;
                     case 1:
-                        result = site.Status_code + " (OK) in " + site.Request_interval + "ms";
+                        result = site.Status_code + " (OK) in " + site.Request_TimeCost + "ms";
                         break;
                     case 2:
                         result = "Unknown";
                         break;
                     case -1:
-                        result = "Timeout in " + site.Request_interval + "ms";
+                        result = "Timeout in " + site.Request_TimeCost + "ms";
                         break;
                     default:
                         break;
