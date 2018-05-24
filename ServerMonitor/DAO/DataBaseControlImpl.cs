@@ -156,7 +156,7 @@ namespace ServerMonitor.SiteDb
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
                             Request_succeed_code = "1000",
-                            Is_success = 2,                           
+                            Is_success = 2                           
                         }
                     };
                     //for (int i = 0; i < 30; i++)
