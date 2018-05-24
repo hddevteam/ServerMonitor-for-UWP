@@ -118,7 +118,7 @@ namespace ServerMonitor.ViewModels
             Infos.SelectSites = selectResult.Item1;
 
             //计算图表数据
-            var getResult = Task.Run(() => ChartDao.CacuChartAsync(Infos.Sites, Infos.Logs)).Result;
+            var getResult = await Task.Run(() => ChartDao.CacuChartAsync(Infos.Sites, Infos.Logs));
             Chart1Collection = getResult.Item1;
             Infos.BarChart = getResult.Item2;
             Lengend = await ChartDao.ChartLengendAsync(Infos.Sites);
@@ -158,20 +158,20 @@ namespace ServerMonitor.ViewModels
             await Task.CompletedTask;
             List<LogModel> logs = new List<LogModel>();
             logs = logDao.GetAllLog();
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now, Request_time = 2000, Is_error = false, Status_code = "1001" });
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddMinutes(-6), Request_time = 2000, Is_error = true, Status_code = "1001" });//null
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddMinutes(-12), Request_time = 2040, Is_error = false, Status_code = "1000" });
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddMinutes(-13), Request_time = 2200, Is_error = false, Status_code = "1001" });
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddMinutes(-16), Request_time = 2600, Is_error = true, Status_code = "1001" });//null
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddMinutes(-18), Request_time = 3000, Is_error = false, Status_code = "1001" });
-            logs.Add(new LogModel() { Site_id = 1, Create_time = DateTime.Now.AddMinutes(-22), Request_time = 200, Is_error = false, Status_code = "1000" });
-            logs.Add(new LogModel() { Site_id = 2, Create_time = DateTime.Now, Request_time = 3000, Is_error = false, Status_code = "1001" });
-            logs.Add(new LogModel() { Site_id = 2, Create_time = DateTime.Now.AddHours(-6), Request_time = 2050, Is_error = true, Status_code = "1001" });//null
-            logs.Add(new LogModel() { Site_id = 2, Create_time = DateTime.Now.AddHours(-12), Request_time = 2007, Is_error = false, Status_code = "1000" });
-            logs.Add(new LogModel() { Site_id = 2, Create_time = DateTime.Now.AddHours(-13), Request_time = 2000, Is_error = false, Status_code = "1001" });
-            logs.Add(new LogModel() { Site_id = 2, Create_time = DateTime.Now.AddHours(-16), Request_time = 500, Is_error = true, Status_code = "1001" });//null
-            logs.Add(new LogModel() { Site_id = 2, Create_time = DateTime.Now.AddHours(-18), Request_time = 1000, Is_error = false, Status_code = "1001" });
-            logs.Add(new LogModel() { Site_id = 2, Create_time = DateTime.Now.AddHours(-22), Request_time = 2005, Is_error = false, Status_code = "1000" });
+            logs.Add(new LogModel() { Site_id = 1, Create_Time = DateTime.Now, TimeCost = 2000, Is_error = false, Status_code = "1001" });
+            logs.Add(new LogModel() { Site_id = 1, Create_Time = DateTime.Now.AddMinutes(-6), TimeCost = 2000, Is_error = true, Status_code = "1001" });//null
+            logs.Add(new LogModel() { Site_id = 1, Create_Time = DateTime.Now.AddMinutes(-12), TimeCost = 2040, Is_error = false, Status_code = "1000" });
+            logs.Add(new LogModel() { Site_id = 1, Create_Time = DateTime.Now.AddMinutes(-13), TimeCost = 2200, Is_error = false, Status_code = "1001" });
+            logs.Add(new LogModel() { Site_id = 1, Create_Time = DateTime.Now.AddMinutes(-16), TimeCost = 2600, Is_error = true, Status_code = "1001" });//null
+            logs.Add(new LogModel() { Site_id = 1, Create_Time = DateTime.Now.AddMinutes(-18), TimeCost = 3000, Is_error = false, Status_code = "1001" });
+            logs.Add(new LogModel() { Site_id = 1, Create_Time = DateTime.Now.AddMinutes(-22), TimeCost = 200, Is_error = false, Status_code = "1000" });
+            logs.Add(new LogModel() { Site_id = 2, Create_Time = DateTime.Now, TimeCost = 3000, Is_error = false, Status_code = "1001" });
+            logs.Add(new LogModel() { Site_id = 2, Create_Time = DateTime.Now.AddHours(-6), TimeCost = 2050, Is_error = true, Status_code = "1001" });//null
+            logs.Add(new LogModel() { Site_id = 2, Create_Time = DateTime.Now.AddHours(-12), TimeCost = 2007, Is_error = false, Status_code = "1000" });
+            logs.Add(new LogModel() { Site_id = 2, Create_Time = DateTime.Now.AddHours(-13), TimeCost = 2000, Is_error = false, Status_code = "1001" });
+            logs.Add(new LogModel() { Site_id = 2, Create_Time = DateTime.Now.AddHours(-16), TimeCost = 500, Is_error = true, Status_code = "1001" });//null
+            logs.Add(new LogModel() { Site_id = 2, Create_Time = DateTime.Now.AddHours(-18), TimeCost = 1000, Is_error = false, Status_code = "1001" });
+            logs.Add(new LogModel() { Site_id = 2, Create_Time = DateTime.Now.AddHours(-22), TimeCost = 2005, Is_error = false, Status_code = "1000" });
             //数据排序，便于图表按序显示
             logs = logs.OrderBy(o => o.Create_Time).ToList();
             return logs;
@@ -294,6 +294,9 @@ namespace ServerMonitor.ViewModels
         }
         #endregion
     }
+
+    #region 图表标签格式化，颜色转换等工具类
+    //图表数据点颜色转换器
     public class DataPointToBrushConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
@@ -318,7 +321,6 @@ namespace ServerMonitor.ViewModels
             throw new NotImplementedException();
         }
     }
-    #region 图表标签格式化类
     //对数轴标签格式化
     public class CustomLogarithmicAxisLabelFormatter : IContentFormatter
     {

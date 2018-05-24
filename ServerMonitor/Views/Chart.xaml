@@ -133,7 +133,9 @@
                         </telerik:RadCartesianChart.VerticalAxis>
                         <telerik:RadCartesianChart.HorizontalAxis>
                             <telerik:DateTimeContinuousAxis x:Name="dateTimeContinuousAxis" Title="{x:Bind ViewModel.Infos.HAxisProperties.ChartTitle,Mode=OneWay}"
-                                                            LabelFitMode="MultiLine"
+                                                            Maximum="{x:Bind ViewModel.Infos.HAxisProperties.MaxnumDateTime,Mode=OneWay}"
+                                                            Minimum="{x:Bind ViewModel.Infos.HAxisProperties.MinnumDateTime,Mode=OneWay}"
+                                                            LabelFitMode="MultiLine" MaximumTicks="10"
                                                             FontWeight="Medium">
                                 <telerik:DateTimeContinuousAxis.LabelFormatter>
                                     <vm1:CustomDateTimeAxisLabelFormatter/>
@@ -157,10 +159,6 @@
                                 </telerik:ChartSeriesProvider.SeriesDescriptors>
                             </telerik:ChartSeriesProvider>
                         </telerik:RadCartesianChart.SeriesProvider>-->
-
-                        <telerik:RadCartesianChart.Behaviors>
-                            <telerik:ChartPanAndZoomBehavior ZoomMode="Horizontal" PanMode="Horizontal"/>
-                        </telerik:RadCartesianChart.Behaviors>
                     </telerik:RadCartesianChart>
                 </StackPanel>
 

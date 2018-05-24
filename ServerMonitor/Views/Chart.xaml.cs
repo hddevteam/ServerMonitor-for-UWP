@@ -43,13 +43,15 @@ namespace ServerMonitor.Views
         {
             RadCartesianChart chart = this.RequestTimeLineChar as RadCartesianChart;
             chart.Series.Clear();
+            //指定建立五个序列
             for (int i = 0; i < 5; i++)
             {
                 CategoricalSeries series = null;
-                if (chart == null)
+                if (chart == null)//若图表为null
                 {
                     return;
                 }
+                //创建指定类型的序列
                 series = new LineSeries()
                 {
                     Stroke = DefaultPalette.FillEntries.Brushes[i],
@@ -60,7 +62,7 @@ namespace ServerMonitor.Views
                 series.ValueBinding = new PropertyNameDataPointBinding("ResponseTime");
                 series.SetBinding(ChartSeries.ItemsSourceProperty, new Binding() { Path = new PropertyPath("Infos.Chart1CollectionCopy[" + i + "]") });
                 series.ClipToPlotArea = false;
-
+                //序列添加到图表
                 chart.Series.Add(series);
             }
         }

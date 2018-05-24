@@ -365,16 +365,6 @@
                                         <telerik:PropertyNameDataPointBinding PropertyName="Ry"/>
                                     </telerik:PieSeries.LegendTitleBinding>
                                 </telerik:PieSeries>
-                                <telerik:PieSeries ShowLabels="True"
-                                           RadiusFactor="0.8"
-                                           ItemsSource="{x:Bind Path=ViewModel.Infos.Pieinfo}">
-                                    <telerik:PieSeries.ValueBinding>
-                                        <telerik:PropertyNameDataPointBinding PropertyName="Count"/>
-                                    </telerik:PieSeries.ValueBinding>
-                                    <telerik:PieSeries.LegendTitleBinding>
-                                        <telerik:PropertyNameDataPointBinding PropertyName="Ry"/>
-                                    </telerik:PieSeries.LegendTitleBinding>
-                                </telerik:PieSeries>
                             </telerik:RadPieChart>
 
                             <!-- 这是饼图的图注-->
