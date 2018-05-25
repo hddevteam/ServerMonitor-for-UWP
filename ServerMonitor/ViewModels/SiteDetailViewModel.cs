@@ -418,8 +418,8 @@ namespace ServerMonitor.ViewModels
                             log = await utilObject.ConnectToServerWithSocket(infos.Detail_Site, new SocketRequest());
                             break;
                         case "ICMP":
-                            log = await utilObject.ConnectToServerWithSocket(infos.Detail_Site, new SocketRequest());
-                            ICMPRequest icmp = new ICMPRequest(IPAddress.Parse(Infos.Detail_Site.Site_address));
+                            IPAddress ip = await utilObject.GetIPAddressAsync(Infos.Detail_Site.Site_address);
+                            ICMPRequest icmp = new ICMPRequest(ip);
                             log = await utilObject.ConnectToServerWithICMP(infos.Detail_Site, icmp);
                             break;
                         default:

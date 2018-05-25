@@ -48,13 +48,14 @@ namespace ServerMonitor.Services.RequestServices
             await Task.CompletedTask;
             // 赋值生成请求的时间
             CreateTime = DateTime.Now;
-            var cSSH = new SshClient(IPAddress, port, Identification.Username, Identification.Password);
-
             // 记录请求耗时
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
+            SshClient cSSH = null;
             try
             {
+                cSSH = new SshClient(IPAddress, port, Identification.Username, Identification.Password);
+                
                 cSSH.Connect();
                 if (cSSH.IsConnected)
                 {
@@ -104,10 +105,15 @@ namespace ServerMonitor.Services.RequestServices
             }
             finally
             {
-                cSSH.Disconnect();
+                if (null != cSSH) {
+                    if (cSSH.IsConnected)
+                    {
+                        cSSH.Disconnect();
+                    }
+                }
             }
             Status = "1001";
-            TimeCost = (short)(OverTime * 2);
+            TimeCost = (short)(OverTime * 1.5);
             return false;
         }
     }
