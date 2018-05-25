@@ -657,7 +657,7 @@ namespace ServerMonitor.ViewModels
         private string GetJson(string username,string password)
         {
             Dictionary<string, string> protocolIdentification = new Dictionary<string, string>();
-            protocolIdentification.Add("useaname", Username);
+            protocolIdentification.Add("username", Username);
             protocolIdentification.Add("password", Password);
             protocolIdentification.Add("type", "1");
             return JsonConvert.SerializeObject(protocolIdentification);
