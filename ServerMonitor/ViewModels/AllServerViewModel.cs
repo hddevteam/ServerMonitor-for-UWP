@@ -117,13 +117,13 @@ namespace ServerMonitor.ViewModels
             }
             if (null != ServerContext)
             {
-                if(ServerContext.Site_status.Equals("Open"))
+                if(ServerContext.Site_status.Equals("Enable"))
                 {
-                    OpenOrClose = "Close";
+                    OpenOrClose = "Disable";
                 }
                 else
                 {
-                    OpenOrClose = "Open";
+                    OpenOrClose = "Enable";
                 }
                 return true;
             }
@@ -147,13 +147,13 @@ namespace ServerMonitor.ViewModels
 
             if (null != ServerContext)
             {
-                if (ServerContext.Site_status.Equals("Open"))
+                if (ServerContext.Site_status.Equals("Enable"))
                 {
-                    OpenOrClose = "Close";
+                    OpenOrClose = "Disable";
                 }
                 else
                 {
-                    OpenOrClose = "Open";
+                    OpenOrClose = "Enable";
                 }
             }
 
@@ -248,11 +248,11 @@ namespace ServerMonitor.ViewModels
             {
                 if (q[i].Is_Monitor)
                 {
-                    site_status = "Open";
+                    site_status = "Enable";
                 }
                 else
                 {
-                    site_status = "Close";
+                    site_status = "Disable";
                 }
 
                 if (q[i].Is_server)
