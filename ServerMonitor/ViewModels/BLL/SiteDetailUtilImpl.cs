@@ -119,7 +119,7 @@ namespace ServerMonitor.ViewModels.BLL
                 // 获取保存的用户验证的信息
                 JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
                 try {
-                    request.Identification = new IdentificationInfo() { Username = js["useaname"].ToString(), Password = js["password"].ToString() };
+                    request.Identification = new IdentificationInfo() { Username = js["username"].ToString(), Password = js["password"].ToString() };
                     request.IdentifyType = (LoginType)Enum.Parse(typeof(LoginType),js["type"].ToString());
                 } catch (NullReferenceException){
                     request.Identification = new IdentificationInfo() {Password=null};
@@ -220,26 +220,23 @@ namespace ServerMonitor.ViewModels.BLL
                 Create_Time = DateTime.Now
             };
             #endregion
-
-            #region 暂时修改的   --xb
-            bool icmpFlag = request.DoRequest();
+            await Task.CompletedTask;
+            #region 根据设计的ICMP请求修改的   --xb
+            bool icmpFlag = request.MakeRequest();
             //请求完毕
             RequestObj requestObj;//用于存储icmp请求结果的对象              
-            requestObj = DataHelper.GetProperty(request); // 处理下请求对象的数据
-            site.Is_success = int.Parse(requestObj.Color);
-            site.Request_count += 1;
-            site.Request_TimeCost = requestObj.TimeCost;
-            site.Last_response = requestObj.Others ?? "";
+            requestObj = DataHelper.GetProperty(request); // 处理下请求对象的数据                                   
+            // 生成请求记录            
+            CreateLogWithRequestServerResult(log, requestObj);
+            // 更新站点信息
+            UpdateSiteStatus(site, log);
             if (icmpFlag == false)
             {
                 site.Is_success = 0;
             }
-            log.Is_error = !icmpFlag;
-            log.Log_Record = requestObj.Others ?? "";
-            log.TimeCost = requestObj.TimeCost;
             #endregion
-            await Task.CompletedTask;
-            return new LogModel();
+       
+            return log;
         }
         /// <summary>
         /// 使用Socket 与服务器建立连接
@@ -247,7 +244,8 @@ namespace ServerMonitor.ViewModels.BLL
         /// <returns></returns>
         public async Task<LogModel> ConnectToServerWithSocket(SiteModel site, SocketRequest request)
         {
-            IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(site.Site_address), site.Server_port);
+            IPAddress ip = await GetIPAddressAsync(site.Site_address);
+            IPEndPoint endPoint = new IPEndPoint(ip, site.Server_port);
             if (null != endPoint.Address && !("".Equals(endPoint.Address)))
             {
                 request.TargetEndPoint = endPoint;
