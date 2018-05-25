@@ -143,7 +143,7 @@ namespace ServerMonitor.ViewModels
             }
         }
         
-        private string statusCodes;
+        private string statusCodes = "200,";
         public string StatusCodes
         {
             get => statusCodes;
@@ -273,13 +273,7 @@ namespace ServerMonitor.ViewModels
             //将界面数据保存下来
             site.Protocol_type = GetProtocolType(ProtocolType);
             site.Site_address = (ProtocolType == 0 ? "http://" : "https://") + SiteAddress;
-            if (StatusCodes==null||"".Equals(StatusCodes))
-            {
-                site.Status_code = "200";
-            }else
-            {
-                site.Status_code = "200," + StatusCodes;
-            }
+            site.Status_code = StatusCodes;
             if (SiteName == null || SiteName.Equals(""))
             {
                 site.Site_name = SiteAddress;
@@ -377,7 +371,7 @@ namespace ServerMonitor.ViewModels
             SiteName = site.Site_name;
             if (site.Status_code.Length>=5)
             {
-                StatusCodes = site.Status_code.Substring(4);
+                StatusCodes = site.Status_code;
 
             }
         }
