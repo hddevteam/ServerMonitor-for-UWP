@@ -414,13 +414,11 @@ namespace ServerMonitor.ViewModels
             {
                 if (NoAnonymous) //true 不匿名 用户请求
                 {
-                    site.ProtocolIdentification = GetJson(Username, Password);
+                    site.ProtocolIdentification = GetJson(Username, Password, "1");
                 }
                 else  //匿名
                 {
-                    Dictionary<string, string> protocolIdentification = new Dictionary<string, string>();
-                    protocolIdentification.Add("type", "0");
-                    site.ProtocolIdentification = JsonConvert.SerializeObject(protocolIdentification);
+                    site.ProtocolIdentification = GetJson(Username, Password, "0");
                 }
             }
             else if(site.Protocol_type.Equals("DNS"))
@@ -654,12 +652,12 @@ namespace ServerMonitor.ViewModels
         /// <param name="username">用户名</param>
         /// <param name="password">密码</param>
         /// <returns>Json数据字符串</returns>
-        private string GetJson(string username,string password)
+        private string GetJson(string username,string password,string type)
         {
             Dictionary<string, string> protocolIdentification = new Dictionary<string, string>();
             protocolIdentification.Add("username", Username);
             protocolIdentification.Add("password", Password);
-            protocolIdentification.Add("type", "1");
+            protocolIdentification.Add("type", type);
             return JsonConvert.SerializeObject(protocolIdentification);
         }
         /// <summary>
