@@ -358,7 +358,7 @@ namespace ServerMonitor.ViewModels
                             break;
                         case "ICMP":
                             ICMPRequest icmp = new ICMPRequest(reIP);
-                            bool icmpFlag = icmp.DoRequest();
+                            bool icmpFlag = icmp.MakeRequest();
                             //请求完毕
                             RequestObj requestObj;//用于存储icmp请求结果的对象              
                             requestObj = DataHelper.GetProperty(icmp);
