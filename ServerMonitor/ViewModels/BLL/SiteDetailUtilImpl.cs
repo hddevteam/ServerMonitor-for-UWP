@@ -118,7 +118,13 @@ namespace ServerMonitor.ViewModels.BLL
                 request.FtpServer = IPAddress.Parse(site.Site_address);
                 // 获取保存的用户验证的信息
                 JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
-                request.Identification = new IdentificationInfo() { Username = js["useaname"].ToString(), Password = js["password"].ToString() };
+                try {
+                    request.Identification = new IdentificationInfo() { Username = js["useaname"].ToString(), Password = js["password"].ToString() };
+                    request.IdentifyType = (LoginType)Enum.Parse(typeof(LoginType),js["type"].ToString());
+                } catch (NullReferenceException){
+                    request.Identification = new IdentificationInfo() {Password=null};
+                    request.IdentifyType = LoginType.Anonymous;
+                }
                 #region 初始化log
                 LogModel log = new LogModel
                 {

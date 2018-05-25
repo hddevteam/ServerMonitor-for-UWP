@@ -55,6 +55,7 @@ namespace ServerMonitor.Services.RequestServices
         //public LoginType IdentifyType { get => identifyType; set => identifyType = value; }
         public IdentificationInfo Identification { get => identification; set => identification = value; }
         public IPAddress FtpServer { get => ftpServer; set => ftpServer = value; }
+        public LoginType IdentifyType { get => identifyType; set => identifyType = value; }
         /// <summary>
         /// 线程安全的请求对象 --完全延迟加载
         /// </summary>
@@ -64,8 +65,7 @@ namespace ServerMonitor.Services.RequestServices
             {
                 return Nested.instance;
             }
-        }
-
+        }       
         private FTPRequest() { }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace ServerMonitor.Services.RequestServices
         /// <param name="type">指定的登入类型</param>
         public FTPRequest(LoginType type)
         {
-            identifyType = type;
+            IdentifyType = type;
             // 选择匿名登入的时候默认设置用户名为anonymous
             if (LoginType.Anonymous.Equals(type))
             {
@@ -95,15 +95,15 @@ namespace ServerMonitor.Services.RequestServices
             byte[] PASSBytes = null;
             byte[] USERBytes = null;
             // 针对登入方式不同进行不同的验证信息复制
-            switch (identifyType)
+            switch (IdentifyType)
             {
                 case LoginType.Anonymous:
                     USERBytes = SendUSERCommand("anonymous");
-                    PASSBytes = string.IsNullOrEmpty(Identification.Password) ? null : SendPASSCommand(Identification.Password);
+                    PASSBytes = string.IsNullOrEmpty(Identification.Password) ? SendPASSCommand("") : SendPASSCommand(Identification.Password);
                     break;
                 case LoginType.Identify:
-                    USERBytes = string.IsNullOrEmpty(Identification.Username) ? null : SendUSERCommand(Identification.Username);
-                    PASSBytes = string.IsNullOrEmpty(Identification.Password) ? null : SendPASSCommand(Identification.Password);
+                    USERBytes = string.IsNullOrEmpty(Identification.Username) ? SendUSERCommand("") : SendUSERCommand(Identification.Username);
+                    PASSBytes = string.IsNullOrEmpty(Identification.Password) ? SendPASSCommand("") : SendPASSCommand(Identification.Password);
                     break;
                 default:
                     // ftp请求登陆模式异常
@@ -288,7 +288,7 @@ namespace ServerMonitor.Services.RequestServices
         /// <returns></returns>
         private byte[] SendUSERCommand(string Username)
         {
-            return string.IsNullOrEmpty(Username) ? null : Encoding.ASCII.GetBytes(string.Format(USERCOMMAND, Username));
+            return string.IsNullOrEmpty(Username) ? Encoding.ASCII.GetBytes(string.Format(USERCOMMAND, "")) : Encoding.ASCII.GetBytes(string.Format(USERCOMMAND, Username));
         }
 
         /// <summary>
@@ -298,7 +298,7 @@ namespace ServerMonitor.Services.RequestServices
         /// <returns></returns>
         private byte[] SendPASSCommand(string Password)
         {
-            return string.IsNullOrEmpty(Password) ? null : Encoding.ASCII.GetBytes(string.Format(PASSCOMMAND, Password));
+            return string.IsNullOrEmpty(Password) ? Encoding.ASCII.GetBytes(string.Format(PASSCOMMAND, "")) : Encoding.ASCII.GetBytes(string.Format(PASSCOMMAND, Password));
         }
 
         /// <summary>
@@ -331,7 +331,7 @@ namespace ServerMonitor.Services.RequestServices
             {
 
             }
-            internal static readonly FTPRequest instance = new FTPRequest();
+            internal static readonly FTPRequest instance = new FTPRequest(LoginType.Identify);
         }
     }
 
