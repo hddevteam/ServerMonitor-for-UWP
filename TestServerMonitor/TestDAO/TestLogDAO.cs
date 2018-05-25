@@ -30,7 +30,7 @@ namespace TestServerMonitor.TestDAO
         LogModel log;
 
         [TestMethod]
-        [AssemblyInitialize]
+        [ClassInitialize]
         public static void InitDatabase(TestContext testContext)
         {
             DBInit db = DataBaseControlImpl.Instance;
@@ -172,8 +172,8 @@ namespace TestServerMonitor.TestDAO
         [TestMethod]
         public void TestLogDAO_DeleteLogsBySite()
         {
-            
 
+            //logDAO.InsertListLog(logModels);
             Assert.AreEqual(2, logDAO.DeleteLogsBySite(logModels[0].Site_id));
             Assert.AreEqual(0,logDAO.GetLogById(logModels[0].Site_id).Site_id);//取一下logmodel[0]，看取得的是否为空log
 
