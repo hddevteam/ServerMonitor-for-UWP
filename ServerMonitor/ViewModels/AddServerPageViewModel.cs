@@ -570,7 +570,7 @@ namespace ServerMonitor.ViewModels
                 JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
                 if (js["type"].ToString().Equals("1"))  //用户请求
                 {
-                    Username = js["useaname"].ToString();//用户名
+                    Username = js["username"].ToString();//用户名
                     Password = js["password"].ToString();//用户名
                     NoAnonymous = true;
                 }
