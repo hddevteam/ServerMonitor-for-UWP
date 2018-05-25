@@ -216,7 +216,7 @@ namespace ServerMonitor.ViewModels.BLL
             #endregion
 
             #region 暂时修改的   --xb
-            bool icmpFlag = request.DoRequest();
+            bool icmpFlag = request.MakeRequest();
             //请求完毕
             RequestObj requestObj;//用于存储icmp请求结果的对象              
             requestObj = DataHelper.GetProperty(request); // 处理下请求对象的数据
