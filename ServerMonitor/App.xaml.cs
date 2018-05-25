@@ -121,11 +121,11 @@ namespace ServerMonitor
                         var https = url.StartsWith("https://");
                         if (http)
                         {
-                            url = url.Substring(7);//网址截取从以第一w
+                            url = url.Substring(7);//去除http
                         }
                         else if (https)
                         {
-                            url = url.Substring(8);//网址截取从以第一w
+                            url = url.Substring(8);//
                         }
                         IPAddress[] hostEntry = await Dns.GetHostAddressesAsync(url);
                         for (int m = 0; m < hostEntry.Length; m++)
@@ -232,7 +232,7 @@ namespace ServerMonitor
                             break;
                         case "ICMP":
                             ICMPRequest icmp = new ICMPRequest(reIP);
-                            bool icmpFlag = icmp.DoRequest();
+                            bool icmpFlag = icmp.MakeRequest();
                             //请求完毕
                             RequestObj requestObj;//用于存储icmp请求结果的对象              
                             requestObj = DataHelper.GetProperty(icmp);
