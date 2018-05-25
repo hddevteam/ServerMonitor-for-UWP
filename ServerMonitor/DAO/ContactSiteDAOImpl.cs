@@ -112,7 +112,7 @@ namespace ServerMonitor.DAOImpl
         /// </summary>
         /// <param name="siteid">输入的siteid</param>
         /// <returns></returns>
-        public List<ContactSiteModel> GetContactSiteBySiteId(int siteid)
+        public List<SiteContactModel> GetContactSiteBySiteId(int siteid)
         {
 
             List<SiteContactModel> contactsiteList;

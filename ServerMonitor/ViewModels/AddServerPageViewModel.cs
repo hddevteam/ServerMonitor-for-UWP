@@ -41,6 +41,7 @@ namespace ServerMonitor.ViewModels
 
         private string _Value = "Default";  //保存传过来的信息  为 "page,siteId"
         public string Value { get { return _Value; } set { Set(ref _Value, value); } }
+        private bool contactChange = false;  //true 绑定联系人改变了
         #endregion
 
         #region 系统函数
@@ -201,8 +202,8 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        private int port;
-        public int Port
+        private string port;
+        public string Port
         {
             get => port;
             set
@@ -331,6 +332,7 @@ namespace ServerMonitor.ViewModels
                     SelectedContacts.Add(Contacts[i]);
                 }
             }
+            contactChange = true;
         }
         
         /// <summary>
@@ -347,8 +349,19 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public void Domain_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string domain = (sender as TextBox).Text.ToString();
-            IsEnabled = CheckDomain(domain);
+            bool flag = false;
+            var textBox = sender as TextBox;
+            if (textBox.Tag.Equals("1"))  //检查站点地址
+            {
+                string domain = textBox.Text.ToString();
+                flag = CheckDomain(domain);
+            }
+            else   //检查状态码
+            {
+                string port = textBox.Text.ToString();
+                flag = CheckPort(port);
+            }
+            IsEnabled = flag;
         }
 
         /// <summary>
@@ -373,13 +386,22 @@ namespace ServerMonitor.ViewModels
             else    //Edit site
             {
                 site = DBHelper.GetSiteById(siteId);
+                site.Protocol_content = null;
+                site.ProtocolIdentification = null;
             }
             site.Update_time = DateTime.Now;
 
             //将界面数据保存下来
             site.Protocol_type = GetProtocolType(ProtocolType);
             site.Site_address = SiteAddress;
-            site.Server_port = Port;
+            try
+            {
+                site.Server_port = int.Parse(Port);
+            }
+            catch (Exception)
+            {
+                site.Server_port = 0;
+            }
             if (SiteName == null|| SiteName.Equals(""))
             {
                 site.Site_name = SiteAddress;
@@ -392,13 +414,11 @@ namespace ServerMonitor.ViewModels
             {
                 if (NoAnonymous) //true 不匿名 用户请求
                 {
-                    site.ProtocolIdentification = GetJson(Username, Password);
+                    site.ProtocolIdentification = GetJson(Username, Password, "1");
                 }
                 else  //匿名
                 {
-                    Dictionary<string, string> protocolIdentification = new Dictionary<string, string>();
-                    protocolIdentification.Add("type", "0");
-                    site.ProtocolIdentification = JsonConvert.SerializeObject(protocolIdentification);
+                    site.ProtocolIdentification = GetJson(Username, Password, "0");
                 }
             }
             else if(site.Protocol_type.Equals("DNS"))
@@ -421,7 +441,7 @@ namespace ServerMonitor.ViewModels
             //数据库操作
             if (siteId == -1)
             {
-                if (DBHelper.InsertOneSite(site) == 1) 
+                if (DBHelper.InsertOneSite(site) == 1)
                 {
                     var contactS = ContactSiteDAOImpl.Instance.InsertListConnects(contactSiteModels);
                     Jump(); //返回原界面
@@ -431,8 +451,11 @@ namespace ServerMonitor.ViewModels
             {
                 if (DBHelper.UpdateSite(site) == 1)
                 {
-                    var in1 = ContactSiteDAOImpl.Instance.DeletSiteAllConnect(siteId);
-                    var contactS = ContactSiteDAOImpl.Instance.InsertListConnects(contactSiteModels);
+                    if (contactChange)
+                    {
+                        var in1 = ContactSiteDAOImpl.Instance.DeletSiteAllConnect(siteId);
+                        var contactS = ContactSiteDAOImpl.Instance.InsertListConnects(contactSiteModels);
+                    }
                     Jump();
                 }
             }
@@ -486,40 +509,42 @@ namespace ServerMonitor.ViewModels
                     DiePort = false;
                     NeedUser = false;
                     NeedRecord = false;
+                    Port = null;
                     break;
                 case 1:     //SOCKET
                     LivePort = true;
                     DiePort = false;
                     NeedUser = false;
                     NeedRecord = false;
+                    Port = null;
                     break;
                 case 2:    //SSH
                     LivePort = false;
                     DiePort = true;
                     NeedUser = true;
                     NeedRecord = false;
-                    Port = 22;
+                    Port = "22";
                     break;
                 case 3:   //FTP
                     LivePort = false;
                     DiePort = true;
                     NeedUser = true;
                     NeedRecord = false;
-                    Port = 21;
+                    Port = "21";
                     break;
                 case 4:    //DNS
                     LivePort = false;
                     DiePort = true;
                     NeedUser = false;
                     NeedRecord = true;
-                    Port = 53;
+                    Port = "53";
                     break;
                 case 5:    //SMTP
                     LivePort = true;
                     DiePort = false;
                     NeedUser = false;
                     NeedRecord = false;
-                    Port = 25;
+                    Port = "25";
                     break;
                 default:
                     break;
@@ -536,14 +561,14 @@ namespace ServerMonitor.ViewModels
             ProtocolType = GetProtocolType(site.Protocol_type);
             SiteAddress = site.Site_address;
             SiteName = site.Site_name;
-            Port = site.Server_port;
+            Port = site.Server_port+"";
             
             if (ProtocolType == 2 || ProtocolType == 3)
             {
                 JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
                 if (js["type"].ToString().Equals("1"))  //用户请求
                 {
-                    Username = js["useaname"].ToString();//用户名
+                    Username = js["username"].ToString();//用户名
                     Password = js["password"].ToString();//用户名
                     NoAnonymous = true;
                 }
@@ -607,18 +632,32 @@ namespace ServerMonitor.ViewModels
             }
         }
 
+        private bool CheckPort(string port)
+        {
+            Regex regPort = new Regex(@"^[0-9]{0,5}$");
+            Boolean check = regPort.IsMatch(port);
+            if (check)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         /// <summary>
         /// 将用户信息变成Json数据
         /// </summary>
         /// <param name="username">用户名</param>
         /// <param name="password">密码</param>
         /// <returns>Json数据字符串</returns>
-        private string GetJson(string username,string password)
+        private string GetJson(string username,string password,string type)
         {
             Dictionary<string, string> protocolIdentification = new Dictionary<string, string>();
-            protocolIdentification.Add("useaname", Username);
+            protocolIdentification.Add("username", Username);
             protocolIdentification.Add("password", Password);
-            protocolIdentification.Add("type", "1");
+            protocolIdentification.Add("type", type);
             return JsonConvert.SerializeObject(protocolIdentification);
         }
         /// <summary>
