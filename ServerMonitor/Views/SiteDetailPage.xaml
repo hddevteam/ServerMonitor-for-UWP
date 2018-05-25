@@ -351,7 +351,7 @@
                             <!--  这是下面的饼图 -->
                             <telerik:RadPieChart Height="300"
                                          PaletteName="DefaultDark"
-                                         Width="250"
+                                         Width="330"
                                          x:Name="AnalysisPeiChart"
                                          Margin="0,10,0,10"
                                          >
