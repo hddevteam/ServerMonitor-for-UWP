@@ -13,9 +13,19 @@ ServerMonitor for UWP
 <a name="项目介绍"></a>  
 ## 项目介绍 
 
-&nbsp;&nbsp;ServerMonitor is an application provide user with **continuously monitoring site service**.With the aim of helping people who have great need in maintaining the site's work, app has integrated generate visual data function and data analysis function.
+Server Monitor is a professional network tool to monitor servers and web sites.
 
-&nbsp;&nbsp;ServerMonitor是一款**为用户提供持续监控网站服务的应用程序**，旨在帮助那些需要维护网站工作的人，app集成了可视化数据功能和数据分析功能。
+You can easily view all server / site status in the same interface. 
+
+Check the server / site status details.
+
+View server / site status charts.
+
+Add contacts to server / site.
+
+You can monitor Web server, SSH Server, Email server, DNS server, FTP server, VPN server, etc.
+
+Monitor web sites based on the domain name / IP address, support HTTP / HTTPS protocol, you can manually add / modify HTTP return code for monitoring.
 
 <a name="使用说明"></a>
 

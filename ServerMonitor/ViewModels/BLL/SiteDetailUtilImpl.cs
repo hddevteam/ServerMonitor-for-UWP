@@ -118,7 +118,13 @@ namespace ServerMonitor.ViewModels.BLL
                 request.FtpServer = IPAddress.Parse(site.Site_address);
                 // 获取保存的用户验证的信息
                 JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
-                request.Identification = new IdentificationInfo() { Username = js["useaname"].ToString(), Password = js["password"].ToString() };
+                try {
+                    request.Identification = new IdentificationInfo() { Username = js["username"].ToString(), Password = js["password"].ToString() };
+                    request.IdentifyType = (LoginType)Enum.Parse(typeof(LoginType),js["type"].ToString());
+                } catch (NullReferenceException){
+                    request.Identification = new IdentificationInfo() {Password=null};
+                    request.IdentifyType = LoginType.Anonymous;
+                }
                 #region 初始化log
                 LogModel log = new LogModel
                 {
@@ -150,8 +156,15 @@ namespace ServerMonitor.ViewModels.BLL
             {
                 request.IPAddress = site.Site_address;
                 // 获取保存的用户验证的信息
-                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
-                request.Identification = new SshIdentificationInfo() { Username = js["useaname"].ToString(), Password = js["password"].ToString() };
+                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);                
+                try
+                {
+                    request.Identification = new SshIdentificationInfo() { Username = js["username"].ToString(), Password = js["password"].ToString() };
+                }
+                catch (NullReferenceException)
+                {
+                    request.Identification = new SshIdentificationInfo() { Username = "anonymous", Password = "anonymous" };
+                }
                 #region 初始化log
                 LogModel log = new LogModel
                 {
@@ -181,6 +194,7 @@ namespace ServerMonitor.ViewModels.BLL
             if (null != site.Site_address && !("".Equals(site.Site_address)))
             {
                 request.DomainName = site.Site_address;
+                request.Port = site.Server_port;
                 #region 初始化log
                 LogModel log = new LogModel
                 {
@@ -214,26 +228,23 @@ namespace ServerMonitor.ViewModels.BLL
                 Create_Time = DateTime.Now
             };
             #endregion
-
-            #region 暂时修改的   --xb
-            bool icmpFlag = request.DoRequest();
+            await Task.CompletedTask;
+            #region 根据设计的ICMP请求修改的   --xb
+            bool icmpFlag = request.MakeRequest();
             //请求完毕
             RequestObj requestObj;//用于存储icmp请求结果的对象              
-            requestObj = DataHelper.GetProperty(request); // 处理下请求对象的数据
-            site.Is_success = int.Parse(requestObj.Color);
-            site.Request_count += 1;
-            site.Request_TimeCost = requestObj.TimeCost;
-            site.Last_response = requestObj.Others ?? "";
+            requestObj = DataHelper.GetProperty(request); // 处理下请求对象的数据                                   
+            // 生成请求记录            
+            CreateLogWithRequestServerResult(log, requestObj);
+            // 更新站点信息
+            UpdateSiteStatus(site, log);
             if (icmpFlag == false)
             {
                 site.Is_success = 0;
             }
-            log.Is_error = !icmpFlag;
-            log.Log_Record = requestObj.Others ?? "";
-            log.TimeCost = requestObj.TimeCost;
             #endregion
-            await Task.CompletedTask;
-            return new LogModel();
+       
+            return log;
         }
         /// <summary>
         /// 使用Socket 与服务器建立连接
@@ -241,7 +252,8 @@ namespace ServerMonitor.ViewModels.BLL
         /// <returns></returns>
         public async Task<LogModel> ConnectToServerWithSocket(SiteModel site, SocketRequest request)
         {
-            IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(site.Site_address), site.Server_port);
+            IPAddress ip = await GetIPAddressAsync(site.Site_address);
+            IPEndPoint endPoint = new IPEndPoint(ip, site.Server_port);
             if (null != endPoint.Address && !("".Equals(endPoint.Address)))
             {
                 request.TargetEndPoint = endPoint;
@@ -299,7 +311,17 @@ namespace ServerMonitor.ViewModels.BLL
             {
                 //如果输入的不是ip地址               
                 //通过域名解析ip地址
-                url = url.Substring(url.IndexOf('w'));//网址截取从以第一w
+                //网址简单处理 去除http和https
+                var http = url.StartsWith("http://");
+                var https = url.StartsWith("https://");
+                if (http)
+                {
+                    url = url.Substring(7);//去除http
+                }
+                else if (https)
+                {
+                    url = url.Substring(8);//
+                }
                 IPAddress[] hostEntry = await Dns.GetHostAddressesAsync(url);
                 for (int m = 0; m < hostEntry.Length; m++)
                 {

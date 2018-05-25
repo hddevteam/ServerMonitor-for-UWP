@@ -95,12 +95,13 @@
                             <ComboBoxItem Content="SMTP"/>
                         </ComboBox>
                         <TextBox Grid.Column="1" Name="domain" PlaceholderText="Domain name/IP   This Field Is Required"
-                                 Text="{Binding SiteAddress, Mode=TwoWay}"
+                                 Text="{Binding SiteAddress, Mode=TwoWay}" Tag="1"
                                  Height="30" TextChanged="{x:Bind ViewModel.Domain_TextChanged}"/>
                     </Grid>
                     <StackPanel Margin="0,8,0,0" Orientation="Horizontal">
                         <TextBox Text="{Binding Port,Mode=TwoWay}" PlaceholderText="Port(optional)"
-                                 Height="30" Width="120" Visibility="{Binding LivePort}"/>
+                                 Height="30" Width="120" Visibility="{Binding LivePort}" Tag="2"
+                                 TextChanged="{x:Bind ViewModel.Domain_TextChanged}"/>
                         <TextBlock Padding="0,4,0,0" Text="Port : " Height="30" Width="40" Visibility="{Binding DiePort}"/>
                         <TextBlock Padding="0,4,0,0" Text="{Binding Port,Mode=TwoWay}" Height="30" TextAlignment="Center" Visibility="{Binding DiePort}"/>
                     </StackPanel>
