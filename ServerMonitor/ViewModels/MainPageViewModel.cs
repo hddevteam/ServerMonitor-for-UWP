@@ -20,6 +20,7 @@ using ServerMonitor.Util;
 using ServerMonitor.Services.RequestServices;
 using ServerMonitor.ViewModels.BLL;
 using ServerMonitor.SiteDb;
+using Windows.UI.Xaml.Data;
 
 namespace ServerMonitor.ViewModels
 {
@@ -103,6 +104,20 @@ namespace ServerMonitor.ViewModels
             {
                 t = value;
                 RaisePropertyChanged(() => T);
+            }
+        }
+
+        private bool requestAsyncStat = false;
+        /// <summary>
+        /// 异部请求状态
+        /// </summary>
+        public bool RequestAsyncStat
+        {
+            get => requestAsyncStat;
+            set
+            {
+                requestAsyncStat = value;
+                RaisePropertyChanged(() => RequestAsyncStat);
             }
         }
         #endregion 绑定数据
@@ -216,7 +231,10 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public async void RequestAll_Click(object sender, RoutedEventArgs e)
         {
-			MessageRemind toast = new MessageRemind();
+            // P操作 禁用刷新按钮
+            (sender as AppBarButton).IsEnabled = false;
+            RequestAsyncStat = true;
+            MessageRemind toast = new MessageRemind();
             //首先进行precheck 
             bool pre =  await Pre_Check();
             if (pre)
@@ -438,6 +456,9 @@ namespace ServerMonitor.ViewModels
                     GetListSite();
                 }
             }
+            // V操作 启用刷新按钮
+            (sender as AppBarButton).IsEnabled = true;
+            RequestAsyncStat = false;
         }
 
         /// <summary>
