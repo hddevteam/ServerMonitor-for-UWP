@@ -156,8 +156,15 @@ namespace ServerMonitor.ViewModels.BLL
             {
                 request.IPAddress = site.Site_address;
                 // 获取保存的用户验证的信息
-                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
-                request.Identification = new SshIdentificationInfo() { Username = js["useaname"].ToString(), Password = js["password"].ToString() };
+                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);                
+                try
+                {
+                    request.Identification = new SshIdentificationInfo() { Username = js["username"].ToString(), Password = js["password"].ToString() };
+                }
+                catch (NullReferenceException)
+                {
+                    request.Identification = new SshIdentificationInfo() { Username = "anonymous", Password = "anonymous" };
+                }
                 #region 初始化log
                 LogModel log = new LogModel
                 {
@@ -187,6 +194,7 @@ namespace ServerMonitor.ViewModels.BLL
             if (null != site.Site_address && !("".Equals(site.Site_address)))
             {
                 request.DomainName = site.Site_address;
+                request.Port = site.Server_port;
                 #region 初始化log
                 LogModel log = new LogModel
                 {
@@ -303,7 +311,17 @@ namespace ServerMonitor.ViewModels.BLL
             {
                 //如果输入的不是ip地址               
                 //通过域名解析ip地址
-                url = url.Substring(url.IndexOf('w'));//网址截取从以第一w
+                //网址简单处理 去除http和https
+                var http = url.StartsWith("http://");
+                var https = url.StartsWith("https://");
+                if (http)
+                {
+                    url = url.Substring(7);//去除http
+                }
+                else if (https)
+                {
+                    url = url.Substring(8);//
+                }
                 IPAddress[] hostEntry = await Dns.GetHostAddressesAsync(url);
                 for (int m = 0; m < hostEntry.Length; m++)
                 {
