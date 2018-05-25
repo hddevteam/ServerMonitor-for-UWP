@@ -393,12 +393,18 @@ namespace ServerMonitor.ViewModels
                             var json = si.ProtocolIdentification;
                             JObject js = (JObject)JsonConvert.DeserializeObject(json);
                             //在此处加入type类型
-                            string username = js["username"].ToString();
-                            string password = js["password"].ToString();
                             FTPRequest fTP = new FTPRequest(LoginType.Identify);
                             fTP.FtpServer = reIP;
-                            fTP.Identification.Username = username;
-                            fTP.Identification.Password = password;
+                            try
+                            {
+                                fTP.Identification = new IdentificationInfo() { Username = js["username"].ToString(), Password = js["password"].ToString() };
+                                fTP.IdentifyType = (LoginType)Enum.Parse(typeof(LoginType), js["type"].ToString());
+                            }
+                            catch (NullReferenceException)
+                            {
+                                fTP.Identification = new IdentificationInfo() { Password = null };
+                                fTP.IdentifyType = LoginType.Anonymous;
+                            }
                             bool ftpFlag = await fTP.MakeRequest();
                             //请求完毕
                             if ("1001".Equals(fTP.Status))
