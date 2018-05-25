@@ -22,6 +22,7 @@ using ServerMonitor.Services.RequestServices;
 using ServerMonitor.ViewModels.BLL;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ServerMonitor.LogDb;
 
 namespace ServerMonitor
 {
@@ -98,7 +99,8 @@ namespace ServerMonitor
 			SiteModel _presite = new SiteModel();
 			_presite = DBHelper.GetSiteById(4);//这里是指定了precheck的id为4
 			var _precolor = _presite.Is_success;//如果percheck为错误 就不进行请求了
-			if (_precolor != 0)
+            SiteDetailUtilImpl util = new SiteDetailUtilImpl();
+            if (_precolor != 0)
             {
                 //遍历sitelist 根据协议进行请求
                 for (int i = 0; i < len; i++)
@@ -155,7 +157,7 @@ namespace ServerMonitor
                             }
                             else
                             {
-                                SiteDetailUtilImpl util = new SiteDetailUtilImpl();//用于查看状态码
+                                //用于查看状态码
                                 bool match = util.SuccessCodeMatch(si, hTTPs.Status);//匹配用户设定状态码
                                 if (match)//匹配为成功  否则为失败
                                 {
@@ -285,8 +287,7 @@ namespace ServerMonitor
                         case "SMTP":
                             SMTPRequest sMTP = new SMTPRequest(_address, si.Server_port);
                             bool smtpFlag = await sMTP.MakeRequest();
-                            //请求完毕
-
+                            //请求完毕                            
                             if ("1000".Equals(sMTP.Status))
                             {
                                 si.Is_success = 1;
@@ -306,6 +307,17 @@ namespace ServerMonitor
                                 si.Is_success = 0;
                                 toast.ShowToast(si);
                             }
+                            break;
+                            // 补充之前欠缺的Socket服务器请求   --xb
+                        case "SOCKET":
+                            // 初始化Socket请求对象
+                            SocketRequest request = new SocketRequest();
+                            request.TargetEndPoint = new IPEndPoint(IPAddress.Parse(si.Site_address), si.Server_port);
+                            // 请求指定终端，并生成对应的请求记录，最后更新站点信息
+                            LogModel log = await util.ConnectToServerWithSocket(si, request);
+                            // 将请求的记录插入数据库
+                            LogDaoImpl logDao = new LogDaoImpl();
+                            logDao.InsertOneLog(log);
                             break;
                         default:
                             break;
