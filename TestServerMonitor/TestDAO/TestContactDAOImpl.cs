@@ -33,8 +33,7 @@ namespace TestServerMonitor.TestDAO
         {
             List<ContactModel> l_list = new List<ContactModel>();
             //新建一个表，验证表
-
-            IContactDAO n = new ContactDAOImpl();
+            IContactDAO ICD = new ContactDAOImpl();//调用接口
             ContactModel l_CL = new ContactModel()
             {
                 Id = 1,
@@ -45,7 +44,7 @@ namespace TestServerMonitor.TestDAO
                 Others = null,
                 Telephone = null,
             };
-            n.InsertOneContact(l_CL);
+            ICD.InsertOneContact(l_CL);
             //为了防止数据库起初没数据，为表插入一条Contact信息，使测试通过
             IContactSiteDao contactSiteDao = ContactSiteDAOImpl.Instance;
             contactSiteDao.InsertListConnects(new List<SiteContactModel>()
@@ -58,7 +57,7 @@ namespace TestServerMonitor.TestDAO
                 }
             });
             //插入一条ContactSite信息
-            l_list = n.GetContactModelsBySiteId(1);
+            l_list = ICD.GetContactModelsBySiteId(1);
             Assert.AreNotEqual(l_list.Count, 0);
             //已经有数据看结果是否有值，验证方法
         }

@@ -23,7 +23,7 @@ namespace TestServerMonitor.TestDAO
         /// <summary>
         /// 测试用logDAO
         /// </summary>
-        LogDAO logDAO = new LogDaoImpl();
+        ILogDAO logDAO = new LogDaoImpl();
         /// <summary>
         /// 测试用log
         /// </summary>

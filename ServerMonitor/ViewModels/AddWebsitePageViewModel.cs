@@ -273,8 +273,13 @@ namespace ServerMonitor.ViewModels
             //将界面数据保存下来
             site.Protocol_type = GetProtocolType(ProtocolType);
             site.Site_address = (ProtocolType == 0 ? "http://" : "https://") + SiteAddress;
-            site.Status_code = "200," + StatusCodes;
-
+            if (StatusCodes==null||"".Equals(StatusCodes))
+            {
+                site.Status_code = "200";
+            }else
+            {
+                site.Status_code = "200," + StatusCodes;
+            }
             if (SiteName == null || SiteName.Equals(""))
             {
                 site.Site_name = SiteAddress;
@@ -393,15 +398,16 @@ namespace ServerMonitor.ViewModels
             {
                 try
                 {
-                    Regex reg = new Regex(@"^((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]\d)|\d)(\.((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]\d)|\d)){3}$");
+                    //域名的正则表达式
+                    Regex reg = new Regex(@"^[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+\.?$");
                     Boolean _domaincheck = reg.IsMatch(domain);
                     if (_domaincheck)
                     {
-                        return false;
+                        return true;
                     }
                     else
                     {
-                        return true;
+                        return false;
                     }
                 }
                 catch

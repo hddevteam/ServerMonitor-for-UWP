@@ -163,18 +163,22 @@ namespace ServerMonitor.Controls
                     if (obj.Color.Equals("2"))
                     {
                         obj.Color = "2";
+                        obj.Status = "1002";
                     }
                     else if (obj.Color.Equals("0"))
                     {
                         obj.Color = "0";
+                        obj.Status = "1001";
                     }
                     else if (obj.Color.Equals("1"))
                     {
                         obj.Color = "1";
+                        obj.Status = "1000";
                     }
                     else
                     {
                         obj.Color = "-1";
+                        obj.Status = "1002";
                     } 
                 }
                 else

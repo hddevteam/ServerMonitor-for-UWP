@@ -14,6 +14,10 @@ using Telerik.Charting;
 using Telerik.UI.Xaml.Controls.Chart;
 using GalaSoft.MvvmLight.Threading;
 using ServerMonitor.ViewModels.BLL;
+using Windows.UI.Xaml.Data;
+using ServerMonitor.SiteDb;
+using ServerMonitor.LogDb;
+using System.ComponentModel;
 
 namespace ServerMonitor.ViewModels
 {
@@ -27,6 +31,8 @@ namespace ServerMonitor.ViewModels
         const int ERROR_CODE = 4;
 
         public IChartUtil ChartDao { get; set; }
+        public ISiteDAO siteDao { get; set; }
+        public ILogDAO logDao { get; set; }
 
         //为柱状图绑定的站点ID提供显示的站点名
         public static List<SiteModel> siteModels = new List<SiteModel>();
@@ -107,7 +113,7 @@ namespace ServerMonitor.ViewModels
             var log = await LoadDbLogAsync();
             var site = await LoadDbSiteAsync();
             var selectResult = await ChartDao.SelectSitesAsync(site);
-            Infos.Sites =  selectResult.Item2;
+            Infos.Sites = selectResult.Item2;
             Infos.Logs = log;
             Infos.SelectSites = selectResult.Item1;
 
@@ -129,6 +135,8 @@ namespace ServerMonitor.ViewModels
         {
             Lengend = new ObservableCollection<ChartLengend>();
             ChartDao = new ChartUtilImpl();
+            siteDao = new SiteDaoImpl();
+            logDao = new LogDaoImpl();
             Chart1Collection = new ObservableCollection<ObservableCollection<Chart1>>();
             Infos.Chart1CollectionCopy = new ObservableCollection<ObservableCollection<Chart1>>();
             Infos.SelectSites = new ObservableCollection<SelectSite>();
@@ -142,14 +150,14 @@ namespace ServerMonitor.ViewModels
         public async Task<List<SiteModel>> LoadDbSiteAsync()
         {
             await Task.CompletedTask;
-            siteModels = DBHelper.GetAllSite();
+            siteModels = siteDao.GetAllSite();
             return siteModels;
         }
         public async Task<List<LogModel>> LoadDbLogAsync()
         {
             await Task.CompletedTask;
             List<LogModel> logs = new List<LogModel>();
-            logs = DBHelper.GetAllLog();
+            logs = logDao.GetAllLog();
             //数据排序，便于图表按序显示
             logs = logs.OrderBy(o => o.Create_Time).ToList();
             return logs;
@@ -254,22 +262,16 @@ namespace ServerMonitor.ViewModels
                     Infos.HAxisProperties.MaxnumDateTime = DateTime.Now;
                     Infos.HAxisProperties.MinnumDateTime = DateTime.Now.AddHours(-23);
                     Infos.HAxisProperties.ChartTitle = "Results within the last 24 hours";
-                    Infos.HAxisProperties.MajorStep = 4;
-                    Infos.HAxisProperties.MajorStepUnit = TimeInterval.Hour;
                     return _selectedIndex;
                 case 1:
                     Infos.HAxisProperties.MaxnumDateTime = DateTime.Now;
                     Infos.HAxisProperties.MinnumDateTime = DateTime.Now.AddDays(-2);
                     Infos.HAxisProperties.ChartTitle = "Nearly three days of request results";
-                    Infos.HAxisProperties.MajorStep = 1;
-                    Infos.HAxisProperties.MajorStepUnit = TimeInterval.Day;
                     return _selectedIndex;
                 case 2:
                     Infos.HAxisProperties.MaxnumDateTime = DateTime.Now;
                     Infos.HAxisProperties.MinnumDateTime = DateTime.Now.AddDays(-6);
                     Infos.HAxisProperties.ChartTitle = "Nearly a week of request results";
-                    Infos.HAxisProperties.MajorStep = 1;
-                    Infos.HAxisProperties.MajorStepUnit = TimeInterval.Day;
                     return _selectedIndex;
                 default:
                     break;
@@ -279,7 +281,32 @@ namespace ServerMonitor.ViewModels
         #endregion
     }
 
-    #region 图表标签格式化类
+    #region 图表标签格式化，颜色转换等工具类
+    //图表数据点颜色转换器
+    public class DataPointToBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            DataPoint point = value as DataPoint;
+            if (point == null)
+            {
+                return value;
+            }
+
+            var series = point.Presenter as LineSeries;
+            if (point.Parent == null || series == null)
+            {
+                return value;
+            }
+
+            return series.Stroke;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
     //对数轴标签格式化
     public class CustomLogarithmicAxisLabelFormatter : IContentFormatter
     {
@@ -308,12 +335,12 @@ namespace ServerMonitor.ViewModels
             var axis = owner as DateTimeContinuousAxis;
             var con = Convert.ToDateTime(content);
 
-            if (axis.MajorStepUnit != TimeInterval.Hour) //当时间间隔为天时，格式化显示天
+            if(axis.Title.ToString().Contains("three days") || axis.Title.ToString().Contains("week"))
             {
                 var con_str = String.Format("{0:MM-dd HH:mm}", con);
                 return con_str;
             }
-            else //否则只显示小时
+            else
             {
                 var con_str = String.Format("{0:HH:mm}", con);
                 return con_str;
@@ -343,8 +370,6 @@ namespace ServerMonitor.ViewModels
     /// </summary>
     public class Chart1HAxisProperties : ObservableObject
     {
-        private TimeInterval majorStepUnit;
-        private double majorStep;
         //图表1 坐标轴时间线结束值
         private DateTime maxnumDateTime = DateTime.Now;
         //图表1 坐标轴时间线起始值
@@ -355,31 +380,6 @@ namespace ServerMonitor.ViewModels
         {
             get { return chartTitle; }
             set { chartTitle = value; RaisePropertyChanged(() => ChartTitle); }
-        }
-        
-        /// <summary>
-        /// 第一个图表的横轴单位
-        /// </summary>
-        public TimeInterval MajorStepUnit
-        {
-            get => majorStepUnit;
-            set
-            {
-                majorStepUnit = value;
-                RaisePropertyChanged(() => MajorStepUnit);
-            }
-        }
-        /// <summary>
-        /// 第一个图表的横轴坐标之间的间隔
-        /// </summary>
-        public double MajorStep
-        {
-            get => majorStep;
-            set
-            {
-                majorStep = value;
-                RaisePropertyChanged(() => MajorStep);
-            }
         }
 
         public DateTime MaxnumDateTime
@@ -392,12 +392,6 @@ namespace ServerMonitor.ViewModels
         {
             get { return minnumDateTime; }
             set { minnumDateTime = value; RaisePropertyChanged(() => MinnumDateTime); }
-        }
-
-        public Chart1HAxisProperties()
-        {
-            MajorStep = 1;
-            MajorStepUnit = TimeInterval.Hour;
         }
     }
 
@@ -477,9 +471,9 @@ namespace ServerMonitor.ViewModels
             set { requestTime = value; RaisePropertyChanged(() => RequestTime); }
         }
         //站点请求回复时间
-        private Double responseTime;
+        private Double? responseTime;
 
-        public Double ResponseTime
+        public Double? ResponseTime
         {
             get { return responseTime; }
             set { responseTime = value; RaisePropertyChanged(() => ResponseTime); }
@@ -498,12 +492,12 @@ namespace ServerMonitor.ViewModels
     public class BarChartData : ObservableObject
     {
         //站点类型
-        private string type;
+        private string address;
 
-        public string Type
+        public string Address
         {
-            get { return type; }
-            set { type = value; RaisePropertyChanged(() => Type); }
+            get { return address; }
+            set { address = value; RaisePropertyChanged(() => Address); }
         }
         //站点id
         private string siteId;

@@ -70,8 +70,9 @@ namespace ServerMonitor
             XElement root = document.Root;
             // 加载数据库名称
             XElement dbName = root.Element("DBFilename");
-            DBHelper.InitDB(dbName.Value);
-            DataBaseControlImpl.Instance.SetDBFilename(dbName.Value);
+            //DBHelper.InitDB(dbName.Value);
+            DBHelper.SetDBFilename(dbName.Value);
+            DataBaseControlImpl.Instance.InitDB(dbName.Value);
             #endregion
             await NavigationService.NavigateAsync(typeof(Views.MainPage));
         }
@@ -120,11 +121,11 @@ namespace ServerMonitor
                         var https = url.StartsWith("https://");
                         if (http)
                         {
-                            url = url.Substring(7);//网址截取从以第一w
+                            url = url.Substring(7);//去除http
                         }
                         else if (https)
                         {
-                            url = url.Substring(8);//网址截取从以第一w
+                            url = url.Substring(8);//
                         }
                         IPAddress[] hostEntry = await Dns.GetHostAddressesAsync(url);
                         for (int m = 0; m < hostEntry.Length; m++)
@@ -154,7 +155,7 @@ namespace ServerMonitor
                             }
                             else
                             {
-                                SiteDetailViewModel util = new SiteDetailViewModel();//用于查看状态码
+                                SiteDetailUtilImpl util = new SiteDetailUtilImpl();//用于查看状态码
                                 bool match = util.SuccessCodeMatch(si, hTTPs.Status);//匹配用户设定状态码
                                 if (match)//匹配为成功  否则为失败
                                 {
@@ -231,7 +232,7 @@ namespace ServerMonitor
                             break;
                         case "ICMP":
                             ICMPRequest icmp = new ICMPRequest(reIP);
-                            bool icmpFlag = icmp.DoRequest();
+                            bool icmpFlag = icmp.MakeRequest();
                             //请求完毕
                             RequestObj requestObj;//用于存储icmp请求结果的对象              
                             requestObj = DataHelper.GetProperty(icmp);

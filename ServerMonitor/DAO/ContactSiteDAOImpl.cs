@@ -42,7 +42,7 @@ namespace ServerMonitor.DAOImpl
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
-                result = conn.Execute("delete from ContactSite where SiteId = ? and ContactId = ?", SiteId, ContactId);
+                result = conn.Execute("delete from Site_Contact where SiteId = ? and contact_id = ?", SiteId, ContactId);
             }
             return result;
         }
@@ -57,7 +57,7 @@ namespace ServerMonitor.DAOImpl
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
-                result = conn.Execute("delete from ContactSite where SiteId = ?", SiteId);
+                result = conn.Execute("delete from Site_Contact where site_id = ?", SiteId);
             }
             return result;
         }
@@ -107,7 +107,11 @@ namespace ServerMonitor.DAOImpl
             }
             return result;
         }
-        //根据 siteid 的 id 从 contactsite 表里查找 contactid
+        /// <summary>
+        ///根据输入的SiteId从ContactSite表里查找ContactId
+        /// </summary>
+        /// <param name="siteid">输入的siteid</param>
+        /// <returns></returns>
         public List<SiteContactModel> GetContactSiteBySiteId(int siteid)
         {
 

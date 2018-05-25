@@ -20,6 +20,7 @@ using ServerMonitor.Util;
 using ServerMonitor.Services.RequestServices;
 using ServerMonitor.ViewModels.BLL;
 using ServerMonitor.SiteDb;
+using Windows.UI.Xaml.Data;
 
 namespace ServerMonitor.ViewModels
 {
@@ -103,6 +104,20 @@ namespace ServerMonitor.ViewModels
             {
                 t = value;
                 RaisePropertyChanged(() => T);
+            }
+        }
+
+        private bool requestAsyncStat = false;
+        /// <summary>
+        /// 异部请求状态
+        /// </summary>
+        public bool RequestAsyncStat
+        {
+            get => requestAsyncStat;
+            set
+            {
+                requestAsyncStat = value;
+                RaisePropertyChanged(() => RequestAsyncStat);
             }
         }
         #endregion 绑定数据
@@ -216,7 +231,10 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public async void RequestAll_Click(object sender, RoutedEventArgs e)
         {
-			MessageRemind toast = new MessageRemind();
+            // P操作 禁用刷新按钮
+            (sender as AppBarButton).IsEnabled = false;
+            RequestAsyncStat = true;
+            MessageRemind toast = new MessageRemind();
             //首先进行precheck 
             bool pre =  await Pre_Check();
             if (pre)
@@ -281,7 +299,7 @@ namespace ServerMonitor.ViewModels
                             }
                             else
                             {
-                                SiteDetailViewModel util = new SiteDetailViewModel();//用于查看状态码
+                                SiteDetailUtilImpl util = new SiteDetailUtilImpl();//用于查看状态码
                                 bool match = util.SuccessCodeMatch(si, hTTPs.Status);//匹配用户设定状态码
                                 if (match)//匹配为成功  否则为失败
                                 {
@@ -358,7 +376,7 @@ namespace ServerMonitor.ViewModels
                             break;
                         case "ICMP":
                             ICMPRequest icmp = new ICMPRequest(reIP);
-                            bool icmpFlag = icmp.DoRequest();
+                            bool icmpFlag = icmp.MakeRequest();
                             //请求完毕
                             RequestObj requestObj;//用于存储icmp请求结果的对象              
                             requestObj = DataHelper.GetProperty(icmp);
@@ -438,8 +456,11 @@ namespace ServerMonitor.ViewModels
                     GetListSite();
                 }
             }
+            // V操作 启用刷新按钮
+            (sender as AppBarButton).IsEnabled = true;
+            RequestAsyncStat = false;
         }
-        
+
         /// <summary>
         /// add server点击事件
         /// </summary>
@@ -448,12 +469,6 @@ namespace ServerMonitor.ViewModels
         public void Add_Server(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(typeof(Views.AddServerPage), "1,-1"); //1MainPage, 2 AllServerPage; -1没有id是新建site
-            ShowAddServerPage();
-        }
-        private void ShowAddServerPage()
-        {
-            //var msgPopup = new AddServerPage();
-            //AddServerPage.ShowWindow();
         }
 
         /// <summary>
@@ -463,12 +478,7 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public void Add_Website(object sender, RoutedEventArgs e)
         {
-            ShowAddWebsitePage();
-        }
-        private void ShowAddWebsitePage()
-        {
-            var msgPopup = new AddWebsitePage();
-            //AddWebsitePage.ShowWindow();
+            NavigationService.Navigate(typeof(Views.AddWebsitePage), "1,-1"); //1MainPage, 2 AllServerPage; -1没有id是新建site
         }
 
         /// <summary>
@@ -524,15 +534,17 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public void CopyFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var q = from t in SiteItems
-                    where t.Id == rightTapped_SiteId
-                    select t;
             var q1 = from t in sites
                      where t.Id == rightTapped_SiteId
                      select t;
-            SiteModel site = CloneSite(q1.First());
+            SiteModel site = q1.First();
             site.Site_name = site.Site_name + " Copy";
             site.Is_success = 2;
+
+            site.Create_time = DateTime.Now;
+            site.Update_time = DateTime.Now;
+            site.Is_pre_check = false;
+
             if (DBHelper.InsertOneSite(site) == 1)
             {
                 GetListSite();
