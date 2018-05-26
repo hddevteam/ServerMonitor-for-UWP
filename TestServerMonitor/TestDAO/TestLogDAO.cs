@@ -144,7 +144,7 @@ namespace TestServerMonitor.TestDAO
                 Log_Record = ""
             };
             logDAO.InsertOneLog(testlog);
-            Assert.AreEqual(testlog.Id, logDAO.GetLogsBySiteId(testlog.Site_id)[0].Id);
+            Assert.AreEqual(testlog.Site_id, logDAO.GetLogsBySiteId(testlog.Site_id)[0].Site_id);
         }
         /// <summary>
         /// 测试DeleteOneLog
@@ -172,9 +172,17 @@ namespace TestServerMonitor.TestDAO
         [TestMethod]
         public void TestLogDAO_DeleteLogsBySite()
         {
-
-            //logDAO.InsertListLog(logModels);
-            Assert.AreEqual(2, logDAO.DeleteLogsBySite(logModels[0].Site_id));
+            LogModel testlog = new LogModel()
+            {
+                Site_id = 123,
+                Status_code = "200",
+                TimeCost = 200,
+                Create_Time = DateTime.Now,
+                Is_error = false,
+                Log_Record = ""
+            };
+            logDAO.InsertOneLog(testlog);
+            Assert.AreEqual(1, logDAO.DeleteLogsBySite(testlog.Site_id));
             Assert.AreEqual(0,logDAO.GetLogById(logModels[0].Site_id).Site_id);//取一下logmodel[0]，看取得的是否为空log
 
             

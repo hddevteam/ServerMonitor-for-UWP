@@ -22,6 +22,7 @@ using ServerMonitor.Services.RequestServices;
 using ServerMonitor.ViewModels.BLL;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ServerMonitor.LogDb;
 
 namespace ServerMonitor
 {
@@ -98,219 +99,91 @@ namespace ServerMonitor
 			SiteModel _presite = new SiteModel();
 			_presite = DBHelper.GetSiteById(4);//这里是指定了precheck的id为4
 			var _precolor = _presite.Is_success;//如果percheck为错误 就不进行请求了
-			if (_precolor != 0)
+            // 引入封装的工具类  --xb
+            SiteDetailUtilImpl util = new SiteDetailUtilImpl();
+            if (_precolor != 0)
             {
                 //遍历sitelist 根据协议进行请求
                 for (int i = 0; i < len; i++)
                 {
-                    SiteModel si = sitelist[i];
-                    string _protocol = si.Protocol_type;
-                    string _address = si.Site_address;
-                    string url = _address;
-                    bool _is_Monitor = si.Is_Monitor;
-                    if (!_is_Monitor)
+                    // 获取站点对象   --xb
+                    SiteModel siteElement = sitelist[i];
+                    // 创建用于记录此次请求的Log对象   --xb
+                    LogModel log = null;
+                    if (!siteElement.Is_Monitor)
                     {
                         continue;
                     }
-                    if (!IPAddress.TryParse(url, out IPAddress reIP))
+                    IPAddress _siteAddress_redress =await util.GetIPAddressAsync(siteElement.Site_address);
+                    switch (siteElement.Protocol_type)//根据协议请求站点
                     {
-                        //如果输入的不是ip地址               
-                        //通过域名解析ip地址
-                        //网址简单处理 去除http和https
-                        var http = url.StartsWith("http://");
-                        var https = url.StartsWith("https://");
-                        if (http)
-                        {
-                            url = url.Substring(7);//去除http
-                        }
-                        else if (https)
-                        {
-                            url = url.Substring(8);//
-                        }
-                        IPAddress[] hostEntry = await Dns.GetHostAddressesAsync(url);
-                        for (int m = 0; m < hostEntry.Length; m++)
-                        {
-                            if (hostEntry[m].AddressFamily == AddressFamily.InterNetwork)
-                            {
-                                reIP = hostEntry[m];
-                                break;
-                            }
-                        }
-                    }//根据地址解析出ipv4地址
-                    switch (_protocol)//根据协议请求站点
-                    {
-                        case "HTTPS":
-                            HTTPRequest hTTPs = HTTPRequest.Instance;
-                            hTTPs.ProtocolType = TransportProtocol.https;//更改协议类型
-                            hTTPs.Uri = _address;
-                            bool httpsFlag = await hTTPs.MakeRequest();
-                            //请求完毕
-                            //处理数据
-                            si.Request_TimeCost = hTTPs.TimeCost;
-                            si.Request_count += 1;
-                            if ("1002".Equals(hTTPs.Status))//定义的超时状态码
-                            {
-                                //请求超时
-                                si.Is_success = -1;
-                            }
-                            else
-                            {
-                                SiteDetailUtilImpl util = new SiteDetailUtilImpl();//用于查看状态码
-                                bool match = util.SuccessCodeMatch(si, hTTPs.Status);//匹配用户设定状态码
-                                if (match)//匹配为成功  否则为失败
-                                {
-                                    si.Is_success = 1;
-                                }
-                                else
-                                {
-                                    si.Is_success = 0;
-                                    toast.ShowToast(si);
-                                }
-                            }
-                            break;
+                        // HTTP/HTTPS协议请求   --xb
+                        // 目前HTTP与HTTPS没有做协议请求上的区分  --xb
+                        case "HTTPS":                           
                         case "HTTP":
-                            HTTPRequest hTTP = HTTPRequest.Instance;//默认协议类型http
-                            hTTP.Uri = _address;
-                            hTTP.ProtocolType = TransportProtocol.http;
-                            bool httpFlag = await hTTP.MakeRequest();
-                            //请求完毕
-                            //处理数据
-                            si.Request_TimeCost = hTTP.TimeCost;
-                            si.Request_count += 1;
-                            if ("1002".Equals(hTTP.Status))
+                            try
                             {
-                                //请求超时
-                                si.Is_success = -1;
+                                // 发起HTTP请求，生成请求记录并更新站点信息  --xb
+                                log = await util.RequestHTTPSite(siteElement, HTTPRequest.Instance);
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                SiteDetailUtilImpl util = new SiteDetailUtilImpl();
-                                bool match = util.SuccessCodeMatch(si, hTTP.Status);//匹配用户设定状态码
-                                if (match)
-                                {
-                                    si.Is_success = 1;
-                                }
-                                else
-                                {
-                                    si.Is_success = 0;
-                                }
-                            }
-                            if (httpFlag == false)
-                            {
-                                toast.ShowToast(si);
-                                si.Is_success = 0;
+                                DBHelper.InsertErrorLog(ex);
+                                log = null;
                             }
                             break;
+                        // DNS协议请求   --xb
                         case "DNS":
-                            string baiduDomain = "www.baidu.com";//设定一个网站供dns服务器进行解析
-                            DNSRequest dNS = new DNSRequest(reIP, baiduDomain);
-                            bool dnsFlag = await dNS.MakeRequest();
-                            //请求完毕
-                            if ("1000".Equals(dNS.Status))
-                            {
-                                //dns正常
-                                si.Is_success = 1;
-                            }
-                            else if ("1001".Equals(dNS.Status))
-                            {
-                                //unknown
-                                si.Is_success = 2;
-                            }
-                            else if ("1002".Equals(dNS.Status))
-                            {
-                                //timeout
-                                si.Is_success = -1;
-                            }
-                            si.Request_TimeCost = dNS.TimeCost;
-                            si.Request_count += 1;
-                            if (dnsFlag == false)
-                            {
-                                //消息提醒
-                                si.Is_success = 0;
-                                toast.ShowToast(si);
-                            }
+                            // 发起DNS请求，生成请求记录并更新站点信息  --xb
+                            log = await util.AccessDNSServer(siteElement, DNSRequest.Instance);
                             break;
+                        // ICMP协议请求   --xb
                         case "ICMP":
-                            ICMPRequest icmp = new ICMPRequest(reIP);
-                            bool icmpFlag = icmp.MakeRequest();
-                            //请求完毕
-                            RequestObj requestObj;//用于存储icmp请求结果的对象              
-                            requestObj = DataHelper.GetProperty(icmp);
-                            si.Is_success = int.Parse(requestObj.Color);
-                            si.Request_count += 1;
-                            si.Request_TimeCost = requestObj.TimeCost;
-                            if (icmpFlag == false)
-                            {
-                                si.Is_success = 0;
-                                toast.ShowToast(si);
-                            }
+                            IPAddress ip = await util.GetIPAddressAsync(siteElement.Site_address);
+                            ICMPRequest icmp = new ICMPRequest(ip);
+                            // 发起ICMP请求，生成请求记录并更新站点信息  --xb
+                            log = await util.ConnectToServerWithICMP(siteElement, icmp);
                             break;
+                        // FTP协议请求   --xb
                         case "FTP":
-                            var json = si.ProtocolIdentification;
-                            JObject js = (JObject)JsonConvert.DeserializeObject(json);
-                            //在此处加入type类型
-                            string username = js["username"].ToString();
-                            string password = js["password"].ToString();
-                            FTPRequest fTP = new FTPRequest(LoginType.Identify)
-                            {
-                                FtpServer = reIP
-                            };
-                            fTP.Identification.Username = username;
-                            fTP.Identification.Password = password;
-                            bool ftpFlag = await fTP.MakeRequest();
-                            //请求完毕
-                            if ("1001".Equals(fTP.Status))
-                            {
-                                //置为错误
-                                si.Is_success = 0;
-                            }
-                            else if ("1000".Equals(fTP.Status))
-                            {
-                                //置为成功
-                                si.Is_success = 1;
-                            }
-                            else if ("1002".Equals(fTP.Status))
-                            {
-                                //超时异常
-                                si.Is_success = -1;
-                            }
-                            si.Request_count += 1;
-                            si.Request_TimeCost = fTP.TimeCost;
-                            if (ftpFlag == false)
-                            {
-                                si.Is_success = 0;
-                                toast.ShowToast(si);
-                            }
+                            // 发起FTP请求，生成请求记录并更新站点信息  --xb
+                            log = await util.AccessFTPServer(siteElement, FTPRequest.Instance);
                             break;
+                        // SMTP协议请求   --xb
                         case "SMTP":
-                            SMTPRequest sMTP = new SMTPRequest(_address, si.Server_port);
-                            bool smtpFlag = await sMTP.MakeRequest();
-                            //请求完毕
-
-                            if ("1000".Equals(sMTP.Status))
+                            // 发起SMTP请求，生成请求记录并更新站点信息  --xb
+                            SMTPRequest _smtpRequest = new SMTPRequest(siteElement.Site_address, siteElement.Server_port);
+                            log = await util.AccessSMTPServer(siteElement, _smtpRequest);
+                            break;
+                            // 补充之前欠缺的Socket服务器请求   --xb
+                        case "SOCKET":
+                            // 初始化Socket请求对象
+                            SocketRequest _socketRequest = new SocketRequest
                             {
-                                si.Is_success = 1;
-                            }
-                            else if ("1001".Equals(sMTP.Status))
-                            {
-                                si.Is_success = 0;
-                            }
-                            else if ("1002".Equals(sMTP.Status))
-                            {
-                                si.Is_success = -1;
-                            }
-                            si.Request_count += 1;
-                            si.Request_TimeCost = sMTP.TimeCost;
-                            if (smtpFlag == false)
-                            {
-                                si.Is_success = 0;
-                                toast.ShowToast(si);
-                            }
+                                TargetEndPoint = new IPEndPoint(IPAddress.Parse(siteElement.Site_address), siteElement.Server_port)
+                            };
+                            // 请求指定终端，并生成对应的请求记录，最后更新站点信息
+                            log = await util.ConnectToServerWithSocket(siteElement, _socketRequest);                            
                             break;
                         default:
                             break;
                     }
-                    DBHelper.UpdateSite(si);
+                    if (null != log)
+                    {
+                        // 将请求的记录插入数据库  --xb
+                        LogDaoImpl logDao = new LogDaoImpl();
+                        logDao.InsertOneLog(log);
+                        // 如果请求失败，提醒用户  --xb
+                        if (log.Is_error)
+                        {
+                            // 消息提醒  --xb
+                            toast.ShowToast(siteElement);
+                        }
+                    }
+                    // 说明此次请求处于异常状态，记录进数据库中
+                    else {
+                        DBHelper.InsertErrorLog(new Exception("Insert Log failed!Beacuse log to insert is null"));
+                    }
                 }
             }
 			
