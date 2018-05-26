@@ -103,6 +103,7 @@ namespace ServerMonitor.Services.RequestServices
                 Debug.WriteLine("请求失败" + e.Message);
                 DBHelper.InsertErrorLog(e);
                 TimeCost = OverTime;
+                Status = "1002";
                 ErrorException = e;
                 requestInfo = e.Message;
                 return false;
@@ -112,6 +113,7 @@ namespace ServerMonitor.Services.RequestServices
                 Debug.WriteLine("请求失败" + e.Message);
                 DBHelper.InsertErrorLog(e);
                 TimeCost = (short)(OverTime * 1.5);
+                Status = "1001";
                 ErrorException = e;
                 requestInfo = e.Message;
                 return false;
