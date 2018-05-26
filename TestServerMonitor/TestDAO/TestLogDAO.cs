@@ -29,13 +29,13 @@ namespace TestServerMonitor.TestDAO
         /// </summary>
         LogModel log;
 
-        //[TestMethod]
-        //[AssemblyInitialize]
-        //public static void InitDatabase(TestContext testContext)
-        //{
-        //    DBInit db = DataBaseControlImpl.Instance;
-        //    db.InitDB("testdb.db");
-        //}
+        [TestMethod]
+        [AssemblyInitialize]
+        public static void InitDatabase(TestContext testContext)
+        {
+            DBInit db = DataBaseControlImpl.Instance;
+            db.InitDB("testdb.db");
+        }
         [TestMethod]
         [TestInitialize]
         [Priority(1)]

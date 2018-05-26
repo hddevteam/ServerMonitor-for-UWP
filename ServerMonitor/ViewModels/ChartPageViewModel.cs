@@ -176,10 +176,6 @@ namespace ServerMonitor.ViewModels
             logs = logDao.GetAllLog();
             //数据排序，便于图表按序显示
             logs = logs.OrderBy(o => o.Create_Time).ToList();
-            //foreach (var item in logs)
-            //{
-            //    Debug.WriteLine("item.createtime:{0},item.siteid:{1}",item.Create_Time,item.Site_id);
-            //}
             return logs;
         }
 
