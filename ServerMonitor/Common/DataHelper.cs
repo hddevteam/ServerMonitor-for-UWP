@@ -6,7 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+/// <summary>
+/// last modification by wzp on 2018/5/26
+/// icmp数据解析helper
+/// </summary>
 namespace ServerMonitor.Controls
 {
     class DataHelper
@@ -149,6 +152,7 @@ namespace ServerMonitor.Controls
         /// <returns></returns>
         public static RequestObj GetProperty(ICMPRequest request)
         {
+            int timecost;//提供时间计算变量
             List<RequestObj> datas = new List<RequestObj>();
             datas = request.Requests;
             RequestObj obj = new RequestObj
@@ -200,7 +204,8 @@ namespace ServerMonitor.Controls
                             break;
                     }
                 }
-                obj.TimeCost = short.Parse((short.Parse(((obj.TimeCost*i) + datas[i].TimeCost).ToString())/short.Parse((i+1).ToString())).ToString());
+                timecost = (obj.TimeCost * i + datas[i].TimeCost) / (i + 1);
+                obj.TimeCost = short.Parse(timecost.ToString());//计算消耗平均时间  防止short溢出 故使用int进行计算
             }
             return obj;
             
