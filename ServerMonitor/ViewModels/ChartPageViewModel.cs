@@ -18,6 +18,7 @@ using Windows.UI.Xaml.Data;
 using ServerMonitor.SiteDb;
 using ServerMonitor.LogDb;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace ServerMonitor.ViewModels
 {
@@ -160,6 +161,10 @@ namespace ServerMonitor.ViewModels
             logs = logDao.GetAllLog();
             //数据排序，便于图表按序显示
             logs = logs.OrderBy(o => o.Create_Time).ToList();
+            foreach (var item in logs)
+            {
+                Debug.WriteLine("item.createtime:{0},item.siteid:{1}",item.Create_Time,item.Site_id);
+            }
             return logs;
         }
 
@@ -234,15 +239,15 @@ namespace ServerMonitor.ViewModels
             }
             else
             {
-                Infos.State1 = Visibility.Visible;
                 Infos.State2 = Visibility.Collapsed;
-
+                Infos.State3 = Visibility.Visible;
+                Lengend = await ChartDao.ChartLengendAsync(Infos.Sites);
                 //重新统计数据
-                var getResult = await Task.Run(() => ChartDao.CacuChartAsync(Infos.Sites, Infos.Logs));
+                var getResult = await ChartDao.CacuChartAsync(Infos.Sites, Infos.Logs);
                 Chart1Collection = getResult.Item1;
                 Infos.BarChart = getResult.Item2;
-                Lengend = await ChartDao.ChartLengendAsync(Infos.Sites);
-
+                Infos.State3 = Visibility.Collapsed;
+                Infos.State1 = Visibility.Visible;
                 //统计完成后触发此方法，计算前台需要显示的数据
                 TypeChanged(Type);
                 return true;

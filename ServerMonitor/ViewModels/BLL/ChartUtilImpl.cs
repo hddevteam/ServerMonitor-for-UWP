@@ -36,7 +36,7 @@ namespace ServerMonitor.ViewModels.BLL
             foreach (var item in sites.Where(i => i.Is_pre_check == false).Select(i => i))
             {
                 //初始时默认选中前五条
-                if (selectSites.Count < 5)
+                if (Sites.Count < 5 && item.Is_Monitor)
                 {
                     Sites.Add(item);
                     selectSites.Add(new SelectSite()
@@ -109,6 +109,8 @@ namespace ServerMonitor.ViewModels.BLL
                             //成功
                             successCount++;
                             result = "Success";
+                            //把数据库里的Utc时间转换为LocalTime
+                            log.Create_Time = log.Create_Time.ToLocalTime();
                             chart1Series.Add(new Chart1() { RequestTime = log.Create_Time, Result = result, ResponseTime = log.TimeCost });
                         }
                         else if (log.Status_code == "1002") //状态码为1002时表示请求超时
@@ -116,6 +118,8 @@ namespace ServerMonitor.ViewModels.BLL
                             //超时
                             overtimeCount++;
                             result = "OverTime";
+                            //把数据库里的Utc时间转换为LocalTime
+                            log.Create_Time = log.Create_Time.ToLocalTime();
                             chart1Series.Add(new Chart1() { RequestTime = log.Create_Time, Result = result, ResponseTime = OVERTIME });
                         }
                         else
@@ -123,6 +127,8 @@ namespace ServerMonitor.ViewModels.BLL
                             //失败
                             errorCount++;
                             result = "Error";
+                            //把数据库里的Utc时间转换为LocalTime
+                            log.Create_Time = log.Create_Time.ToLocalTime();
                             chart1Series.Add(new Chart1() { RequestTime = log.Create_Time, Result = result, ResponseTime = null });
                         }
                     }

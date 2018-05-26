@@ -63,7 +63,7 @@
                       RelativePanel.AlignLeftWithPanel="True"
                       RelativePanel.AlignRightWithPanel="True"
                       RelativePanel.Below="pageHeader">
-            <telerikPrimitives:RadBusyIndicator IsActive="True" Foreground="SteelBlue" AnimationStyle="AnimationStyle3" />
+            <telerikPrimitives:RadBusyIndicator IsActive="True" Foreground="SteelBlue" AnimationStyle="AnimationStyle9" />
         </Grid>
         <!--界面1-->
         <ScrollViewer Padding="24" RelativePanel.AlignBottomWithPanel="True" Visibility="{x:Bind ViewModel.Infos.State1,Mode=TwoWay}"
