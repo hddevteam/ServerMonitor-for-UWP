@@ -146,8 +146,8 @@
                     </StackPanel>
                     
                     <!--PRIORITY-->
-                    <TextBlock Text="PRIORITY" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8"/>
-                    <ComboBox SelectedIndex="{Binding Priority, Mode=TwoWay}" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center">
+                    <TextBlock Text="PRIORITY" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8" Visibility="Collapsed"/>
+                    <ComboBox SelectedIndex="{Binding Priority, Mode=TwoWay}" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center" Visibility="Collapsed">
                         <ComboBoxItem Content="Low"/>
                         <ComboBoxItem Content="Normal"/>
                         <ComboBoxItem Content="High"/>
