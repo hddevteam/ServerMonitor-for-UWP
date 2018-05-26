@@ -418,7 +418,7 @@ namespace ServerMonitor.ViewModels
                 }
                 else  //匿名
                 {
-                    site.ProtocolIdentification = GetJson(Username, Password, "0");
+                    site.ProtocolIdentification = GetJson("", "", "0");
                 }
             }
             else if(site.Protocol_type.Equals("DNS"))
@@ -654,6 +654,14 @@ namespace ServerMonitor.ViewModels
         /// <returns>Json数据字符串</returns>
         private string GetJson(string username,string password,string type)
         {
+            if (username == null)
+            {
+                username = "";
+            }
+            if (password == null)
+            {
+                password = "";
+            }
             Dictionary<string, string> protocolIdentification = new Dictionary<string, string>();
             protocolIdentification.Add("username", Username);
             protocolIdentification.Add("password", Password);
