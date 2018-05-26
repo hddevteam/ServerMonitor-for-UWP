@@ -58,7 +58,7 @@ namespace ServerMonitor.Services.RequestServices
                         //Color = "0";
                         request.Color = "0";
                         request.Status = "1001";
-                        request.TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                        request.TimeCost = (short)(request.OverTime * request.ErrorQuality);
                         Requests.Add(request);
                         return false;
                     }
@@ -84,7 +84,7 @@ namespace ServerMonitor.Services.RequestServices
                         //Color = "0";
                         request.Color = "0";
                         request.Status = "1001";
-                        request.TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                        request.TimeCost = (short)(request.OverTime * request.ErrorQuality);
                         //string backJson = JsonConvert.SerializeObject(information);
                         //backData.Add("1", backJson);
                         Requests.Add(request);
@@ -111,7 +111,7 @@ namespace ServerMonitor.Services.RequestServices
                             //Color = "0";//访问被拒绝
                             request.Color = "0";
                             request.Status = "1001";
-                            request.TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                            request.TimeCost = (short)(request.OverTime * request.ErrorQuality);
                             //TimeCost = (short)stopwatch.ElapsedMilliseconds;
                             Requests.Add(request);
                             return false;
@@ -147,7 +147,7 @@ namespace ServerMonitor.Services.RequestServices
                                 //string backJson = JsonConvert.SerializeObject(information);
                                 //backData.Add(i.ToString(), backJson);
                                 //return backData;
-                                request.TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                                request.TimeCost = (short)(request.OverTime * request.ErrorQuality);
                                 Requests.Add(request);
                                 break;
                             }
@@ -164,7 +164,7 @@ namespace ServerMonitor.Services.RequestServices
                                 //string backJson = JsonConvert.SerializeObject(information);
                                 //backData.Add(i.ToString(), backJson);
                                 //return backData;
-                                request.TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                                request.TimeCost = (short)(request.OverTime * request.ErrorQuality);
                                 Requests.Add(request);
                                 break;
                             }
@@ -220,7 +220,7 @@ namespace ServerMonitor.Services.RequestServices
                         request.Status = "1001";
                         //string backJson = JsonConvert.SerializeObject(information);
                         //backData.Add(i.ToString(), backJson);
-                        request.TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                        request.TimeCost = (short)(request.OverTime * request.ErrorQuality);
                         request.ErrorException = ex;
                         Requests.Add(request);
                         return false;
@@ -241,7 +241,7 @@ namespace ServerMonitor.Services.RequestServices
                 };//创建一个请求对象
                 request.Color = "0";
                 request.Status = "1001";
-                request.TimeCost = 0;       
+                request.TimeCost = (short)(request.OverTime * request.ErrorQuality);       
                 return false;
             }
         }

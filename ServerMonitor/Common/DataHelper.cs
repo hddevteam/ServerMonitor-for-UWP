@@ -183,7 +183,7 @@ namespace ServerMonitor.Controls
                 }
                 else
                 {
-                    obj.Color = datas[i].Color; 
+                    obj.Color = datas[i].Color;
                     switch (datas[i].Color)
                     {
                         case "0":
@@ -199,7 +199,6 @@ namespace ServerMonitor.Controls
                             obj.Status = "1002";
                             break;
                     }
-
                 }
                 obj.TimeCost = short.Parse((short.Parse(((obj.TimeCost*i) + datas[i].TimeCost).ToString())/short.Parse((i+1).ToString())).ToString());
             }
