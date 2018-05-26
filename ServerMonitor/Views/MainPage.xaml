@@ -88,18 +88,18 @@
             </controls:PageHeader.SecondaryCommands>
         </controls:PageHeader>
 
+        <ProgressBar IsIndeterminate="True" Height="24" RelativePanel.Below="pageHeader"
+                     RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignRightWithPanel="True"
+                     Visibility="{Binding RequestAsyncStat,Mode=OneWay}"/>
+        
         <Grid RelativePanel.Below="pageHeader" HorizontalAlignment="Stretch" 
               RelativePanel.AlignBottomWithPanel="True"
               RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignRightWithPanel="True">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0" Grid.RowSpan="2">
+            <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
@@ -132,14 +132,13 @@
                     </RelativePanel>
                 </Grid>
                 <ScrollViewer x:Name="sitelist_scroll" HorizontalScrollBarVisibility="Disabled" Grid.Row="1"
-                              VerticalScrollBarVisibility="Auto" Margin="0,24,0,0">
+                              VerticalScrollBarVisibility="Auto" Margin="24,24,20,0">
                     <StackPanel Orientation="Vertical">
-                        <GridView x:Name="sitelist"
-                                  ItemsSource="{Binding SiteItems}"
-                                  AllowDrop="True" HorizontalAlignment="Center"
+                        <GridView x:Name="sitelist" ItemsSource="{Binding SiteItems}"
+                                  AllowDrop="True"
                                   CanReorderItems="True" SelectionMode="Single"
                                   Tapped="{x:Bind ViewModel.SiteList_Tapped}"
-                                  Padding="4,0,0,0" RightTapped="SiteList_RightTapped">
+                                  RightTapped="SiteList_RightTapped">
                             <GridView.Resources>
                                 <MenuFlyout x:Name="site_flyout">
                                     <MenuFlyout.Items>
@@ -166,7 +165,7 @@
                             </GridView.ItemTemplate>
                         </GridView>
                         <!--site detail-->
-                        <Grid Margin="24,24,0,0">
+                        <Grid Margin="0,24,0,0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
@@ -191,52 +190,7 @@
                 </ScrollViewer>
             </Grid>
 
-            <Grid x:Name="RightUp" Grid.Row="0" Grid.Column="1" Width="200" BorderThickness="2"
-                          BorderBrush="#E5E5E5" Background="#F0F0F0"
-                          Margin="0,24,8,4" Visibility="Collapsed">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Grid BorderThickness="0,0,0,2" BorderBrush="#E5E5E5">
-                    <TextBlock Text="Recent Outage" FontSize="18" FontWeight="Bold" Margin="8,4,0,8" Foreground="#4682B4"/>
-                </Grid>
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
-                    <ListView SelectionMode="None"  ItemsSource="{Binding OutageSites}"
-                              Foreground="White" IsItemClickEnabled="True" Grid.Row="1">
-                        <ListView.Resources>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="BorderThickness" Value="0,0,0,2"/>
-                                <Setter Property="BorderBrush" Value="#E5E5E5" />
-                            </Style>
-                        </ListView.Resources>
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid HorizontalAlignment="Stretch" Height="44" Width="180">
-                                    <TextBlock Text="{Binding Site_name}" FontWeight="Bold" Foreground="{Binding Color}"
-                                               HorizontalAlignment="Left" VerticalAlignment="Top" TextTrimming="CharacterEllipsis"/>
-                                    <TextBlock Text="{Binding LastTime}" Foreground="{Binding Color}" Grid.Column="1"
-                                               HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="12"
-                                               Margin="0,0,8,4"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                        <!--<ListView.Items>
-                            <ListViewItem>
-                                <Grid HorizontalAlignment="Stretch" Height="44" Width="180">
-                                    <TextBlock Text="123456789123456789123456789123456789" FontWeight="Bold" Foreground="Black"
-                                           HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                                    <TextBlock Text="asdsafd" Foreground="Black" Grid.Column="1" Margin="0,0,8,4"
-                                           HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="12"/>
-                                </Grid>
-                            </ListViewItem>
-                        </ListView.Items>-->
-                        
-                    </ListView>
-                </ScrollViewer>
-            </Grid>
-
-            <ContentDialog x:Name="termsOfUseContentDialog" Grid.RowSpan="2"
+            <ContentDialog x:Name="termsOfUseContentDialog"
                            Grid.ColumnSpan="2" PrimaryButtonText="Accept"
                            SecondaryButtonText="Cancel">
                 <ContentDialog.TitleTemplate>
@@ -259,49 +213,98 @@
                 </StackPanel>
             </ContentDialog>
 
-            <Grid  x:Name="RightLow" Grid.Row="1" Grid.Column="1" Width="200"
-                   BorderThickness="2" BorderBrush="#E5E5E5" Background="#F0F0F0"
-                   Margin="0,20,8,8" Visibility="Collapsed">
+            <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Grid BorderThickness="0,0,0,2" BorderBrush="#E5E5E5">
-                    <TextBlock Text="Apdex Benchmark" FontSize="18" FontWeight="Bold" Margin="8,4,0,8" Foreground="#4682B4"
-                               VerticalAlignment="Top"/>
-                </Grid>
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
-                    <ListView SelectionMode="None"  ItemsSource="{Binding SitePerformanceList}"
+                <Grid x:Name="RightUp" Grid.Row="0" Width="200" BorderThickness="2"
+                          BorderBrush="#E5E5E5" Background="#F0F0F0"
+                          Margin="0,24,8,4" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid BorderThickness="0,0,0,2" BorderBrush="#E5E5E5">
+                        <TextBlock Text="Recent Outage" FontSize="18" FontWeight="Bold" Margin="8,4,0,8" Foreground="#4682B4"/>
+                    </Grid>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
+                        <ListView SelectionMode="None"  ItemsSource="{Binding OutageSites}"
                               Foreground="White" IsItemClickEnabled="True" Grid.Row="1">
-                        <ListView.Resources>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="BorderThickness" Value="0,0,0,2"/>
-                                <Setter Property="BorderBrush" Value="#E5E5E5" />
-                            </Style>
-                        </ListView.Resources>
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Margin="-4,0,0,0" HorizontalAlignment="Stretch" Width="180" Height="50">
-                                    <TextBlock Text="{Binding Ranking}" FontWeight="Bold" Foreground="Black" FontSize="20"
+                            <ListView.Resources>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="BorderThickness" Value="0,0,0,2"/>
+                                    <Setter Property="BorderBrush" Value="#E5E5E5" />
+                                </Style>
+                            </ListView.Resources>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid HorizontalAlignment="Stretch" Height="44" Width="180">
+                                        <TextBlock Text="{Binding Site_name}" FontWeight="Bold" Foreground="{Binding Color}"
+                                               HorizontalAlignment="Left" VerticalAlignment="Top" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding LastTime}" Foreground="{Binding Color}" Grid.Column="1"
+                                               HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="12"
+                                               Margin="0,0,8,4"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                            <!--<ListView.Items>
+                            <ListViewItem>
+                                <Grid HorizontalAlignment="Stretch" Height="44" Width="180">
+                                    <TextBlock Text="123456789123456789123456789123456789" FontWeight="Bold" Foreground="Black"
+                                           HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <TextBlock Text="asdsafd" Foreground="Black" Grid.Column="1" Margin="0,0,8,4"
+                                           HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="12"/>
+                                </Grid>
+                            </ListViewItem>
+                        </ListView.Items>-->
+
+                        </ListView>
+                    </ScrollViewer>
+                </Grid>
+                <Grid  x:Name="RightLow" Grid.Row="1" Width="200"
+                   BorderThickness="2" BorderBrush="#E5E5E5" Background="#F0F0F0"
+                   Margin="0,20,8,8" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid BorderThickness="0,0,0,2" BorderBrush="#E5E5E5">
+                        <TextBlock Text="Apdex Benchmark" FontSize="18" FontWeight="Bold" Margin="8,4,0,8" Foreground="#4682B4"
+                               VerticalAlignment="Top"/>
+                    </Grid>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
+                        <ListView SelectionMode="None"  ItemsSource="{Binding SitePerformanceList}"
+                              Foreground="White" IsItemClickEnabled="True" Grid.Row="1">
+                            <ListView.Resources>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="BorderThickness" Value="0,0,0,2"/>
+                                    <Setter Property="BorderBrush" Value="#E5E5E5" />
+                                </Style>
+                            </ListView.Resources>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="-4,0,0,0" HorizontalAlignment="Stretch" Width="180" Height="50">
+                                        <TextBlock Text="{Binding Ranking}" FontWeight="Bold" Foreground="Black" FontSize="20"
                                                HorizontalAlignment="Left" VerticalAlignment="Center" Width="48"/>
-                                    <TextBlock Text="{Binding Site_name}" Foreground="Black" Grid.Column="1" FontWeight="Bold"
+                                        <TextBlock Text="{Binding Site_name}" Foreground="Black" Grid.Column="1" FontWeight="Bold"
                                                HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="12" TextTrimming="CharacterEllipsis"
                                                Margin="68,8,4,0"/>
-                                    <TextBlock Text="Apdex :" Foreground="Black" Grid.Column="1"
+                                        <TextBlock Text="Apdex :" Foreground="Black" Grid.Column="1"
                                                HorizontalAlignment="Left" VerticalAlignment="Bottom" FontSize="12"
                                                Margin="68,0,4,8"/>
-                                    <TextBlock Text="{Binding Apdex}" Foreground="Black" Grid.Column="1"
+                                        <TextBlock Text="{Binding Apdex}" Foreground="Black" Grid.Column="1"
                                                HorizontalAlignment="Left" VerticalAlignment="Bottom" FontSize="12"
                                                Margin="112,0,4,8"/>
-                                    <!--<Grid BorderThickness="1" BorderBrush="Gray" Margin="0,0,0,0" Height="1"
+                                        <!--<Grid BorderThickness="1" BorderBrush="Gray" Margin="0,0,0,0" Height="1"
                                           VerticalAlignment="Bottom"/>-->
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </ScrollViewer>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </ScrollViewer>
+                </Grid>
             </Grid>
-
         </Grid>
     </RelativePanel>
 </Page>

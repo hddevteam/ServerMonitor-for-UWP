@@ -55,6 +55,7 @@ namespace ServerMonitor.Services.RequestServices
         //public LoginType IdentifyType { get => identifyType; set => identifyType = value; }
         public IdentificationInfo Identification { get => identification; set => identification = value; }
         public IPAddress FtpServer { get => ftpServer; set => ftpServer = value; }
+        public LoginType IdentifyType { get => identifyType; set => identifyType = value; }
         /// <summary>
         /// 线程安全的请求对象 --完全延迟加载
         /// </summary>
@@ -64,8 +65,7 @@ namespace ServerMonitor.Services.RequestServices
             {
                 return Nested.instance;
             }
-        }
-
+        }       
         private FTPRequest() { }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace ServerMonitor.Services.RequestServices
         /// <param name="type">指定的登入类型</param>
         public FTPRequest(LoginType type)
         {
-            identifyType = type;
+            IdentifyType = type;
             // 选择匿名登入的时候默认设置用户名为anonymous
             if (LoginType.Anonymous.Equals(type))
             {
@@ -95,20 +95,20 @@ namespace ServerMonitor.Services.RequestServices
             byte[] PASSBytes = null;
             byte[] USERBytes = null;
             // 针对登入方式不同进行不同的验证信息复制
-            switch (identifyType)
+            switch (IdentifyType)
             {
                 case LoginType.Anonymous:
                     USERBytes = SendUSERCommand("anonymous");
-                    PASSBytes = string.IsNullOrEmpty(Identification.Password) ? null : SendPASSCommand(Identification.Password);
+                    PASSBytes = string.IsNullOrEmpty(Identification.Password) ? SendPASSCommand("") : SendPASSCommand(Identification.Password);
                     break;
                 case LoginType.Identify:
-                    USERBytes = string.IsNullOrEmpty(Identification.Username) ? null : SendUSERCommand(Identification.Username);
-                    PASSBytes = string.IsNullOrEmpty(Identification.Password) ? null : SendPASSCommand(Identification.Password);
+                    USERBytes = string.IsNullOrEmpty(Identification.Username) ? SendUSERCommand("") : SendUSERCommand(Identification.Username);
+                    PASSBytes = string.IsNullOrEmpty(Identification.Password) ? SendPASSCommand("") : SendPASSCommand(Identification.Password);
                     break;
                 default:
                     // ftp请求登陆模式异常
                     CreateTime = DateTime.Now;
-                    TimeCost = (short)(OverTime * 2);
+                    TimeCost = (short)(OverTime * ErrorQuality);
                     Status = "1001";
                     ErrorException = new Exception("User identifyType is invalid!");
                     protocalInfo = "User identifyType is invalid!";
@@ -122,7 +122,7 @@ namespace ServerMonitor.Services.RequestServices
             // 检测服务器的IPAddress是否合法
             if (! ValidateIPv4(ftpServer.ToString()))
             {
-                TimeCost = (short)(OverTime * 2);
+                TimeCost = (short)(OverTime * ErrorQuality);
                 Status = "1001";
                 ErrorException = new Exception("Server address is invalid!");
                 protocalInfo = "Server address is invalid!";
@@ -144,69 +144,79 @@ namespace ServerMonitor.Services.RequestServices
                     // 建立远程连接
                     Task connectTask = Task.Run(async() =>
                     {
-                        await socket.ConnectAsync(new IPEndPoint(ftpServer, port));
-
-                        // 获取连接状态
-                        if (socket.Connected)
+                        try
                         {
-                            // 存放接受的信息的长度
-                            Int32 bytes = 0;
-                            // 存放接受信息内容
-                            string strRet = "";
-
-                            // 获取建立连接的返回信息
-                            bytes = socket.Receive(RecvBuffer, RecvBuffer.Length, 0);
-                            strRet = Encoding.ASCII.GetString(RecvBuffer, 0, bytes);
-
-                            // 登录指令
-                            socket.Send(USERBytes, USERBytes.Length, 0);
-                            // 获取返回信息
-                            bytes = socket.Receive(RecvBuffer, RecvBuffer.Length, 0);
-                            strRet = Encoding.ASCII.GetString(RecvBuffer, 0, bytes);
-
-                            // 密码指令
-                            socket.Send(PASSBytes, PASSBytes.Length, 0);
-                            // 获取返回信息
-                            bytes = socket.Receive(RecvBuffer, RecvBuffer.Length, 0);
-                            strRet = Encoding.ASCII.GetString(RecvBuffer, 0, bytes);
-
-                            // 停表
-                            stopwatch.Stop();
-
-                            // 截取获得返回状态码
-                            int commandcode = int.Parse(strRet.Substring(0, 1));
-                            // 230 530 为常见返回值，其中230为成功 530为登入失败
-                            switch (commandcode)
+                            await socket.ConnectAsync(new IPEndPoint(ftpServer, port));
+                            // 获取连接状态
+                            if (socket.Connected)
                             {
-                                // 请求成功
-                                case 2:
-                                case 3:
-                                    TimeCost = (short)stopwatch.ElapsedMilliseconds;
-                                    Status = "1000";
-                                    protocalInfo = strRet;
-                                    break;
-                                // 请求失败 
-                                case 4:
-                                case 5:
-                                    TimeCost = (short)(OverTime * 2);
-                                    Status = "1001";
-                                    protocalInfo = strRet;
-                                    break;
-                                // 请求未知
-                                default:
-                                    TimeCost = (short)stopwatch.ElapsedMilliseconds;
-                                    Status = "1001";
-                                    protocalInfo = strRet;
-                                    break;
+                                // 存放接受的信息的长度
+                                Int32 bytes = 0;
+                                // 存放接受信息内容
+                                string strRet = "";
+
+                                // 获取建立连接的返回信息
+                                bytes = socket.Receive(RecvBuffer, RecvBuffer.Length, 0);
+                                strRet = Encoding.ASCII.GetString(RecvBuffer, 0, bytes);
+
+                                // 登录指令
+                                socket.Send(USERBytes, USERBytes.Length, 0);
+                                // 获取返回信息
+                                bytes = socket.Receive(RecvBuffer, RecvBuffer.Length, 0);
+                                strRet = Encoding.ASCII.GetString(RecvBuffer, 0, bytes);
+
+                                // 密码指令
+                                socket.Send(PASSBytes, PASSBytes.Length, 0);
+                                // 获取返回信息
+                                bytes = socket.Receive(RecvBuffer, RecvBuffer.Length, 0);
+                                strRet = Encoding.ASCII.GetString(RecvBuffer, 0, bytes);
+
+                                // 停表
+                                stopwatch.Stop();
+
+                                // 截取获得返回状态码
+                                int commandcode = int.Parse(strRet.Substring(0, 1));
+                                // 230 530 为常见返回值，其中230为成功 530为登入失败
+                                switch (commandcode)
+                                {
+                                    // 请求成功
+                                    case 2:
+                                    case 3:
+                                        TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                                        Status = "1000";
+                                        protocalInfo = strRet;
+                                        break;
+                                    // 请求失败 
+                                    case 4:
+                                    case 5:
+                                        TimeCost = (short)(OverTime * ErrorQuality);
+                                        Status = "1001";
+                                        protocalInfo = strRet;
+                                        break;
+                                    // 请求未知
+                                    default:
+                                        TimeCost = (short)(OverTime * ErrorQuality);
+                                        Status = "1001";
+                                        protocalInfo = strRet;
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                // 未连接，将秒表停止，此次请求作为失败的请求
+                                stopwatch.Stop();
+                                TimeCost = (short)(OverTime * ErrorQuality);
+                                Status = "1001";
+                                protocalInfo = "Connect failed!";
                             }
                         }
-                        else
+                        catch (Exception e)
                         {
-                            // 未连接，将秒表停止，此次请求作为失败的请求
                             stopwatch.Stop();
-                            TimeCost = (short)(OverTime * 2);
+                            TimeCost = (short)(OverTime * ErrorQuality);
                             Status = "1001";
-                            protocalInfo = "Connect failed!";
+                            protocalInfo = e.ToString();
+                            ErrorException = e;
                         }
                     },cts.Token);
                     // 开启另一个任务同时进行用于记录是否超时
@@ -229,7 +239,7 @@ namespace ServerMonitor.Services.RequestServices
                 {
                     // 输入的指令格式不正确 ，此次请求作为失败的请求
                     stopwatch.Stop();
-                    TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                    TimeCost = (short)(OverTime * ErrorQuality);
                     Status = "1001";
                     protocalInfo = e.ToString();
                     ErrorException = e;
@@ -248,7 +258,7 @@ namespace ServerMonitor.Services.RequestServices
                             ErrorException = e;
                             break;
                         default:
-                            TimeCost = (short)(OverTime * 2);
+                            TimeCost = (short)(OverTime * ErrorQuality);
                             Status = "1001";
                             protocalInfo = e.Message;
                             break;
@@ -259,7 +269,7 @@ namespace ServerMonitor.Services.RequestServices
                 {
                     // 出现未捕获到的异常，此次请求作为失败的请求
                     stopwatch.Stop();
-                    TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                    TimeCost = (short)(OverTime * ErrorQuality);
                     Status = "1001";
                     protocalInfo = e.ToString();
                     ErrorException = e;
@@ -288,7 +298,7 @@ namespace ServerMonitor.Services.RequestServices
         /// <returns></returns>
         private byte[] SendUSERCommand(string Username)
         {
-            return string.IsNullOrEmpty(Username) ? null : Encoding.ASCII.GetBytes(string.Format(USERCOMMAND, Username));
+            return string.IsNullOrEmpty(Username) ? Encoding.ASCII.GetBytes(string.Format(USERCOMMAND, "")) : Encoding.ASCII.GetBytes(string.Format(USERCOMMAND, Username));
         }
 
         /// <summary>
@@ -298,7 +308,7 @@ namespace ServerMonitor.Services.RequestServices
         /// <returns></returns>
         private byte[] SendPASSCommand(string Password)
         {
-            return string.IsNullOrEmpty(Password) ? null : Encoding.ASCII.GetBytes(string.Format(PASSCOMMAND, Password));
+            return string.IsNullOrEmpty(Password) ? Encoding.ASCII.GetBytes(string.Format(PASSCOMMAND, "")) : Encoding.ASCII.GetBytes(string.Format(PASSCOMMAND, Password));
         }
 
         /// <summary>
@@ -331,7 +341,7 @@ namespace ServerMonitor.Services.RequestServices
             {
 
             }
-            internal static readonly FTPRequest instance = new FTPRequest();
+            internal static readonly FTPRequest instance = new FTPRequest(LoginType.Identify);
         }
     }
 

@@ -163,23 +163,42 @@ namespace ServerMonitor.Controls
                     if (obj.Color.Equals("2"))
                     {
                         obj.Color = "2";
+                        obj.Status = "1002";
                     }
                     else if (obj.Color.Equals("0"))
                     {
                         obj.Color = "0";
+                        obj.Status = "1001";
                     }
                     else if (obj.Color.Equals("1"))
                     {
                         obj.Color = "1";
+                        obj.Status = "1000";
                     }
                     else
                     {
                         obj.Color = "-1";
+                        obj.Status = "1002";
                     } 
                 }
                 else
                 {
                     obj.Color = datas[i].Color;
+                    switch (datas[i].Color)
+                    {
+                        case "0":
+                            obj.Status = "1001";
+                            break;
+                        case "1":
+                            obj.Status = "1000";
+                            break;
+                        case "-1":
+                            obj.Status = "1002";
+                            break;
+                        case "2":
+                            obj.Status = "1002";
+                            break;
+                    }
                 }
                 obj.TimeCost = short.Parse((short.Parse(((obj.TimeCost*i) + datas[i].TimeCost).ToString())/short.Parse((i+1).ToString())).ToString());
             }

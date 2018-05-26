@@ -4,6 +4,7 @@ namespace ServerMonitor.Services.RequestServices
 {
     public abstract class BasicRequest
     {
+        public readonly double ErrorQuality = 1.5;
         /// <summary>
         /// 请求创建的时间
         /// </summary>
