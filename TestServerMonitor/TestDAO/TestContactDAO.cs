@@ -31,12 +31,14 @@ namespace TestServerMonitor.TestDAO
 
         [TestMethod]
         [TestInitialize]
-        //测试之前初始化
+        /// <summary>
+        /// 测试之前初始化, 初始化3条ContactModel数据
+        /// </summary>
         public void Init()
         {
             SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath);
 
-            //初始化3条ContactModel数据, lc[1], lc[2]暂不插入数据库,测试时使用
+            //暂不插入数据库,测试时使用
             lc = new List<ContactModel>
             {
                 new ContactModel
@@ -57,13 +59,11 @@ namespace TestServerMonitor.TestDAO
                     Contact_email = "3@qq.com"            
                 }
             };
-
-
         }
 
         /// <summary>
         /// 测试InsertOneContact方法
-        /// 用例说明：对比插入方法的返回值是否和-1相等判断是否插入成功
+        /// 用例说明：对比插入方法的返回值是否和1相等判断是否插入成功
         /// </summary>
         [TestMethod]
         public void TestInsertOneContact()
@@ -77,7 +77,7 @@ namespace TestServerMonitor.TestDAO
 
         /// <summary>
         /// 测试DeleteOneContact方法
-        /// 用例说明：删除失败 result
+        /// 用例说明：删除成功result为1
         /// </summary>
         [TestMethod]
         public void TestDeleteOneContact()
@@ -93,7 +93,7 @@ namespace TestServerMonitor.TestDAO
 
         /// <summary>
         /// 测试UpdateContact方法
-        /// 用例说明：
+        /// 用例说明：插入一条数据后更改, 再从数据库中取出并且判断是否更改, 最后删除数据
         /// </summary>
         [TestMethod]
         public void TestUpdateContact()
@@ -112,6 +112,7 @@ namespace TestServerMonitor.TestDAO
 
         /// <summary>
         /// 测试GetContactByContactId方法
+        /// 用例说明: 根据ContactId获得一条Contact数据项, 根据返回值判断是否相等
         /// </summary>
         public void TestGetContactByContactId()
         {
@@ -122,7 +123,8 @@ namespace TestServerMonitor.TestDAO
 
         /// <summary>
         /// 测试GetAllContact方法
-        /// 用例说明:
+        /// 用例说明:在Insert方法执行后, 数据表中有一条数据, 
+        ///         根据GetAllContact()方法返回数据的个数判断是否执行成功
         /// </summary>
         [TestMethod]
         public void TestGetAllContact()

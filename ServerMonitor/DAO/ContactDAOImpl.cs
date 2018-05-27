@@ -19,7 +19,7 @@ namespace ServerMonitor.DAO
         /// <summary>
         /// 返回所有的联系人
         /// </summary>
-        /// <returns></returns>
+        /// <returns>ContactModel列表</returns>
         public List<ContactModel> GetAllContact()
         {
             List<ContactModel> r;
@@ -35,7 +35,7 @@ namespace ServerMonitor.DAO
         /// 插入一条联系人
         /// </summary>
         /// <param name="Contact"></param>
-        /// <returns></returns>
+        /// <returns>成功返回插入条数</returns>
         public int InsertOneContact(ContactModel contact)
         {
             int result = -1;
@@ -50,7 +50,7 @@ namespace ServerMonitor.DAO
         /// 删除一个联系人
         /// </summary>
         /// <param name="contactId"></param>
-        /// <returns></returns>
+        /// <returns>成功返回更改条数</returns>
         public int DeleteOneContact(int contactId)
         {
             int result = -1;
@@ -65,7 +65,7 @@ namespace ServerMonitor.DAO
         /// 更新联系人信息
         /// </summary>
         /// <param name="contact"></param>
-        /// <returns></returns>
+        /// <returns>更改条数</returns>
         public int UpdateContact(ContactModel contact)
         {
             // result = -1 表示异常返回值，执行操作失败
@@ -86,7 +86,12 @@ namespace ServerMonitor.DAO
             }
             return result;
         }
-        //根据contactid输出contact信息
+
+        /// <summary>
+        /// 根据contactid输出contact信息
+        /// </summary>    
+        /// <param name="contactid"></param>
+        /// <returns>ContactModel</returns>
         public ContactModel GetContactByContactId(int ContactId)
         {
 
@@ -105,6 +110,11 @@ namespace ServerMonitor.DAO
             return contactList[0];
         }
 
+        /// <summary>
+        /// 根据siteid输出contact信息
+        /// </summary>    
+        /// <param name="siteID"></param>
+        /// <returns>ContaceModel列表</returns>
         public List<ContactModel> GetContactModelsBySiteId(int siteid)
         {
             List<ContactModel> contactModels = new List<ContactModel>();   //新建一个ContactModel表格用于储存获取到的信息
