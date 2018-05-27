@@ -19,6 +19,8 @@ namespace TestServerMonitor.TestDAO
         private ContactDAOImpl contactDAO = new ContactDAOImpl();
         //ContactModel对象列表,用于测试方法
         private List<ContactModel> lc;
+        //定义一条SiteContactModel类型数据
+        private SiteContactModel sm;
 
         [ClassInitialize]
         /// <param name="testContext"></param>
@@ -37,6 +39,9 @@ namespace TestServerMonitor.TestDAO
         public void Init()
         {
             SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath);
+
+            //初始化SiteContactModel数据项
+            sm = new SiteContactModel() { ContactId = 1, SiteId = 1 };
 
             //暂不插入数据库,测试时使用
             lc = new List<ContactModel>
@@ -102,8 +107,8 @@ namespace TestServerMonitor.TestDAO
 
             contactDAO.InsertOneContact(lc[2]);//将一条数据插入
             lc[2].Contact_email = "333@qq.com";//更改上次插入的email 
-            result = contactDAO.UpdateContact(lc[2]);//对更改后的记录进行更新
-            Assert.AreEqual(1, result); //判断是否更改成功
+            result = contactDAO.UpdateContact(lc[2]);
+            Assert.AreEqual(1, result);
             ContactModel contact = contactDAO.GetContactByContactId(3);
             Assert.AreEqual(contact.Contact_name, "333@qq.com");//判断是否更改成功
 
@@ -133,6 +138,19 @@ namespace TestServerMonitor.TestDAO
             Assert.AreEqual(1, contactDAO.GetAllContact().Count());//数据表中只有一条记录
         }
 
-      
+        /// <summary>
+        /// 测试GetContactModelsBySiteId方法
+        /// 用例说明: 先向site_contact表中插入一条数据, 从site_contact取得SiteId为1的第一条数据与lc[0]进行对比 
+        /// </summary>
+        public void TestGetContactModelsBySiteId()
+        {
+            int result = -1;
+            using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
+            {
+                result = conn.Insert(sm);
+            }
+            ContactModel contact = contactDAO.GetContactModelsBySiteId(1)[0];
+            Assert.AreEqual(contact.Contact_name, "Tom");
+        }
     }
 }
