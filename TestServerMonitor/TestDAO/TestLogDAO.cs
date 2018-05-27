@@ -30,7 +30,7 @@ namespace TestServerMonitor.TestDAO
         LogModel log;
 
         [TestMethod]
-        [AssemblyInitialize]
+        [ClassInitialize]
         public static void InitDatabase(TestContext testContext)
         {
             DBInit db = DataBaseControlImpl.Instance;

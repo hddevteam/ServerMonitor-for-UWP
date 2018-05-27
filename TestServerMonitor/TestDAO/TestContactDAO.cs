@@ -22,7 +22,9 @@ namespace TestServerMonitor.TestDAO
         //定义一条SiteContactModel类型数据
         private SiteContactModel sm;
 
+        [TestMethod]
         [ClassInitialize]
+        [Priority(1)]
         /// <param name="testContext"></param>
         //创建测试用数据库test.sqlite
         public static void InitDatabase(TestContext testContext)
@@ -33,6 +35,7 @@ namespace TestServerMonitor.TestDAO
 
         [TestMethod]
         [TestInitialize]
+        [Priority(1)]
         /// <summary>
         /// 测试之前初始化, 初始化3条ContactModel数据
         /// </summary>
@@ -71,6 +74,7 @@ namespace TestServerMonitor.TestDAO
         /// 用例说明：对比插入方法的返回值是否和1相等判断是否插入成功
         /// </summary>
         [TestMethod]
+        [Priority(2)]
         public void TestInsertOneContact()
         {
             int result = -1;
@@ -85,6 +89,7 @@ namespace TestServerMonitor.TestDAO
         /// 用例说明：删除成功result为1
         /// </summary>
         [TestMethod]
+        [Priority(2)]
         public void TestDeleteOneContact()
         {
             int result = -1;
@@ -101,6 +106,7 @@ namespace TestServerMonitor.TestDAO
         /// 用例说明：插入一条数据后更改, 再从数据库中取出并且判断是否更改, 最后删除数据
         /// </summary>
         [TestMethod]
+        [Priority(2)]
         public void TestUpdateContact()
         {
             int result = -1;
@@ -109,16 +115,18 @@ namespace TestServerMonitor.TestDAO
             lc[2].Contact_email = "333@qq.com";//更改上次插入的email 
             result = contactDAO.UpdateContact(lc[2]);
             Assert.AreEqual(1, result);
-            ContactModel contact = contactDAO.GetContactByContactId(3);
-            Assert.AreEqual(contact.Contact_name, "333@qq.com");//判断是否更改成功
+            ContactModel contact = contactDAO.GetContactByContactId(4);
+            Assert.AreEqual(contact.Contact_email, "333@qq.com");//判断是否更改成功
 
-            contactDAO.DeleteOneContact(3);//删除记录
+            contactDAO.DeleteOneContact(4);//删除记录
         }
 
         /// <summary>
         /// 测试GetContactByContactId方法
         /// 用例说明: 根据ContactId获得一条Contact数据项, 根据返回值判断是否相等
         /// </summary>
+        [TestMethod]
+        [Priority(2)]
         public void TestGetContactByContactId()
         {
             int id = 1;
@@ -132,6 +140,7 @@ namespace TestServerMonitor.TestDAO
         ///         根据GetAllContact()方法返回数据的个数判断是否执行成功
         /// </summary>
         [TestMethod]
+        [Priority(2)]
         public void TestGetAllContact()
         {
             //判断GetAllContact()函数的返回列表中记录的条数是否与实际相等
@@ -142,6 +151,8 @@ namespace TestServerMonitor.TestDAO
         /// 测试GetContactModelsBySiteId方法
         /// 用例说明: 先向site_contact表中插入一条数据, 从site_contact取得SiteId为1的第一条数据与lc[0]进行对比 
         /// </summary>
+        [TestMethod]
+        [Priority(3)]
         public void TestGetContactModelsBySiteId()
         {
             int result = -1;
