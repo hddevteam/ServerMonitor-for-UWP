@@ -107,7 +107,7 @@ namespace TestServerMonitor.TestDAO
         /// 用例说明：插入一条数据后更改, 再从数据库中取出并且判断是否更改, 最后删除数据
         /// </summary>
         [TestMethod]
-        [Priority(2)]
+        [Priority(3)]
         public void TestUpdateContact()
         {
             int result = -1;
@@ -116,10 +116,7 @@ namespace TestServerMonitor.TestDAO
             lc[2].Contact_email = "333@qq.com";//更改上次插入的email 
             result = contactDAO.UpdateContact(lc[2]);
             Assert.AreEqual(1, result);
-            ContactModel contact = contactDAO.GetContactByContactId(4);
-            Assert.AreEqual(contact.Contact_email, "333@qq.com");//判断是否更改成功
 
-            contactDAO.DeleteOneContact(4);//删除记录
         }
 
         /// <summary>
@@ -127,7 +124,7 @@ namespace TestServerMonitor.TestDAO
         /// 用例说明: 根据ContactId获得一条Contact数据项, 根据返回值判断是否相等
         /// </summary>
         [TestMethod]
-        [Priority(2)]
+        [Priority(4)]
         public void TestGetContactByContactId()
         {
             int id = 1;
@@ -140,11 +137,11 @@ namespace TestServerMonitor.TestDAO
         /// 用例说明:在Insert方法执行后, 数据表中有一条数据, 根据GetAllContact()方法返回数据的个数判断是否执行成功
         /// </summary>
         [TestMethod]
-        [Priority(2)]
+        [Priority(5)]
         public void TestGetAllContact()
         {
             //判断GetAllContact()函数的返回列表中记录的条数是否与实际相等
-            Assert.AreEqual(1, contactDAO.GetAllContact().Count());//数据表中只有一条记录
+            Assert.AreEqual(2, contactDAO.GetAllContact().Count());//数据表中只有一条记录
         }
 
         /// <summary>
@@ -152,7 +149,7 @@ namespace TestServerMonitor.TestDAO
         /// 用例说明: 先向site_contact表中插入一条数据, 从site_contact取得SiteId为1的第一条数据与lc[0]进行对比 
         /// </summary>
         [TestMethod]
-        [Priority(3)]
+        [Priority(6)]
         public void TestGetContactModelsBySiteId()
         {
             int result = -1;

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ServerMonitor.Models;
 using ServerMonitor.DAO;
+using SQLite.Net;
 
 namespace ServerMonitor.DAO
 {
@@ -51,6 +52,8 @@ namespace ServerMonitor.DAO
         /// <summary>
         /// 插入异常抛出错误
         /// </summary>
-        
+        void InsertErrorLog(SQLiteException e);
+
+
     }
 }
