@@ -131,9 +131,6 @@ namespace TestServerMonitor.TestDAO
             Assert.AreEqual(1, contactDAO.GetAllContact().Count());//数据表中只有一条记录
         }
 
-        public void GetContactModelsBySiteId(int siteid)
-        {
-
-        }
+       
     }
 }
