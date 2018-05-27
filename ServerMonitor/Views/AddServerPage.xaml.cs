@@ -70,20 +70,28 @@ namespace ServerMonitor.Views
 
             }
         }
+        /// <summary>
+        /// LiuYang 2018/5/27
+        /// 发送SMTP请求
+        /// </summary>
         private async void SendSMTPRequest()
         {
             int port;
-            if (!int.TryParse(model.Port, out port)) {
+            if (!int.TryParse(model.Port, out port)) {//判断端口号是否是数字
                 await new MessageDialog("端口号输入错误").ShowAsync();
             }
             SMTPRequest request = new SMTPRequest(model.SiteAddress,port);
             await request.MakeRequest();
-            await new MessageDialog(request.Status).ShowAsync();
+            await new MessageDialog(request.Status).ShowAsync();//显示结果
         }
+        /// <summary>
+        /// LiuYang 2018/5/27
+        /// 发送FTP请求
+        /// </summary>
         private async void SendFTPRequest()
         {
             IPAddress address = null;
-            try
+            try//检测IP地址是否合法
             {
                 address = IPAddress.Parse(model.SiteAddress);
             }
@@ -105,8 +113,12 @@ namespace ServerMonitor.Views
             request.IdentifyType = loginType;
             request.FtpServer = address;
             await request.MakeRequest();
-            await new MessageDialog(request.ProtocalInfo).ShowAsync();
+            await new MessageDialog(request.ProtocalInfo).ShowAsync();//显示结果
         }
+        /// <summary>
+        /// LiuYang 2018/5/27
+        /// 发送SSH请求
+        /// </summary>
         private async void SendSSHRequest()
         {
             SshIdentificationInfo userInfo = new SshIdentificationInfo();//登录信息
@@ -125,12 +137,16 @@ namespace ServerMonitor.Views
             request.Identification = userInfo;
             Task<bool>result=  request.MakeRequest();
             await result;
-            await new MessageDialog(request.ProtocolInfo).ShowAsync();
+            await new MessageDialog(request.ProtocolInfo).ShowAsync();//显示请求结果
         }
+        /// <summary>
+        /// LiuYang 2018/5/27
+        /// 发送ICMP请求
+        /// </summary>
         private async void SendICMPRequest()
         {
             IPAddress address;
-            try
+            try//检测IP地址是否合法
             {
                 address = IPAddress.Parse(model.SiteAddress);
             }
@@ -144,7 +160,7 @@ namespace ServerMonitor.Views
             List<RequestObj> objs = request.Requests;
             foreach (RequestObj tmp in objs)//ICMPRequest一共发送五条请求，其中有一条有问题就返回错误信息
             {
-                if (tmp.Status.Equals("1000"))
+                if (tmp.Status.Equals("1000"))//Status为1000说明请求正常
                 {
                     continue;
                 }
@@ -163,11 +179,15 @@ namespace ServerMonitor.Views
                 await new MessageDialog("has a unknown error").ShowAsync();
             }
         }
+        /// <summary>
+        /// LiuYang 2018/5/27
+        /// 发送DNS请求
+        /// </summary>
         private async void  SendDNSRequestAsync()
         {
             DNSRequest request = DNSRequest.Instance;
             IPAddress server;
-            try
+            try//检测IP地址是否合法
             {
                 server = IPAddress.Parse(model.SiteAddress);
             }
@@ -193,17 +213,21 @@ namespace ServerMonitor.Views
                 default:
                     break;
             }
-            request.DomainName = model.Lookup;
+            request.DomainName = model.Lookup;//要解析的域名
             request.RecordType = type;
             request.DnsServer = server;
             await request.MakeRequest();
-            await new MessageDialog(request.RequestInfos).ShowAsync();
+            await new MessageDialog(request.RequestInfos).ShowAsync();//返回结果
         }
+        /// <summary>
+        /// LiuYang 2018/5/27
+        /// 发送Socket请求
+        /// </summary>
         private async void SendSocketRequest()
         {
             SocketRequest request = new SocketRequest();
             IPAddress address = null;
-            try
+            try//检测IP地址是否正确
             {
                 address = IPAddress.Parse(model.SiteAddress);
             } catch {
@@ -211,7 +235,7 @@ namespace ServerMonitor.Views
                 return;
             }
             int port = 0;
-            if (!int.TryParse(model.Port, out port))
+            if (!int.TryParse(model.Port, out port))//检测port是否为数字
             {
                 await new MessageDialog("the port is wrong").ShowAsync();
             }
