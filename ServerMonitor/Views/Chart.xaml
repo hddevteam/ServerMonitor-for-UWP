@@ -63,7 +63,7 @@
                       RelativePanel.AlignLeftWithPanel="True"
                       RelativePanel.AlignRightWithPanel="True"
                       RelativePanel.Below="pageHeader">
-            <telerikPrimitives:RadBusyIndicator IsActive="True" Foreground="SteelBlue" AnimationStyle="AnimationStyle3" />
+            <telerikPrimitives:RadBusyIndicator IsActive="True" Foreground="SteelBlue" AnimationStyle="AnimationStyle9" />
         </Grid>
         <!--界面1-->
         <ScrollViewer Padding="24" RelativePanel.AlignBottomWithPanel="True" Visibility="{x:Bind ViewModel.Infos.State1,Mode=TwoWay}"
@@ -98,7 +98,7 @@
                 <!--选择类型--> 
                 <ComboBox x:Name="selectionTypeCombo" Grid.Row="1" Grid.Column="0" Width="225"
                           HorizontalAlignment="Left" Height="40" Grid.ColumnSpan="2" 
-                          ItemsSource="{Binding RequestResult}" Margin="10" SelectedItem="{x:Bind ViewModel.Type,Mode=TwoWay}">
+                          ItemsSource="{Binding RequestResult}" Margin="10" SelectedItem="{x:Bind ViewModel.RequestResultType,Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
@@ -298,7 +298,7 @@
         </ScrollViewer>
         <!--界面2 筛选站点-->
         <Grid RelativePanel.Below="pageHeader" Visibility="{x:Bind ViewModel.Infos.State2,Mode=TwoWay}">
-            <telerikGrid:RadDataGrid x:Name="grid2" Margin="24" ItemsSource="{Binding Infos.SelectSites}" VerticalAlignment="Stretch"
+            <telerikGrid:RadDataGrid x:Name="grid2" Margin="24" ItemsSource="{Binding Infos.SiteInfoCompleted}" VerticalAlignment="Stretch"
                                          AutoGenerateColumns="False" UserColumnReorderMode="None" UserFilterMode="Disabled" SelectionUnit="Row"
                                          GridLinesVisibility="Horizontal" AlternationStartIndex="1" AlternationStep="2" GridLinesBrush="#5D5A58"
                                          Foreground="White" RowBackground="#5D5A58" AlternateRowBackground="#5D5A58"

@@ -8,6 +8,10 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+/// <summary>
+/// last modification by wzp on 2018/5/26
+/// ICMP相关方法
+/// </summary>
 
 namespace ServerMonitor.Services.RequestServices
 {
@@ -139,7 +143,7 @@ namespace ServerMonitor.Services.RequestServices
                                 DBHelper.InsertErrorLog(e.InnerException);
                             }
                             EndPoint correctEndpoint = (EndPoint)new IPEndPoint(MyIPAddress, 0);
-                            if (hostEndpoint != correctEndpoint)
+                            if (hostEndpoint.GetHashCode() != correctEndpoint.GetHashCode())//对host取哈希判断是否是正确主机
                             {
                                 //不是正确的主机进行回复
                                 request.Color = "0";

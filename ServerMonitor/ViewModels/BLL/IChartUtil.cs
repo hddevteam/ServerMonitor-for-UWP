@@ -6,21 +6,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telerik.UI.Xaml.Controls.Chart;
-
+/// <summary>
+/// 创建：fjl  创建时间：2018/05/25 
+/// Chart页面计算逻辑接口
+/// </summary>
 namespace ServerMonitor.ViewModels.BLL
 {
     public interface IChartUtil
     {
         ChartPalette DefaultPalette { get; }
 
-        ObservableCollection<ChartLengend> Lengend { get; set; }
+        ObservableCollection<LineChartLengend> Lengend { get; set; }
 
         ObservableCollection<BarChartData> BarChart { get; set; }
 
-        Task<Tuple<ObservableCollection<SelectSite>, List<SiteModel>>> SelectSitesAsync(List<SiteModel> sites);
+        Task<Tuple<ObservableCollection<AddSiteInfo>, List<SiteModel>>> AddInfoForSiteAsync(List<SiteModel> sites);
 
-        Task<ObservableCollection<ChartLengend>> ChartLengendAsync(List<SiteModel> sites);
+        Task<ObservableCollection<LineChartLengend>> SetLineChartLengendAsync(List<SiteModel> sites);
 
-        Task<Tuple<ObservableCollection<ObservableCollection<Chart1>>, ObservableCollection<BarChartData>>> CacuChartAsync(List<SiteModel> sites, List<LogModel> logs);
+        Task<Tuple<ObservableCollection<ObservableCollection<LineChartData>>, ObservableCollection<BarChartData>>> StatisticsSiteRequestResultAsync(List<SiteModel> sites, List<LogModel> logs);
     }
 }

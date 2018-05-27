@@ -107,19 +107,19 @@ namespace ServerMonitor
                 for (int i = 0; i < len; i++)
                 {
                     // 获取站点对象   --xb
-                    SiteModel siteElement = sitelist[i];
+                    SiteModel siteElement =sitelist[i];
                     // 创建用于记录此次请求的Log对象   --xb
                     LogModel log = null;
                     if (!siteElement.Is_Monitor)
                     {
                         continue;
                     }
-                    IPAddress _siteAddress_redress =await util.GetIPAddressAsync(siteElement.Site_address);
+                    IPAddress _siteAddress_redress = await util.GetIPAddressAsync(siteElement.Site_address);
                     switch (siteElement.Protocol_type)//根据协议请求站点
                     {
                         // HTTP/HTTPS协议请求   --xb
                         // 目前HTTP与HTTPS没有做协议请求上的区分  --xb
-                        case "HTTPS":                           
+                        case "HTTPS":
                         case "HTTP":
                             try
                             {
@@ -139,8 +139,7 @@ namespace ServerMonitor
                             break;
                         // ICMP协议请求   --xb
                         case "ICMP":
-                            IPAddress ip = await util.GetIPAddressAsync(siteElement.Site_address);
-                            ICMPRequest icmp = new ICMPRequest(ip);
+                            ICMPRequest icmp = new ICMPRequest(_siteAddress_redress);
                             // 发起ICMP请求，生成请求记录并更新站点信息  --xb
                             log = await util.ConnectToServerWithICMP(siteElement, icmp);
                             break;
@@ -155,15 +154,19 @@ namespace ServerMonitor
                             SMTPRequest _smtpRequest = new SMTPRequest(siteElement.Site_address, siteElement.Server_port);
                             log = await util.AccessSMTPServer(siteElement, _smtpRequest);
                             break;
-                            // 补充之前欠缺的Socket服务器请求   --xb
+                        // 补充之前欠缺的Socket服务器请求   --xb
                         case "SOCKET":
                             // 初始化Socket请求对象
                             SocketRequest _socketRequest = new SocketRequest
                             {
-                                TargetEndPoint = new IPEndPoint(IPAddress.Parse(siteElement.Site_address), siteElement.Server_port)
+                                TargetEndPoint = new IPEndPoint(_siteAddress_redress, siteElement.Server_port)
                             };
                             // 请求指定终端，并生成对应的请求记录，最后更新站点信息
-                            log = await util.ConnectToServerWithSocket(siteElement, _socketRequest);                            
+                            log = await util.ConnectToServerWithSocket(siteElement, _socketRequest);
+                            break;
+                        // 补充之前欠缺的SSH服务器请求   --xb
+                        case "SSH":
+                            log = await util.AccessSSHServer(siteElement, new SSHRequest(siteElement.Site_address, SshLoginType.Anonymous));
                             break;
                         default:
                             break;
@@ -181,7 +184,8 @@ namespace ServerMonitor
                         }
                     }
                     // 说明此次请求处于异常状态，记录进数据库中
-                    else {
+                    else
+                    {
                         DBHelper.InsertErrorLog(new Exception("Insert Log failed!Beacuse log to insert is null"));
                     }
                 }
