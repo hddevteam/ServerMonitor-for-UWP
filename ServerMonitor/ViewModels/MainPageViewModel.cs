@@ -282,8 +282,7 @@ namespace ServerMonitor.ViewModels
                             break;
                         // ICMP协议请求   --xb
                         case "ICMP":
-                            IPAddress ip = await util.GetIPAddressAsync(siteElement.Site_address);
-                            ICMPRequest icmp = new ICMPRequest(ip);
+                            ICMPRequest icmp = new ICMPRequest(_siteAddress_redress);
                             // 发起ICMP请求，生成请求记录并更新站点信息  --xb
                             log = await util.ConnectToServerWithICMP(siteElement, icmp);
                             break;
@@ -299,14 +298,18 @@ namespace ServerMonitor.ViewModels
                             log = await util.AccessSMTPServer(siteElement, _smtpRequest);
                             break;
                         // 补充之前欠缺的Socket服务器请求   --xb
-                        case "SOCKET":
+                        case "SOCKET":                            
                             // 初始化Socket请求对象
                             SocketRequest _socketRequest = new SocketRequest
                             {
-                                TargetEndPoint = new IPEndPoint(IPAddress.Parse(siteElement.Site_address), siteElement.Server_port)
+                                TargetEndPoint = new IPEndPoint(_siteAddress_redress, siteElement.Server_port)
                             };
                             // 请求指定终端，并生成对应的请求记录，最后更新站点信息
                             log = await util.ConnectToServerWithSocket(siteElement, _socketRequest);
+                            break;
+                        // 补充之前欠缺的SSH服务器请求   --xb
+                        case "SSH":
+                            log = await util.AccessSSHServer(siteElement, new SSHRequest(siteElement.Site_address, SshLoginType.Anonymous));
                             break;
                         default:
                             break;
