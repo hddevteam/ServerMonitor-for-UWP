@@ -9,7 +9,10 @@ using ServerMonitor.Models;
 using SQLite.Net;
 using SQLite.Net.Platform.WinRT;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
+/// <summary>
+/// 创建: mzy
+/// 测试ContactDAOImpl文件的相关方法
+/// </summary>
 namespace TestServerMonitor.TestDAO
 {
     [TestClass]
@@ -22,9 +25,11 @@ namespace TestServerMonitor.TestDAO
         //定义一条SiteContactModel类型数据
         private SiteContactModel sm;
 
-        [TestMethod]
         [ClassInitialize]
         [Priority(1)]
+        /// <summary>
+        /// 初始化数据库
+        /// </summary>
         /// <param name="testContext"></param>
         //创建测试用数据库test.sqlite
         public static void InitDatabase(TestContext testContext)
@@ -33,7 +38,6 @@ namespace TestServerMonitor.TestDAO
             db.InitDB("test.sqlite");
         }
 
-        [TestMethod]
         [TestInitialize]
         [Priority(1)]
         /// <summary>
@@ -41,8 +45,6 @@ namespace TestServerMonitor.TestDAO
         /// </summary>
         public void Init()
         {
-            SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath);
-
             //初始化SiteContactModel数据项
             sm = new SiteContactModel() { ContactId = 1, SiteId = 1 };
 
@@ -100,7 +102,6 @@ namespace TestServerMonitor.TestDAO
             Assert.AreEqual(1, result);
         }
 
-
         /// <summary>
         /// 测试UpdateContact方法
         /// 用例说明：插入一条数据后更改, 再从数据库中取出并且判断是否更改, 最后删除数据
@@ -136,8 +137,7 @@ namespace TestServerMonitor.TestDAO
 
         /// <summary>
         /// 测试GetAllContact方法
-        /// 用例说明:在Insert方法执行后, 数据表中有一条数据, 
-        ///         根据GetAllContact()方法返回数据的个数判断是否执行成功
+        /// 用例说明:在Insert方法执行后, 数据表中有一条数据, 根据GetAllContact()方法返回数据的个数判断是否执行成功
         /// </summary>
         [TestMethod]
         [Priority(2)]

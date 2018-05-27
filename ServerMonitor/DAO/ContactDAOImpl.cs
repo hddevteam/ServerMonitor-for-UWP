@@ -10,9 +10,15 @@ using ServerMonitor.Models;
 using ServerMonitor.SiteDb;
 using SQLite.Net;
 using SQLite.Net.Platform.WinRT;
-
+/// <summary>
+/// 创建: mzy 创建时间: 2018/05/25
+/// 联系人的相关操作
+/// </summary>
 namespace ServerMonitor.DAO
 {
+    /// <summary>
+    /// 创建: mzy 创建时间: 2018/05/27 修改: mzy
+    /// </summary>
     public class ContactDAOImpl : IContactDAO
     {
         #region Contact表操作
@@ -34,7 +40,7 @@ namespace ServerMonitor.DAO
         /// <summary>
         /// 插入一条联系人
         /// </summary>
-        /// <param name="Contact"></param>
+        /// <param name="Contact">联系人</param>
         /// <returns>成功返回插入条数</returns>
         public int InsertOneContact(ContactModel contact)
         {
@@ -49,7 +55,7 @@ namespace ServerMonitor.DAO
         /// <summary>
         /// 删除一个联系人
         /// </summary>
-        /// <param name="contactId"></param>
+        /// <param name="contactId">联系人ID</param>
         /// <returns>成功返回更改条数</returns>
         public int DeleteOneContact(int contactId)
         {
@@ -64,7 +70,7 @@ namespace ServerMonitor.DAO
         /// <summary>
         /// 更新联系人信息
         /// </summary>
-        /// <param name="contact"></param>
+        /// <param name="contact">联系人</param>
         /// <returns>更改条数</returns>
         public int UpdateContact(ContactModel contact)
         {
@@ -90,8 +96,8 @@ namespace ServerMonitor.DAO
         /// <summary>
         /// 根据contactid输出contact信息
         /// </summary>    
-        /// <param name="contactid"></param>
-        /// <returns>ContactModel</returns>
+        /// <param name="contactid">联系人ID</param>
+        /// <returns>搜索到的联系人</returns>
         public ContactModel GetContactByContactId(int ContactId)
         {
 
@@ -113,7 +119,7 @@ namespace ServerMonitor.DAO
         /// <summary>
         /// 根据siteid输出contact信息
         /// </summary>    
-        /// <param name="siteID"></param>
+        /// <param name="siteID">站点ID</param>
         /// <returns>ContaceModel列表</returns>
         public List<ContactModel> GetContactModelsBySiteId(int siteid)
         {
@@ -129,6 +135,9 @@ namespace ServerMonitor.DAO
             return contactModels;
         }
 
+        /// <summary>
+        /// 插入失败抛出异常
+        /// </summary>    
         public void InsertErrorLog(SQLiteException e)
         {
             throw new NotImplementedException();
