@@ -10,7 +10,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Windows.UI.Popups;
-
+/// <summary>
+/// 创建：zhanglin  创建时间：2018/05/27
+/// 测试LogDAO
+/// </summary>
 namespace TestServerMonitor.TestDAO
 {
     [TestClass]
@@ -21,30 +24,34 @@ namespace TestServerMonitor.TestDAO
         /// </summary>
         List<LogModel> logModels = new List<LogModel>();
         /// <summary>
-        /// 测试用logDAO
+        /// 测试用ILogDAO的实例
         /// </summary>
         ILogDAO logDAO = new LogDaoImpl();
         /// <summary>
         /// 测试用log
         /// </summary>
         LogModel log;
-
-        [TestMethod]
+        /// <summary>
+        /// 初始化一个测试用的数据库，命名为testdb.db
+        /// </summary>
+        /// <param name="testContext"></param>
         [ClassInitialize]
         public static void InitDatabase(TestContext testContext)
         {
             DBInit db = DataBaseControlImpl.Instance;
             db.InitDB("testdb.db");
         }
+        /// <summary>
+        /// 为测试用log和logModels赋值
+        /// </summary>
         [TestMethod]
         [TestInitialize]
         [Priority(1)]
-        public void Init()//初始化数据库并向log列表填充数据
+        public void Init()
         {
             logModels = new List<LogModel>();
             LogModel logModel1 = new LogModel()
             {
-                //Id = 66,
                 Site_id = 88,
                 Status_code = "200",
                 TimeCost = 200,
@@ -54,7 +61,6 @@ namespace TestServerMonitor.TestDAO
             };
             LogModel logModel2 = new LogModel()
             {
-                //Id = 67,
                 Site_id = 88,
                 Status_code = "200",
                 TimeCost = 200,
@@ -66,7 +72,6 @@ namespace TestServerMonitor.TestDAO
             logModels.Add(logModel2);
             log = new LogModel()
             {
-                //Id = 69,
                 Site_id = 89,
                 Status_code = "200",
                 TimeCost = 200,
@@ -76,7 +81,8 @@ namespace TestServerMonitor.TestDAO
             };
         }
         ///<summary>
-        ///测试InsertOneLog
+        ///测试插入一条Log
+        ///说明：插入一条Log看Return值是否为1，然后再根据id查找，看是否能查到
         ///</summary>
         [TestMethod]
         [Priority(1)]
@@ -87,6 +93,7 @@ namespace TestServerMonitor.TestDAO
         }
         /// <summary>
         /// 测试插入一条空的log
+        /// 说明：插入一条为空的Log，看返回值是否为0
         /// </summary>
         [TestMethod]
         [Priority(1)]
@@ -97,7 +104,8 @@ namespace TestServerMonitor.TestDAO
 
         }
         /// <summary>
-        /// 测试InsertListLog
+        /// 测试插入一个Log列表
+        /// 说明：插入logModels，看返回值是否为列表元素个数，然后再根据site_id进行查询看是否为空
         /// </summary>
         [TestMethod]
         [Priority(1)]
@@ -108,7 +116,7 @@ namespace TestServerMonitor.TestDAO
 
         }
         /// <summary>
-        /// 测试GetAllLog
+        /// 测试获取所有的Log
         /// </summary>
         [TestMethod]
         [Priority(2)]
@@ -118,7 +126,8 @@ namespace TestServerMonitor.TestDAO
             Assert.AreNotEqual(0, logDAO.GetAllLog().Count);//如果等于0，查出一个空的List<LogModel>
         }
         /// <summary>
-        /// 测试GetLogById
+        /// 测试根据Id查询Log
+        /// 说明：将GetAllLog查询到的Log列表的的第一个元素的Id进行查询，看是否查询得到
         /// </summary>
         [TestMethod]
         [Priority(2)]
@@ -129,6 +138,7 @@ namespace TestServerMonitor.TestDAO
         }
         /// <summary>
         /// 用预先插入的Log的Site_id进行测试GetLogBySiteId
+        /// 说明：插入一条testlog，然后根据testlog的site_id进行查询，看查到的Log是否为testlog
         /// </summary>
         [TestMethod]
         [Priority(2)]
@@ -147,7 +157,8 @@ namespace TestServerMonitor.TestDAO
             Assert.AreEqual(testlog.Site_id, logDAO.GetLogsBySiteId(testlog.Site_id)[0].Site_id);
         }
         /// <summary>
-        /// 测试DeleteOneLog
+        /// 测试删除一条Log
+        /// 说明：先插入一条testlog，然后将其删除看返回值是否为1，然后在根据testlog的id进行查询看查到的Log是否为空Log
         /// </summary>
         [TestMethod]
         public void TestLogDAO_DeleteOneLog()
@@ -167,7 +178,8 @@ namespace TestServerMonitor.TestDAO
             Assert.AreEqual(0, logDAO.GetLogById(testlog.Id).Site_id);//取一下testlog，看是否取到空log
         }
         /// <summary>
-        /// 用预先插入的Log的Site_id进行测试DeleteLogsBySite
+        /// 用预先插入的Log的Site_id进行测试根据site_id进行删除
+        /// 说明：先插入一条testlog，对比根据test_id删除的返回值是否为1，然后再根据testlog的id进行查找看是否为空；
         /// </summary>
         [TestMethod]
         public void TestLogDAO_DeleteLogsBySite()
@@ -183,12 +195,13 @@ namespace TestServerMonitor.TestDAO
             };
             logDAO.InsertOneLog(testlog);
             Assert.AreEqual(1, logDAO.DeleteLogsBySite(testlog.Site_id));
-            Assert.AreEqual(0,logDAO.GetLogById(logModels[0].Site_id).Site_id);//取一下logmodel[0]，看取得的是否为空log
+            Assert.AreEqual(0,logDAO.GetLogById(testlog.Id).Id);//取一下testlog，看取得的是否为空log
 
             
         }
         /// <summary>
-        /// 测试UpdateLog
+        /// 测试更新一条Log
+        /// 说明：插入一条testlog然后将其Is_error改为true，再进行updatelog，然后根据id查找对比Is_error是否更新
         /// </summary>
         [TestMethod]
         [Priority(3)]
@@ -209,7 +222,7 @@ namespace TestServerMonitor.TestDAO
             Assert.AreEqual(true, logDAO.GetLogById(testlog.Id).Is_error);//对比updatelog后testlog的Is_error是否改变
         }
         /// <summary>
-        /// 测试UpdateListLog
+        /// 测试更新一个Log列表
         /// </summary>
         [TestMethod]
         [Priority(3)]
@@ -222,7 +235,7 @@ namespace TestServerMonitor.TestDAO
 
         }
         /// <summary>
-        /// 测试InertErrorLog
+        /// 测试插入一个错误Log
         /// </summary>
         [TestMethod]
         public void TestLogDAO_InsertErrorLog()
