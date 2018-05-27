@@ -104,6 +104,7 @@ namespace ServerMonitor.Services.RequestServices
                 DBHelper.InsertErrorLog(e);
                 TimeCost = OverTime;
                 ErrorException = e;
+                Status = "1002";
                 requestInfo = e.Message;
                 return false;
             }
@@ -113,6 +114,7 @@ namespace ServerMonitor.Services.RequestServices
                 DBHelper.InsertErrorLog(e);
                 TimeCost = (short)(OverTime * 1.5);
                 ErrorException = e;
+                Status = "1001";
                 requestInfo = e.Message;
                 return false;
             }

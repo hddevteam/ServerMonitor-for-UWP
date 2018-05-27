@@ -22,7 +22,10 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
-
+/// <summary>
+/// 创建：fjl  创建时间：2018/05/26
+/// Chart页面后台
+/// </summary>
 namespace ServerMonitor.Views
 {
     /// <summary>
@@ -60,7 +63,7 @@ namespace ServerMonitor.Views
                 };
                 series.CategoryBinding = new PropertyNameDataPointBinding("RequestTime");
                 series.ValueBinding = new PropertyNameDataPointBinding("ResponseTime");
-                series.SetBinding(ChartSeries.ItemsSourceProperty, new Binding() { Path = new PropertyPath("Infos.Chart1CollectionCopy[" + i + "]") });
+                series.SetBinding(ChartSeries.ItemsSourceProperty, new Binding() { Path = new PropertyPath("Infos.LineChartCollectionCopy[" + i + "]") });
                 series.ClipToPlotArea = false;
                 //序列添加到图表
                 chart.Series.Add(series);

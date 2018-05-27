@@ -44,7 +44,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button Background="{x:Null}" IsEnabled="{Binding IsEnabled}" Click="{x:Bind ViewModel.Save}">
+            <Button Background="{x:Null}" IsEnabled="{Binding IsEnabled}" Click="{x:Bind ViewModel.SaveAsync}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Images/commit.png" Width="16" Height="16"/>
                     <TextBlock Text="Save" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
@@ -146,8 +146,8 @@
                     </StackPanel>
                     
                     <!--PRIORITY-->
-                    <TextBlock Text="PRIORITY" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8"/>
-                    <ComboBox SelectedIndex="{Binding Priority, Mode=TwoWay}" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center">
+                    <TextBlock Text="PRIORITY" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8" Visibility="Collapsed"/>
+                    <ComboBox SelectedIndex="{Binding Priority, Mode=TwoWay}" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center" Visibility="Collapsed">
                         <ComboBoxItem Content="Low"/>
                         <ComboBoxItem Content="Normal"/>
                         <ComboBoxItem Content="High"/>

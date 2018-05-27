@@ -134,12 +134,11 @@
                 <ScrollViewer x:Name="sitelist_scroll" HorizontalScrollBarVisibility="Disabled" Grid.Row="1"
                               VerticalScrollBarVisibility="Auto" Margin="0,24,0,0">
                     <StackPanel Orientation="Vertical">
-                        <GridView x:Name="sitelist"
-                                  ItemsSource="{Binding SiteItems}"
+                        <GridView x:Name="sitelist" ItemsSource="{Binding SiteItems}"
                                   AllowDrop="True" HorizontalAlignment="Center"
                                   CanReorderItems="True" SelectionMode="Single"
                                   Tapped="{x:Bind ViewModel.SiteList_Tapped}"
-                                  Padding="4,0,0,0" RightTapped="SiteList_RightTapped">
+                                  Padding="24,0,20,0" RightTapped="SiteList_RightTapped">
                             <GridView.Resources>
                                 <MenuFlyout x:Name="site_flyout">
                                     <MenuFlyout.Items>
@@ -151,7 +150,7 @@
                             </GridView.Resources>
                             <GridView.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Background="{Binding ResultColor}" Width="220" Height="100">
+                                    <Grid Background="{Binding ResultColor}" Width="208" Height="100">
                                         <Image Source="{Binding Image_path}" Width="32" Height="32"
                                                Margin="4,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                                         <TextBlock Text="{Binding Id}" Margin="0,4,4,0" Foreground="White"
@@ -287,7 +286,7 @@
                                 <DataTemplate>
                                     <Grid Margin="-4,0,0,0" HorizontalAlignment="Stretch" Width="180" Height="50">
                                         <TextBlock Text="{Binding Ranking}" FontWeight="Bold" Foreground="Black" FontSize="20"
-                                               HorizontalAlignment="Left" VerticalAlignment="Center" Width="48"/>
+                                               HorizontalAlignment="Left" VerticalAlignment="Center" Width="64"/>
                                         <TextBlock Text="{Binding Site_name}" Foreground="Black" Grid.Column="1" FontWeight="Bold"
                                                HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="12" TextTrimming="CharacterEllipsis"
                                                Margin="68,8,4,0"/>
