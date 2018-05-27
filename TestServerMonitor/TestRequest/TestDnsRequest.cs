@@ -42,7 +42,7 @@ namespace TestServerMonitor.TestRequest
         [Priority(1)]// 优先级
         public void TestMakeRequest_ServerIPNull()// 测试发起Dns请求 
         {
-            dnsRequest.DnsServer = null;
+            dnsRequest.DnsServer = IPAddress.Parse("8.8.8.9");
             // 校验 dnsRequest 是否为空
             Assert.AreNotEqual(null, dnsRequest);
 

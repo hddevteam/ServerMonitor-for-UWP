@@ -58,7 +58,7 @@
             </Button>
 
             <Grid Grid.Column="2" Width="1" Background="DarkGray"/>
-            <Button Grid.Column="3" Background="{x:Null}">
+            <Button Grid.Column="3" Background="{x:Null}" Click="TestSiteConnection">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Images/test.png" Width="16" Height="16"/>
                     <TextBlock Text="TEST" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
@@ -87,7 +87,7 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <ComboBox SelectedIndex="{Binding ProtocolType, Mode=TwoWay}" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center">
+                        <ComboBox Name="ProtocolType" SelectedIndex="{Binding ProtocolType, Mode=TwoWay}" Width="96" Margin="0,0,4,0" HorizontalContentAlignment="Center">
                             <ComboBoxItem Content="http://"/>
                             <ComboBoxItem Content="https://"/>
                         </ComboBox>

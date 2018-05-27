@@ -17,6 +17,7 @@ namespace ServerMonitor.Services.RequestServices
 {
     public class ICMPRequest
     {
+        public int tmp = -10;
         public static Dictionary<string, string> backData = new Dictionary<string, string>();
 
         public ICMPRequest(IPAddress iPAddress)
@@ -101,7 +102,7 @@ namespace ServerMonitor.Services.RequestServices
                     try
                     {
                         Nbytes = socket.SendTo(Senddata, Packetsize, SocketFlags.None, hostEndpoint);
-
+                        tmp = Nbytes;
                         if (Nbytes == -1)
                         {
                             //exception.Text = "无法传送";

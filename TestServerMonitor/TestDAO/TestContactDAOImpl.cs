@@ -22,7 +22,11 @@ namespace TestServerMonitor.TestDAO
         private int a;
 
         public object Count { get; private set; }
+<<<<<<< Updated upstream
         [ClassInitialize] // 测试类生成预处理
+=======
+        [ClassInitialize()] // 测试类生成预处理
+>>>>>>> Stashed changes
         public static void Init(TestContext testContext)
         {
             DBInit db1 = DataBaseControlImpl.Instance;

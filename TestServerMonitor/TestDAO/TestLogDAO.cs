@@ -30,7 +30,11 @@ namespace TestServerMonitor.TestDAO
         LogModel log;
 
         [TestMethod]
+<<<<<<< Updated upstream
         [ClassInitialize]
+=======
+        [ClassInitialize()]
+>>>>>>> Stashed changes
         public static void InitDatabase(TestContext testContext)
         {
             DBInit db = DataBaseControlImpl.Instance;
