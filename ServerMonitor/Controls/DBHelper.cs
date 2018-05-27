@@ -494,11 +494,12 @@ namespace ServerMonitor.Controls
             int result = -1;
 
             //构成一个错误日志对象
-            ErrorLogModel log = new ErrorLogModel() {
+            ErrorLogModel log = new ErrorLogModel()
+            {
                 ExceptionType = e.GetType().ToString(),
                 CreateTime = DateTime.Now,
-                ExceptionContent = e.Message,
-                Others = string.Format("Exception Source : {0} \t Exception HResult : {1}", e.Source, e.HResult)
+                ExceptionContent = e.StackTrace,
+                Others = string.Format("Exception Message : {0} \t Exception Source : {0} \t Exception HResult : {1}", e.Message, e.Source, e.HResult)
             };
 
             // 开始插入
