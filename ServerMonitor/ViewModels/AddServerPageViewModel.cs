@@ -316,7 +316,7 @@ namespace ServerMonitor.ViewModels
         }
 
         /// <summary>
-        /// 侧边栏Ok按钮点击事件
+        /// 侧边栏Ok按钮点击事件 保存对绑定联系人的编辑
         /// </summary>
         public void Ok_Click(object sender, RoutedEventArgs e)
         {
@@ -385,9 +385,37 @@ namespace ServerMonitor.ViewModels
                 IsEnabled = false;
                 return;
             }
-            SiteModel site = GetUISite();
+            if (siteId == -1)  //新建Site
+            {
+                SaveAdd();
+            }
+            else      //Edit site
+            {
+                SaveEdit();
+            }
+        }
+        /// <summary>
+        /// 新建保存
+        /// </summary>
+        public void SaveAdd()
+        {
+            SiteModel site = new SiteModel()
+            {
+                Is_server = true,
+                Monitor_interval = 5,
+                Is_Monitor = true,
+                Create_time = DateTime.Now,
+                Update_time = DateTime.Now,
+                Is_success = 2,
+                Request_succeed_code = "1000",
+            };
+
+            //将界面数据保存下来
+            GetUIDate(site);
+
+            //生成可存进数据库的list数据
             List<SiteContactModel> contactSiteModels = new List<SiteContactModel>();
-            foreach (var item in vs)  //生成可存进数据库的list数据
+            foreach (var item in vs)  
             {
                 if (item.Value)
                 {
@@ -399,28 +427,89 @@ namespace ServerMonitor.ViewModels
                 }
             }
             //数据库操作
-            if (siteId == -1)
+            if (DBHelper.InsertOneSite(site) == 1)
             {
-                if (DBHelper.InsertOneSite(site) == 1)
+                var contactS = ContactSiteDAOImpl.Instance.InsertListConnects(contactSiteModels);
+                Jump(); //返回原界面
+            }
+        }
+        /// <summary>
+        /// 编辑保存
+        /// </summary>
+        public void SaveEdit()
+        {
+            SiteModel site = DBHelper.GetSiteById(siteId);
+            site.Protocol_content = null;
+            site.ProtocolIdentification = null;
+            site.Update_time = DateTime.Now;
+            
+            //生成可存进数据库的list数据
+            List<SiteContactModel> contactSiteModels = new List<SiteContactModel>();
+            foreach (var item in vs)
+            {
+                if (item.Value)
                 {
-                    var contactS = ContactSiteDAOImpl.Instance.InsertListConnects(contactSiteModels);
-                    Jump(); //返回原界面
+                    contactSiteModels.Add(new SiteContactModel()
+                    {
+                        SiteId = siteId,
+                        ContactId = item.Key,
+                    });
                 }
             }
-            else
+            //将界面数据保存下来 因为传入的是引用类型，所以无需返回值
+            GetUIDate(site);
+            //数据库操作
+            if (DBHelper.UpdateSite(site) == 1)
             {
-                if (DBHelper.UpdateSite(site) == 1)
+                if (contactChange)
                 {
-                    if (contactChange)
-                    {
-                        var in1 = ContactSiteDAOImpl.Instance.DeletSiteAllConnect(siteId);
-                        var contactS = ContactSiteDAOImpl.Instance.InsertListConnects(contactSiteModels);
-                    }
-                    Jump();
+                    var in1 = ContactSiteDAOImpl.Instance.DeletSiteAllConnect(siteId);
+                    var contactS = ContactSiteDAOImpl.Instance.InsertListConnects(contactSiteModels);
                 }
+                Jump();
             }
         }
 
+        /// <summary>
+        /// 将界面数据保存下来
+        /// </summary>
+        /// <param name="site">保存在该站点里</param>
+        public void GetUIDate(SiteModel site)
+        {
+            site.Protocol_type = GetProtocolType(ProtocolType);
+            site.Site_address = SiteAddress;
+            try
+            {
+                site.Server_port = int.Parse(Port);
+            }
+            catch (Exception)
+            {
+                site.Server_port = 0;
+            }
+            if (SiteName == null || SiteName.Equals(""))
+            {
+                site.Site_name = SiteAddress;
+            }
+            else
+            {
+                site.Site_name = SiteName;
+            }
+            if (site.Protocol_type.Equals("SSH") || site.Protocol_type.Equals("FTP"))
+            {
+                if (NoAnonymous) //true 不匿名 用户请求
+                {
+                    site.ProtocolIdentification = GetJson(Username, Password, "1");
+                }
+                else  //匿名
+                {
+                    site.ProtocolIdentification = GetJson("", "", "0");
+                }
+            }
+            else if (site.Protocol_type.Equals("DNS"))
+            {
+                site.Protocol_content = GetJson(RecordType, Lookup, ExpectedResults);
+            }
+        }
         /// <summary>
         /// 取消修改/添加 返回原界面
         /// </summary>
@@ -578,70 +667,6 @@ namespace ServerMonitor.ViewModels
                 Lookup = js["lookup"].ToString();
                 ExpectedResults = js["expectedResults"].ToString();
             }
-        }
-
-        /// <summary>
-        /// 结合从UI上获取的信息，生成SiteModel型对象
-        /// </summary>
-        /// <returns>SiteModel型对象，即一个站点对象</returns>
-        private SiteModel GetUISite()
-        {
-            SiteModel site;
-            if (siteId == -1)  //新建Site
-            {
-                site = new SiteModel()
-                {
-                    Is_server = true,
-                    Monitor_interval = 5,
-                    Is_Monitor = true,
-                    Create_time = DateTime.Now,
-                    Is_success = 2,
-                    Request_succeed_code = "1000",
-                };
-            }
-            else    //Edit site
-            {
-                site = DBHelper.GetSiteById(siteId);
-                site.Protocol_content = null;
-                site.ProtocolIdentification = null;
-            }
-            site.Update_time = DateTime.Now;
-
-            //将界面数据保存下来
-            site.Protocol_type = GetProtocolType(ProtocolType);
-            site.Site_address = SiteAddress;
-            try
-            {
-                site.Server_port = int.Parse(Port);
-            }
-            catch (Exception)
-            {
-                site.Server_port = 0;
-            }
-            if (SiteName == null || SiteName.Equals(""))
-            {
-                site.Site_name = SiteAddress;
-            }
-            else
-            {
-                site.Site_name = SiteName;
-            }
-            if (site.Protocol_type.Equals("SSH") || site.Protocol_type.Equals("FTP"))
-            {
-                if (NoAnonymous) //true 不匿名 用户请求
-                {
-                    site.ProtocolIdentification = GetJson(Username, Password, "1");
-                }
-                else  //匿名
-                {
-                    site.ProtocolIdentification = GetJson("", "", "0");
-                }
-            }
-            else if (site.Protocol_type.Equals("DNS"))
-            {
-                site.Protocol_content = GetJson(RecordType, Lookup, ExpectedResults);
-            }
-            return site;
         }
 
         /// <summary>

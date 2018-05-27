@@ -41,6 +41,7 @@ namespace ServerMonitor.ViewModels
 
         private string _Value = "Default";  //保存传过来的信息  为 "page,siteId"
         public string Value { get { return _Value; } set { Set(ref _Value, value); } }
+        private bool contactChange = false;  //true 绑定联系人改变了
         #endregion
 
         #region 系统函数
@@ -201,7 +202,7 @@ namespace ServerMonitor.ViewModels
         }
 
         /// <summary>
-        /// 侧边栏Ok按钮点击事件
+        /// 侧边栏Ok按钮点击事件 保存对绑定联系人的编辑
         /// </summary>
         public void Ok_Click(object sender, RoutedEventArgs e)
         {
@@ -219,6 +220,7 @@ namespace ServerMonitor.ViewModels
                     SelectedContacts.Add(Contacts[i]);
                 }
             }
+            contactChange = true;
         }
 
         /// <summary>
@@ -270,8 +272,43 @@ namespace ServerMonitor.ViewModels
                 IsEnabled = false;
                 return;
             }
-            SiteModel site = GetUISite();
-            
+            if (siteId == -1)  //新建Site
+            {
+                SaveAdd();
+            }
+            else      //Edit site
+            {
+                SaveEdit();
+            }
+        }
+        /// <summary>
+        /// 新建保存
+        /// </summary>
+        public void SaveAdd()
+        {
+            SiteModel site = new SiteModel()
+            {
+                Is_server = false,
+                Monitor_interval = 5,
+                Is_Monitor = true,
+                Server_port = 80,
+                Create_time = DateTime.Now,
+                Update_time = DateTime.Now,
+                Is_success = 2,  //代表unknown
+            };
+            //将界面数据保存下来
+            site.Protocol_type = GetProtocolType(ProtocolType);
+            site.Site_address = (ProtocolType == 0 ? "http://" : "https://") + SiteAddress;
+            site.Request_succeed_code = StatusCodes;
+            if (SiteName == null || SiteName.Equals(""))
+            {
+                site.Site_name = SiteAddress;
+            }
+            else
+            {
+                site.Site_name = SiteName;
+            }
+
             //生成可存进数据库的绑定联系人list数据
             List<SiteContactModel> contactSiteModels = new List<SiteContactModel>();
             foreach (var item in vs)
@@ -286,25 +323,56 @@ namespace ServerMonitor.ViewModels
                 }
             }
             //数据库操作
-            if (siteId == -1)
+            if (DBHelper.InsertOneSite(site) == 1)
             {
-                if (DBHelper.InsertOneSite(site) == 1)
-                {
-                    var contactS = ContactSiteDAOImpl.Instance.InsertListConnects(contactSiteModels);
-                    Jump(); //返回原界面
-                }
+                var contactS = ContactSiteDAOImpl.Instance.InsertListConnects(contactSiteModels);
+                Jump(); //返回原界面
+            }
+        }
+        /// <summary>
+        /// 编辑保存
+        /// </summary>
+        public void SaveEdit()
+        {
+            SiteModel site = DBHelper.GetSiteById(siteId);
+            site.Update_time = DateTime.Now;
+
+            //将界面数据保存下来
+            site.Protocol_type = GetProtocolType(ProtocolType);
+            site.Site_address = (ProtocolType == 0 ? "http://" : "https://") + SiteAddress;
+            site.Request_succeed_code = StatusCodes;
+            if (SiteName == null || SiteName.Equals(""))
+            {
+                site.Site_name = SiteAddress;
             }
             else
             {
-                if (DBHelper.UpdateSite(site) == 1)
+                site.Site_name = SiteName;
+            }
+            //生成可存进数据库的绑定联系人list数据
+            List<SiteContactModel> contactSiteModels = new List<SiteContactModel>();
+            foreach (var item in vs)
+            {
+                if (item.Value)
+                {
+                    contactSiteModels.Add(new SiteContactModel()
+                    {
+                        SiteId = siteId,
+                        ContactId = item.Key,
+                    });
+                }
+            }
+            //数据库操作
+            if (DBHelper.UpdateSite(site) == 1)
+            {
+                if (contactChange)
                 {
                     var in1 = ContactSiteDAOImpl.Instance.DeletSiteAllConnect(siteId);
                     var contactS = ContactSiteDAOImpl.Instance.InsertListConnects(contactSiteModels);
-                    Jump();
                 }
+                Jump();
             }
         }
-
         /// <summary>
         /// 取消修改/添加 返回原界面
         /// </summary>
@@ -390,47 +458,6 @@ namespace ServerMonitor.ViewModels
                 StatusCodes = site.Status_code;
 
             }
-        }
-
-        /// <summary>
-        /// 结合从UI上获取的信息，生成SiteModel型对象
-        /// </summary>
-        /// <returns>SiteModel型对象，即一个站点对象</returns>
-        private SiteModel GetUISite()
-        {
-            SiteModel site;
-            if (siteId == -1)  //新建Site
-            {
-                site = new SiteModel()
-                {
-                    Is_server = false,
-                    Monitor_interval = 5,
-                    Is_Monitor = true,
-                    Server_port = 80,
-                    Create_time = DateTime.Now,
-                    Update_time = DateTime.Now,
-                    Is_success = 2,  //代表unknown
-                };
-            }
-            else    //Edit site
-            {
-                site = DBHelper.GetSiteById(siteId);
-                site.Update_time = DateTime.Now;
-            }
-
-            //将界面数据保存下来
-            site.Protocol_type = GetProtocolType(ProtocolType);
-            site.Site_address = (ProtocolType == 0 ? "http://" : "https://") + SiteAddress;
-            site.Request_succeed_code = StatusCodes;
-            if (SiteName == null || SiteName.Equals(""))
-            {
-                site.Site_name = SiteAddress;
-            }
-            else
-            {
-                site.Site_name = SiteName;
-            }
-            return site;
         }
 
         /// <summary>
