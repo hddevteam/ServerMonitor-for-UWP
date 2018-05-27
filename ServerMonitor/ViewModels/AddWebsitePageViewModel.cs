@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -110,6 +111,9 @@ namespace ServerMonitor.ViewModels
         private ObservableCollection<ContactModel> selectedContacts = new ObservableCollection<ContactModel>();  //选中的绑定联系人
         public ObservableCollection<ContactModel> SelectedContacts { get => selectedContacts; set => selectedContacts = value; }
 
+        /// <summary>
+        /// int协议类型，在下面的辅助方法GetProtocolType(int type)里转换
+        /// </summary>
         private int protocolType = 0;
         public int ProtocolType
         {
@@ -144,6 +148,9 @@ namespace ServerMonitor.ViewModels
         }
         
         private string statusCodes = "200,";
+        /// <summary>
+        /// 站点状态码 以英文逗号分隔
+        /// </summary>
         public string StatusCodes
         {
             get => statusCodes;
@@ -234,11 +241,20 @@ namespace ServerMonitor.ViewModels
             {
                 string domain = textBox.Text.ToString();
                 flag = CheckDomain(domain);
+                //domain没问题了，看看状态码有没有问题 --xn
+                if (flag)
+                {
+                    flag = CheckCodes(StatusCodes);
+                }
             }
             else   //检查状态码
             {
                 string codes = textBox.Text.ToString();
                 flag = CheckCodes(codes);
+                if (flag) //状态码没问题了，看看domain有没有问题 --xn
+                {
+                    flag = CheckDomain(SiteAddress);
+                }
             }
             IsEnabled = flag;
         }
@@ -246,43 +262,16 @@ namespace ServerMonitor.ViewModels
         /// <summary>
         /// 上传提交，保存到数据库
         /// </summary>
-        public void Save()
+        public async Task SaveAsync()
         {
-            SiteModel site;
-            if (siteId == -1)  //新建Site
+            //save前检查下站点地址是否可解析
+            if (!(await CheckSite()))
             {
-                site = new SiteModel()
-                {
-                    Is_server = false,
-                    Monitor_interval = 5,
-                    Is_Monitor = true,
-                    Server_port = 1,
-                    Create_time = DateTime.Now,
-                    Update_time = DateTime.Now,
-                    Is_success = 2,  //代表unknown
-                    //Status_code = "1000/0",
-                    Request_succeed_code = "200",
-                };
+                IsEnabled = false;
+                return;
             }
-            else    //Edit site
-            {
-                site = DBHelper.GetSiteById(siteId);
-                site.Update_time = DateTime.Now;
-            }
+            SiteModel site = GetUISite();
             
-            //将界面数据保存下来
-            site.Protocol_type = GetProtocolType(ProtocolType);
-            site.Site_address = (ProtocolType == 0 ? "http://" : "https://") + SiteAddress;
-            site.Status_code = StatusCodes;
-            if (SiteName == null || SiteName.Equals(""))
-            {
-                site.Site_name = SiteAddress;
-            }
-            else
-            {
-                site.Site_name = SiteName;
-            }
-
             //生成可存进数据库的绑定联系人list数据
             List<SiteContactModel> contactSiteModels = new List<SiteContactModel>();
             foreach (var item in vs)
@@ -325,6 +314,33 @@ namespace ServerMonitor.ViewModels
         }
         #endregion
 
+        #region 异步辅助函数
+        /// <summary>
+        /// 最后判断，判断SiteAddress是否可以解析
+        /// </summary>
+        /// <returns>是否可以解析</returns>
+        public async Task<bool> CheckSite()
+        {
+            try
+            {
+                IPAddress[] hostEntry = await Dns.GetHostAddressesAsync(SiteAddress);
+            }
+            catch (Exception)
+            {
+                //不可解析 弹出对话框
+                IsEnabled = false;
+                string str = "Unable to parse the domain name you entered!!!!";  //弹出框文本
+                var messageBox = new Windows.UI.Popups.MessageDialog(str) { Title = "Warning" };
+                messageBox.Commands.Add(new Windows.UI.Popups.UICommand("OK", uicommand =>
+                {
+                }));
+                await messageBox.ShowAsync();  //弹出框显示
+                return false;
+            }
+            return true;
+        }
+        #endregion
+
         #region 辅助函数
         /// <summary>
         /// OnNavigatedTo后调用 UI控件对象传递 界面元素可交互
@@ -334,7 +350,7 @@ namespace ServerMonitor.ViewModels
             rightFrame1 = grid;   //侧边栏
             this.contactList = contactList;   //侧边栏联系人列表
             rightFrame1.Visibility = Visibility.Collapsed;  //关闭侧边栏
-            IsEnabled = CheckDomain(SiteAddress);  //检验设置Sava是否可用
+            IsEnabled = (CheckDomain(SiteAddress) && CheckCodes(StatusCodes));  //检验设置Sava是否可用
         }
 
         /// <summary>
@@ -377,6 +393,47 @@ namespace ServerMonitor.ViewModels
         }
 
         /// <summary>
+        /// 结合从UI上获取的信息，生成SiteModel型对象
+        /// </summary>
+        /// <returns>SiteModel型对象，即一个站点对象</returns>
+        private SiteModel GetUISite()
+        {
+            SiteModel site;
+            if (siteId == -1)  //新建Site
+            {
+                site = new SiteModel()
+                {
+                    Is_server = false,
+                    Monitor_interval = 5,
+                    Is_Monitor = true,
+                    Server_port = 80,
+                    Create_time = DateTime.Now,
+                    Update_time = DateTime.Now,
+                    Is_success = 2,  //代表unknown
+                };
+            }
+            else    //Edit site
+            {
+                site = DBHelper.GetSiteById(siteId);
+                site.Update_time = DateTime.Now;
+            }
+
+            //将界面数据保存下来
+            site.Protocol_type = GetProtocolType(ProtocolType);
+            site.Site_address = (ProtocolType == 0 ? "http://" : "https://") + SiteAddress;
+            site.Request_succeed_code = StatusCodes;
+            if (SiteName == null || SiteName.Equals(""))
+            {
+                site.Site_name = SiteAddress;
+            }
+            else
+            {
+                site.Site_name = SiteName;
+            }
+            return site;
+        }
+
+        /// <summary>
         /// 检验地址是否合法
         /// </summary>
         /// <param name="domain">地址字符串</param>
@@ -384,7 +441,7 @@ namespace ServerMonitor.ViewModels
         private bool CheckDomain(string domain)  //可测
         {
             //非空判断 正则验证
-            if ("".Equals(domain))
+            if ("".Equals(domain) || domain == null)
             {
                 return false;
             }
@@ -420,7 +477,7 @@ namespace ServerMonitor.ViewModels
         {
             if (codes.Equals("")||codes==null)
             {
-                return true;
+                return false;  //不能为空 --xn
             }
             string[] arr = codes.Split(',');
             for (int i = 0; i < arr.Count(); i++)

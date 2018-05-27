@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -169,6 +170,7 @@ namespace ServerMonitor.ViewModels
         private ObservableCollection<ContactModel> selectedContacts = new ObservableCollection<ContactModel>();  //选中的绑定联系人
         public ObservableCollection<ContactModel> SelectedContacts { get => selectedContacts; set => selectedContacts = value; }
 
+        //协议类型，在下面的辅助方法GetProtocolType(int type)里转换
         private int protocolType = 0;
         public int ProtocolType
         {
@@ -355,77 +357,35 @@ namespace ServerMonitor.ViewModels
             {
                 string domain = textBox.Text.ToString();
                 flag = CheckDomain(domain);
+                //domain没问题了，看看Port有没有问题 另：只有0:ICMP，1:SOCKET需要手动输入Port，需判断 --xn
+                if (flag && (ProtocolType == 0 || ProtocolType == 1))
+                {
+                    flag = CheckPort(Port);
+                }
             }
-            else   //检查状态码
+            else   //检查端口
             {
                 string port = textBox.Text.ToString();
                 flag = CheckPort(port);
+                if (flag) //Port没问题了，看看domain有没有问题 --xn
+                {
+                    flag = CheckDomain(SiteAddress);
+                }
             }
             IsEnabled = flag;
         }
-
+        
         /// <summary>
-        /// 上传提交，保存到数据库
+        /// 上传提交，保存到数据库。改用异步方法 -xn
         /// </summary>
-        public void Save()
+        public async Task SaveAsync()
         {
-            SiteModel site;
-            if (siteId == -1)  //新建Site
+            if (!(await CheckSite()))
             {
-                site = new SiteModel()
-                {
-                    Is_server = true,
-                    Monitor_interval = 5,
-                    Is_Monitor = true,
-                    Create_time = DateTime.Now,
-                    Is_success = 2,
-                    Status_code = "1000/0",
-                    Request_succeed_code = "1000",
-                };
+                IsEnabled = false;
+                return;
             }
-            else    //Edit site
-            {
-                site = DBHelper.GetSiteById(siteId);
-                site.Protocol_content = null;
-                site.ProtocolIdentification = null;
-            }
-            site.Update_time = DateTime.Now;
-
-            //将界面数据保存下来
-            site.Protocol_type = GetProtocolType(ProtocolType);
-            site.Site_address = SiteAddress;
-            try
-            {
-                site.Server_port = int.Parse(Port);
-            }
-            catch (Exception)
-            {
-                site.Server_port = 0;
-            }
-            if (SiteName == null|| SiteName.Equals(""))
-            {
-                site.Site_name = SiteAddress;
-            }
-            else
-            {
-                site.Site_name = SiteName;
-            }
-            if (site.Protocol_type.Equals("SSH")|| site.Protocol_type.Equals("FTP"))
-            {
-                if (NoAnonymous) //true 不匿名 用户请求
-                {
-                    site.ProtocolIdentification = GetJson(Username, Password, "1");
-                }
-                else  //匿名
-                {
-                    site.ProtocolIdentification = GetJson("", "", "0");
-                }
-            }
-            else if(site.Protocol_type.Equals("DNS"))
-            {
-                site.Protocol_content = GetJson(RecordType, Lookup, ExpectedResults);
-            }
-
+            SiteModel site = GetUISite();
             List<SiteContactModel> contactSiteModels = new List<SiteContactModel>();
             foreach (var item in vs)  //生成可存进数据库的list数据
             {
@@ -470,6 +430,40 @@ namespace ServerMonitor.ViewModels
         }
         #endregion
 
+        #region 异步辅助函数
+        /// <summary>
+        /// 最后判断，判断SiteAddress是否可以解析
+        /// </summary>
+        /// <returns>是否可以解析</returns>
+        public async Task<bool> CheckSite()
+        {
+            try
+            {
+                if (!IPAddress.TryParse(SiteAddress, out IPAddress reIP))
+                {
+                    IPAddress[] hostEntry = await Dns.GetHostAddressesAsync(SiteAddress);
+                }
+                else
+                {
+                    IPAddress.Parse(SiteAddress);
+                }
+            }
+            catch (Exception)
+            {
+                //不可解析 弹出对话框
+                IsEnabled = false;
+                string str = "Unable to parse the domain name you entered!!!!";  //弹出框文本
+                var messageBox = new Windows.UI.Popups.MessageDialog(str) { Title = "Warning" };
+                messageBox.Commands.Add(new Windows.UI.Popups.UICommand("OK", uicommand =>
+                {
+                }));
+                await messageBox.ShowAsync();  //弹出框显示
+                return false;
+            }
+            return true;
+        }
+        #endregion
+
         #region 辅助函数
         /// <summary>
         /// OnNavigatedTo后调用 UI控件对象传递 界面元素可交互
@@ -479,7 +473,7 @@ namespace ServerMonitor.ViewModels
             rightFrame1 = grid;   //侧边栏
             this.contactList = contactList;   //侧边栏联系人列表
             rightFrame1.Visibility = Visibility.Collapsed;  //关闭侧边栏
-            IsEnabled = CheckDomain(SiteAddress);  //检验Sava是否可用
+            IsEnabled = (CheckDomain(SiteAddress) && CheckPort(Port));  //初始判断 Sava是否可用
         }
 
         /// <summary>
@@ -587,6 +581,70 @@ namespace ServerMonitor.ViewModels
         }
 
         /// <summary>
+        /// 结合从UI上获取的信息，生成SiteModel型对象
+        /// </summary>
+        /// <returns>SiteModel型对象，即一个站点对象</returns>
+        private SiteModel GetUISite()
+        {
+            SiteModel site;
+            if (siteId == -1)  //新建Site
+            {
+                site = new SiteModel()
+                {
+                    Is_server = true,
+                    Monitor_interval = 5,
+                    Is_Monitor = true,
+                    Create_time = DateTime.Now,
+                    Is_success = 2,
+                    Request_succeed_code = "1000",
+                };
+            }
+            else    //Edit site
+            {
+                site = DBHelper.GetSiteById(siteId);
+                site.Protocol_content = null;
+                site.ProtocolIdentification = null;
+            }
+            site.Update_time = DateTime.Now;
+
+            //将界面数据保存下来
+            site.Protocol_type = GetProtocolType(ProtocolType);
+            site.Site_address = SiteAddress;
+            try
+            {
+                site.Server_port = int.Parse(Port);
+            }
+            catch (Exception)
+            {
+                site.Server_port = 0;
+            }
+            if (SiteName == null || SiteName.Equals(""))
+            {
+                site.Site_name = SiteAddress;
+            }
+            else
+            {
+                site.Site_name = SiteName;
+            }
+            if (site.Protocol_type.Equals("SSH") || site.Protocol_type.Equals("FTP"))
+            {
+                if (NoAnonymous) //true 不匿名 用户请求
+                {
+                    site.ProtocolIdentification = GetJson(Username, Password, "1");
+                }
+                else  //匿名
+                {
+                    site.ProtocolIdentification = GetJson("", "", "0");
+                }
+            }
+            else if (site.Protocol_type.Equals("DNS"))
+            {
+                site.Protocol_content = GetJson(RecordType, Lookup, ExpectedResults);
+            }
+            return site;
+        }
+
+        /// <summary>
         /// 检验地址是否合法
         /// </summary>
         /// <param name="domain">地址字符串</param>
@@ -594,7 +652,7 @@ namespace ServerMonitor.ViewModels
         private bool CheckDomain(string domain)  //可测
         {
             //非空判断 正则验证
-            if ("".Equals(domain))
+            if ("".Equals(domain) || domain == null)
             {
                 return false;
             }
@@ -609,13 +667,6 @@ namespace ServerMonitor.ViewModels
                     //域名的正则表达式
                     Regex reg = new Regex(@"^[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+\.?$");
                     Boolean _domaincheck = reg.IsMatch(domain);
-
-                    //Boolean _ipcheck = Regex.IsMatch(domain, "^(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|[1-9])\\."
-                    //                        + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
-                    //                        + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
-                    //                        + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)$");//是ip
-                    //Regex rg = new Regex("^[\u4e00-\u9fa5]+$");//是中文
-                    //Boolean _domaincheck = rg.IsMatch(domain);
                     if (_ipcheck || _domaincheck)
                     {
                         return true;
@@ -632,9 +683,18 @@ namespace ServerMonitor.ViewModels
             }
         }
 
+        /// <summary>
+        /// 检验站点端口是否合法
+        /// </summary>
+        /// <param name="port">站点端口</param>
+        /// <returns>是否合法</returns>
         private bool CheckPort(string port)
         {
-            Regex regPort = new Regex(@"^[0-9]{0,5}$");
+            if (port == null)
+            {
+                return false;
+            }
+            Regex regPort = new Regex(@"^[1-9][0-9]{0,5}$");
             Boolean check = regPort.IsMatch(port);
             if (check)
             {

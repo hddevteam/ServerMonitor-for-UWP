@@ -44,7 +44,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button Background="{x:Null}" IsEnabled="{Binding IsEnabled}" Click="{x:Bind ViewModel.Save}">
+            <Button Background="{x:Null}" IsEnabled="{Binding IsEnabled}" Click="{x:Bind ViewModel.SaveAsync}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Images/commit.png" Width="16" Height="16"/>
                     <TextBlock Text="Save" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
