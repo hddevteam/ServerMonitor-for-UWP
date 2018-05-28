@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ServerMonitor.Models;
 using ServerMonitor.DAO;
+using SQLite.Net;
 
 namespace ServerMonitor.DAO
 {
@@ -37,6 +38,22 @@ namespace ServerMonitor.DAO
         /// <returns></returns>
         int UpdateContact(ContactModel contact);
 
+        /// <summary>
+        /// 根据SiteId寻找Contact
+        /// </summary>
+        /// <param name="siteid"></param>
+        /// <returns>Contact列表</returns>
         List<ContactModel> GetContactModelsBySiteId(int siteid);
+        /// <summary>
+        /// 根据联系人ID查询对应的联系人
+        /// </summary>
+        ContactModel GetContactByContactId(int id);
+
+        /// <summary>
+        /// 插入异常抛出错误
+        /// </summary>
+        void InsertErrorLog(SQLiteException e);
+
+
     }
 }

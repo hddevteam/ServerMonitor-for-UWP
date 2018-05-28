@@ -30,8 +30,15 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
+/// <summary>
+/// 创建：xb  创建时间：2018/01/25  修改：xb  最后一次修改时间：2018/05/26
+/// 站点详情界面对应的上下文
+/// </summary>
 namespace ServerMonitor.ViewModels
 {
+    /// <summary>
+    /// 创建：xb 创建时间：2018/01/25 修改：xb
+    /// </summary>
     public class SiteDetailViewModel : Template10.Mvvm.ViewModelBase
     {
         #region 变量声明
