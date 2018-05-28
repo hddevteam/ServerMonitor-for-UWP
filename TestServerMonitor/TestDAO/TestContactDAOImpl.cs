@@ -22,12 +22,12 @@ namespace TestServerMonitor.TestDAO
         private int a;
 
         public object Count { get; private set; }
-        [AssemblyInitialize] // 测试类生成预处理
-        public static void Init(TestContext testContext)
-        {
-            DBInit db1 = DataBaseControlImpl.Instance;
-            db1.InitDB("Filename.db");
-        }//对数据库进行初始化，连接数据库
+        //[AssemblyInitialize] // 测试类生成预处理
+        //public static void Init(TestContext testContext)
+        //{
+        //    DBInit db1 = DataBaseControlImpl.Instance;
+        //    db1.InitDB("Filename.db");
+        //}//对数据库进行初始化，连接数据库
         [TestMethod]
         public void GetContactModelsBySiteId()
         {
