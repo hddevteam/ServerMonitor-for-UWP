@@ -171,6 +171,8 @@ namespace ServerMonitor.ViewModels
             {
                 Infos.LastRequest = new LogModel();
                 Infos.LastRequestWords = "None Data !";
+                Infos.PreviousRequestLog = new LogModel();
+                Infos.PreviousRequestLogWords = "None Data!";
             }
             else
             {
@@ -194,6 +196,17 @@ namespace ServerMonitor.ViewModels
                 }
                 Infos.LastRequest = l.Last<LogModel>();
                 infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
+
+                if (l.Count > 1)
+                {
+                    infos.PreviousRequestLog = l[l.Count - 1];
+                    Infos.PreviousRequestLogWords = string.Format("{0} in {1} ms", Infos.PreviousRequestLog.Status_code, infos.PreviousRequestLog.TimeCost);
+                }
+                else
+                {
+                    Infos.PreviousRequestLog = new LogModel();
+                    Infos.PreviousRequestLogWords = "None Data!";
+                }
             }
         }
         /// <summary>
@@ -209,6 +222,7 @@ namespace ServerMonitor.ViewModels
             {
                 Debug.WriteLine("无联系人!");
                 Infos.ContactCollection.Add(new ContactModel() { Contact_name = "No Data!", Contact_email = "No Data!", Telephone = "No Data!" });
+                Infos.IsContactEmpty = true;
             }
             else
             {
@@ -216,6 +230,7 @@ namespace ServerMonitor.ViewModels
                 {
                     Infos.ContactCollection.Add(contact);
                 }
+                Infos.IsContactEmpty = false;
             }
         }
         /// <summary>
@@ -244,6 +259,8 @@ namespace ServerMonitor.ViewModels
                 // 没有数据则显示无数据的提醒
                 Infos.LastRequest = new LogModel();
                 Infos.LastRequestWords = string.Format("No Datas ! ");
+                Infos.PreviousRequestLog = new LogModel();
+                Infos.LastRequestWords = string.Format("No Datas ! ");
             }
             else
             {
@@ -266,6 +283,16 @@ namespace ServerMonitor.ViewModels
                 // 更新上次请求记录
                 Infos.LastRequest = Infos.Logs.Last<LogModel>();
                 Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
+                if (Infos.Logs.Count > 1)
+                {
+                    infos.PreviousRequestLog = Infos.Logs[Infos.Logs.Count - 2];
+                    Infos.PreviousRequestLogWords = string.Format("{0} in {1} ms", Infos.PreviousRequestLog.Status_code, infos.PreviousRequestLog.TimeCost);
+                }
+                else
+                {
+                    Infos.PreviousRequestLog = new LogModel();
+                    Infos.PreviousRequestLogWords = "None Data!";
+                }
             }
         }
         /// <summary>
@@ -305,7 +332,8 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="logs"></param>
         /// <param name="log"></param>
-        public void InsertLogWithCategory(ObservableCollection<ObservableCollection<LogModel>> logs, LogModel log) {
+        public void InsertLogWithCategory(ObservableCollection<ObservableCollection<LogModel>> logs, LogModel log)
+        {
             // logs[i] i-> 0 : Success ,1 : OverTime, 2 : Error
             if (infos.IsWebSite)
             {
@@ -382,7 +410,7 @@ namespace ServerMonitor.ViewModels
             Infos.Pieinfo = new ObservableCollection<PieChartInfo>();
             Infos.Pieinfo = InitPieChartData();
             #endregion
-        }       
+        }
         /// <summary>
         /// 发起请求主体
         /// </summary>
@@ -419,7 +447,7 @@ namespace ServerMonitor.ViewModels
                             log = await utilObject.AccessSSHServer(infos.Detail_Site, new SSHRequest(infos.Detail_Site.Site_address, SshLoginType.Anonymous));
                             break;
                         case "SMTP":
-                            log = await utilObject.AccessSMTPServer(infos.Detail_Site, new SMTPRequest(infos.Detail_Site.Site_address,infos.Detail_Site.Server_port));
+                            log = await utilObject.AccessSMTPServer(infos.Detail_Site, new SMTPRequest(infos.Detail_Site.Site_address, infos.Detail_Site.Server_port));
                             break;
                         case "SOCKET":
                             log = await utilObject.ConnectToServerWithSocket(infos.Detail_Site, new SocketRequest());
@@ -452,7 +480,7 @@ namespace ServerMonitor.ViewModels
             //Infos.MedianValue = Math.Log10(t.Item2);
             Infos.AverageValue = t.Item1;
             Infos.MedianValue = t.Item2;
-        }               
+        }
         /// <summary>
         /// 界面数据添加一条新的记录
         /// </summary>
@@ -718,6 +746,16 @@ namespace ServerMonitor.ViewModels
                 // 更新上次请求记录
                 Infos.LastRequest = Infos.Logs.Last();
                 Infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
+                if (Infos.Logs.Count > 1)
+                {
+                    infos.PreviousRequestLog = Infos.Logs[Infos.Logs.Count - 2];
+                    Infos.PreviousRequestLogWords = string.Format("{0} in {1} ms", Infos.PreviousRequestLog.Status_code, infos.PreviousRequestLog.TimeCost);
+                }
+                else
+                {
+                    Infos.PreviousRequestLog = new LogModel();
+                    Infos.PreviousRequestLogWords = "None Data!";
+                }
             }
             else
             {
@@ -725,6 +763,8 @@ namespace ServerMonitor.ViewModels
                 Infos.AverageValue = 0;
                 Infos.LastRequest = new LogModel();
                 Infos.LastRequestWords = "No Data!";
+                Infos.PreviousRequestLog = new LogModel();
+                Infos.PreviousRequestLogWords = "None Data!";
             }
             // V操作 启用刷新按钮
             Infos.RequestAsyncStat = true;
@@ -734,15 +774,23 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void NavigateIntoEditPart(object sender, RoutedEventArgs e) {
+        public void NavigateIntoEditPart(object sender, RoutedEventArgs e)
+        {
             if (infos.IsWebSite)
             {
                 NavigationService.Navigate(typeof(Views.AddWebsitePage), "2," + infos.Detail_Site.Id);
             }
-            else {
+            else
+            {
                 NavigationService.Navigate(typeof(Views.AddServerPage), "2," + infos.Detail_Site.Id);
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         #endregion
         #region 没有用到方法集
         ///// <summary>
@@ -1092,8 +1140,11 @@ namespace ServerMonitor.ViewModels
         private ObservableCollection<ContactModel> contactCollection;
         private bool loadAsyncStat = false;
         private bool requestAsyncStat = true;
+        private bool isContactEmpty = true;
         private ObservableCollection<ObservableCollection<LogModel>> logCollections;
         private Uri site_Address;
+        private LogModel previousRequestLog;
+        private string previousRequestLogWords;
 
         // 对应界面上的toggledSwitch 按钮的值，表示此站点是否正在监测
         public bool IsMonitor
@@ -1282,7 +1333,8 @@ namespace ServerMonitor.ViewModels
         /// <summary>
         /// 封装多个请求序列的变量
         /// </summary>
-        public ObservableCollection<ObservableCollection<LogModel>> LogCollections {
+        public ObservableCollection<ObservableCollection<LogModel>> LogCollections
+        {
             get => logCollections;
             set
             {
@@ -1294,6 +1346,34 @@ namespace ServerMonitor.ViewModels
         /// 标识站点的Uri地址
         /// </summary>
         public Uri Site_Address { get => site_Address; set => site_Address = value; }
+        /// <summary>
+        /// 前一次的（上上次的）请求结果
+        /// </summary>
+        public LogModel PreviousRequestLog
+        {
+            get => previousRequestLog; set
+            {
+                previousRequestLog = value;
+                RaisePropertyChanged(() => PreviousRequestLog);
+            }
+        }
+
+        public string PreviousRequestLogWords
+        {
+            get => previousRequestLogWords; set
+            {
+                previousRequestLogWords = value;
+                RaisePropertyChanged(() => PreviousRequestLogWords);
+            }
+        }
+        public bool IsContactEmpty
+        {
+            get => isContactEmpty; set
+            {
+                isContactEmpty = value;
+                RaisePropertyChanged(() => IsContactEmpty);
+            }
+        }
     }
 
     /// <summary>
@@ -1408,7 +1488,7 @@ namespace ServerMonitor.ViewModels
         {
             // The owner parameter is the Axis instance which labels are currently formatted
             var axis = owner as Axis;
-            var con = content == null ? 0:int.Parse(content.ToString());
+            var con = content == null ? 0 : int.Parse(content.ToString());
             if (con >= 1000)
             {
                 content = con / 1000 + "s";
@@ -1429,7 +1509,7 @@ namespace ServerMonitor.ViewModels
             var axis = owner as DateTimeContinuousAxis;
             var con = Convert.ToDateTime(content);
 
-            if (axis.MajorStepUnit != TimeInterval.Hour||axis.MajorStep>=12) //当时间间隔为天时，格式化显示天
+            if (axis.MajorStepUnit != TimeInterval.Hour || axis.MajorStep >= 12) //当时间间隔为天时，格式化显示天
             {
                 var con_str = String.Format("{0:MM-dd HH:mm}", con);
                 return con_str;
@@ -1484,7 +1564,14 @@ namespace ServerMonitor.ViewModels
         {
             string typeOfValue = parameter as string;
             double _value = double.Parse(value.ToString());
-            return string.Format("{0}：{1} ms", typeOfValue,  (int)_value);
+            if (parameter.ToString().Equals("Median"))
+            {
+                return string.Format("{0}：{1} ms", typeOfValue, (int)_value);
+            }
+            else
+            {
+                return string.Format("{0}：{1} ms\t\t\t", typeOfValue, (int)_value);
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
