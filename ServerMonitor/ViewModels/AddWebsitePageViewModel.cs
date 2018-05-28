@@ -453,11 +453,8 @@ namespace ServerMonitor.ViewModels
                 SiteAddress = site.Site_address.Substring(8);
             }
             SiteName = site.Site_name;
-            if (site.Status_code.Length>=5)
-            {
-                StatusCodes = site.Status_code;
 
-            }
+            StatusCodes = site.Request_succeed_code;
         }
 
         /// <summary>

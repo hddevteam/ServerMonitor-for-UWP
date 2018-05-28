@@ -156,7 +156,7 @@
                                         <TextBlock Text="{Binding Id}" Margin="0,4,4,0" Foreground="White"
                                                    HorizontalAlignment="Right" VerticalAlignment="Top">
                                         </TextBlock>
-                                        <TextBlock Text="{Binding Site_name}" Foreground="White" FontSize="32" TextTrimming="CharacterEllipsis"
+                                        <TextBlock Text="{Binding Site_name}" Foreground="White" FontSize="28" TextTrimming="CharacterEllipsis"
                                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         <TextBlock Text="{Binding Last_result}" Margin="0,0,4,4" Foreground="LightGray"
                                                    HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
@@ -165,7 +165,7 @@
                             </GridView.ItemTemplate>
                         </GridView>
                         <!--site detail-->
-                        <Grid Margin="24,24,0,0">
+                        <!--<Grid Margin="24,24,0,0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
@@ -185,14 +185,14 @@
                                     </DataTemplate>
                                 </GridView.ItemTemplate>
                             </GridView>
-                        </Grid>
+                        </Grid>-->
                     </StackPanel>
                 </ScrollViewer>
             </Grid>
 
             <ContentDialog x:Name="termsOfUseContentDialog"
                            Grid.ColumnSpan="2" PrimaryButtonText="Accept"
-                           SecondaryButtonText="Cancel">
+                           SecondaryButtonText="Cancel" IsPrimaryButtonEnabled="{Binding IsPrimaryButtonEnabled}">
                 <ContentDialog.TitleTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -200,16 +200,12 @@
                         </StackPanel>
                     </DataTemplate>
                 </ContentDialog.TitleTemplate>
-                <StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="Time Range(1ms-2000ms)" Margin="0,0,0,12"/>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="T :" Width="20"/>
-                        <TextBlock Text="{Binding ElementName=slide1,Path=Value}"/>
-                        <TextBlock Text=" ( ms )"/>
+                        <TextBox Text="{Binding T, Mode=TwoWay}" Width="200" TextChanged="{x:Bind ViewModel.TChanged}"/>
+                        <TextBlock Text="ms" VerticalAlignment="Center" Margin="8,0,0,4"/>
                     </StackPanel>
-
-                    <Slider x:Name="slide1" Maximum="2000" Minimum="100" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" 
-                            TickFrequency="100" TickPlacement="TopLeft" SmallChange="1"
-                            Value="{Binding T, Mode=TwoWay}"/>
                 </StackPanel>
             </ContentDialog>
 
