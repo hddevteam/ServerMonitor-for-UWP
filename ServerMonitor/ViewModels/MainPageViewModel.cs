@@ -86,7 +86,8 @@ namespace ServerMonitor.ViewModels
             new SiteResult{Color="#f7630c", Name="Warning:"},
             new SiteResult{Color="#5D5A58", Name="Unknown:"}
         };
-        public List<SiteResult> SiteResults { get => siteResults; set => siteResults = value; }
+        //相应UI注释，其绑定字段也注释 --xn
+        //public List<SiteResult> SiteResults { get => siteResults; set => siteResults = value; }
 
         //站点的宕机信息列表，显示在右上方
         private ObservableCollection<OutageSite> outageSites = new ObservableCollection<OutageSite>();
@@ -119,6 +120,17 @@ namespace ServerMonitor.ViewModels
             {
                 requestAsyncStat = value;
                 RaisePropertyChanged(() => RequestAsyncStat);
+            }
+        }
+        //Set Apdex T 的Accept是否可用
+        private bool isPrimaryButtonEnabled = true;
+        public bool IsPrimaryButtonEnabled
+        {
+            get => isPrimaryButtonEnabled;
+            set
+            {
+                isPrimaryButtonEnabled = value;
+                RaisePropertyChanged(() => IsPrimaryButtonEnabled);
             }
         }
         #endregion 绑定数据
@@ -282,8 +294,7 @@ namespace ServerMonitor.ViewModels
                             break;
                         // ICMP协议请求   --xb
                         case "ICMP":
-                            IPAddress ip = await util.GetIPAddressAsync(siteElement.Site_address);
-                            ICMPRequest icmp = new ICMPRequest(ip);
+                            ICMPRequest icmp = new ICMPRequest(_siteAddress_redress);
                             // 发起ICMP请求，生成请求记录并更新站点信息  --xb
                             log = await util.ConnectToServerWithICMP(siteElement, icmp);
                             break;
@@ -299,14 +310,18 @@ namespace ServerMonitor.ViewModels
                             log = await util.AccessSMTPServer(siteElement, _smtpRequest);
                             break;
                         // 补充之前欠缺的Socket服务器请求   --xb
-                        case "SOCKET":
+                        case "SOCKET":                            
                             // 初始化Socket请求对象
                             SocketRequest _socketRequest = new SocketRequest
                             {
-                                TargetEndPoint = new IPEndPoint(IPAddress.Parse(siteElement.Site_address), siteElement.Server_port)
+                                TargetEndPoint = new IPEndPoint(_siteAddress_redress, siteElement.Server_port)
                             };
                             // 请求指定终端，并生成对应的请求记录，最后更新站点信息
                             log = await util.ConnectToServerWithSocket(siteElement, _socketRequest);
+                            break;
+                        // 补充之前欠缺的SSH服务器请求   --xb
+                        case "SSH":
+                            log = await util.AccessSSHServer(siteElement, new SSHRequest(siteElement.Site_address, SshLoginType.Anonymous));
                             break;
                         default:
                             break;
@@ -483,6 +498,29 @@ namespace ServerMonitor.ViewModels
                 T = temp;
             }
         }
+        /// <summary>
+        /// 判断输入的T值是否合法
+        /// </summary>
+        public void TChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            try
+            {
+                int x = int.Parse(textBox.Text);
+                if (x < 1 || x > 2000)
+                {
+                    IsPrimaryButtonEnabled = false;
+                }
+                else
+                {
+                    IsPrimaryButtonEnabled = true;
+                }
+            }
+            catch (Exception)
+            {
+                IsPrimaryButtonEnabled = false;
+            }
+        }
         #endregion 响应事件
 
         #region 辅助函数
@@ -500,10 +538,10 @@ namespace ServerMonitor.ViewModels
         private void GetListSite()   //不可测
         {
             SiteItems.Clear();  //清空其数据
-            for (int i = 0; i < 4; i++)
-            {
-                SiteResults[i].Number = 0;
-            }
+            //for (int i = 0; i < 4; i++)
+            //{
+            //    SiteResults[i].Number = 0;
+            //}
             sites = DBHelper.GetAllSite();
             List<SiteModel> q = ProcessSite(sites);
             GetOutageSite(sites);
@@ -532,7 +570,7 @@ namespace ServerMonitor.ViewModels
                         Protocol_type = q[i].Protocol_type,
                         Site_address = q[i].Site_address,
                     });
-                    ChangeSiteResult(q[i].Is_success);//在for循环内累加站点统计信息
+                    //ChangeSiteResult(q[i].Is_success);//在for循环内累加站点统计信息
                 }
                 else
                 {
@@ -547,7 +585,7 @@ namespace ServerMonitor.ViewModels
                         Protocol_type = q[i].Protocol_type,
                         Site_address = q[i].Site_address,
                     });
-                    ChangeSiteResult(q[i].Is_success);
+                    //ChangeSiteResult(q[i].Is_success);
                 }
             }
         }
@@ -750,26 +788,26 @@ namespace ServerMonitor.ViewModels
         /// 修改站点情况统计信息 相应站点情况（如Success）数量 +1
         /// </summary>
         /// <param name="last_request_result">最近站点请求结果</param>
-        private void ChangeSiteResult(int last_request_result)   //不可测
-        {
-            switch (last_request_result)
-            {
-                case 1:
-                    SiteResults[0].Number ++;
-                    break;
-                case 0:
-                    SiteResults[1].Number ++;
-                    break;
-                case -1:
-                    SiteResults[2].Number ++;
-                    break;
-                case 2:
-                    SiteResults[3].Number ++;
-                    break;
-                default:
-                    break;
-            }
-        }
+        //private void ChangeSiteResult(int last_request_result)   //不可测
+        //{
+        //    switch (last_request_result)
+        //    {
+        //        case 1:
+        //            SiteResults[0].Number ++;
+        //            break;
+        //        case 0:
+        //            SiteResults[1].Number ++;
+        //            break;
+        //        case -1:
+        //            SiteResults[2].Number ++;
+        //            break;
+        //        case 2:
+        //            SiteResults[3].Number ++;
+        //            break;
+        //        default:
+        //            break;
+        //    }
+        //}
 
         /// <summary>
         /// 返回站点在UI上对应颜色
