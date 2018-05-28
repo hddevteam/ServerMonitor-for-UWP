@@ -133,7 +133,9 @@ namespace ServerMonitor.Services.RequestServices
                     actualResult = new HashSet<string>();
                     foreach (var item in response.Answers)
                     {
-                        actualResult.Add(item.RECORD.ToString());
+                        if (item.Type.ToString().Equals(recordType.ToString())) {
+                            actualResult.Add(item.RECORD.ToString());
+                        }
                     }
                     requestInfos = "Succeed!";
                     return true;
