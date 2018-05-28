@@ -71,7 +71,7 @@ namespace TestServerMonitor.TestRequest
         [Priority(1)]// 优先级
         public void TestMakeRequest_TimeOut()// 测试发起Dns请求 
         {
-            dnsRequest.OverTime = 1;
+            dnsRequest.OverTime = 0;
             // 校验 dnsRequest 是否为空
             Assert.AreNotEqual(null, dnsRequest);
             dnsRequest.MakeRequest().Wait();

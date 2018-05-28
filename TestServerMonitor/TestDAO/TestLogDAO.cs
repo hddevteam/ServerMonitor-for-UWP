@@ -36,7 +36,6 @@ namespace TestServerMonitor.TestDAO
             DBInit db = DataBaseControlImpl.Instance;
             db.InitDB("testdb.db");
         }
-        [TestMethod]
         [TestInitialize]
         [Priority(1)]
         public void Init()//初始化数据库并向log列表填充数据
