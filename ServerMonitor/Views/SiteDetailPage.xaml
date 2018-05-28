@@ -113,14 +113,11 @@
                         <StackPanel HorizontalAlignment="Left"
                                 Orientation="Horizontal"
                                 Margin="26,24,0,0" Grid.Column="0">
-                            <TextBox Text="{x:Bind ViewModel.Infos.MedianValue,Mode=OneWay,Converter={StaticResource StringFormatConvert},ConverterParameter=Median}" 
-                                     Width="200" Height="40" 
-                                 Background="RoyalBlue" Foreground="White"
-                                 IsReadOnly="true" />
-                            <TextBox Text="{x:Bind ViewModel.Infos.AverageValue,Mode=OneWay,Converter={StaticResource StringFormatConvert},ConverterParameter=Average}"
-                                     Width="200" Height="40" 
-                                 Background="Purple" Foreground="White" AllowFocusOnInteraction="False" 
-                                 IsReadOnly="true"/>
+                            <!-- Background="RoyalBlue" IsReadOnly="true" -->
+                            <TextBlock  Text="{x:Bind ViewModel.Infos.MedianValue,Mode=OneWay,Converter={StaticResource StringFormatConvert},ConverterParameter=Median}" 
+                                    TextAlignment="Center" FontSize="16" Width="200" Foreground="RoyalBlue" />
+                            <TextBlock Text="{x:Bind ViewModel.Infos.AverageValue,Mode=OneWay,Converter={StaticResource StringFormatConvert},ConverterParameter=Average}"
+                                     TextAlignment="Center" FontSize="16" Width="200" Foreground="Purple" />                            
 
                         </StackPanel>
 
@@ -168,7 +165,7 @@
                                 Axis="{Binding Path=VerticalAxis, ElementName=RequestTimeBarChar}"
                                 Value="{x:Bind ViewModel.Infos.MedianValue,Mode=OneWay}"
                                 Stroke="RoyalBlue"
-                                StrokeThickness="1"
+                                StrokeThickness="2"
                                 BorderBrush="Black"
                                 BorderThickness="1"
                                 Label="{x:Bind ViewModel.Infos.MedianValue,Mode=OneWay,Converter={StaticResource StringFormatConvert},ConverterParameter=Median}"                                
@@ -177,7 +174,7 @@
                                 Axis="{Binding Path=VerticalAxis, ElementName=RequestTimeBarChar}"
                                 Value="{x:Bind ViewModel.Infos.AverageValue,Mode=OneWay}"
                                 Stroke="Purple"
-                                StrokeThickness="1"
+                                StrokeThickness="2"
                                 BorderBrush="Black"
                                 BorderThickness="1"
                                 Label="{x:Bind ViewModel.Infos.AverageValue,Mode=OneWay,Converter={StaticResource StringFormatConvert},ConverterParameter=Average}"
