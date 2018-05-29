@@ -61,23 +61,6 @@ namespace ServerMonitor.ViewModels
 
             set { lengend = value; RaisePropertyChanged(() => Lengend); }
         }
-        //请求结果类型
-        public List<string> RequestResult { get; set; }
-        //所选结果类型
-        private string type;
-        public string RequestResultType
-        {
-            get { return type; }
-            set
-            {
-                if (value != null && value != type)
-                {
-                    type = value;
-                    TypeChanged(type);
-                    RaisePropertyChanged(() => RequestResultType);
-                }
-            }
-        }
         
         private int pivotIndex;
         public int PivotIndex
@@ -92,20 +75,11 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        //线性表数据序列集合（前台绑定的非此属性，而是可变副本）
-        private ObservableCollection<ObservableCollection<LineChartData>> lineChartCollection;
-
-        public ObservableCollection<ObservableCollection<LineChartData>> LineChartCollection
-        {
-            get { return lineChartCollection; }
-            set { lineChartCollection = value; RaisePropertyChanged(() => LineChartCollection); }
-        }
         #endregion
 
         //构造函数
         public ChartPageViewModel()
         {
-            RequestResult = new List<string> {"All", "Success", "Error", "OverTime" };
             PivotIndex = 0;
             Infos = new ChartSiteRequestCountInfo();
         }
@@ -125,11 +99,10 @@ namespace ServerMonitor.ViewModels
 
             //计算图表数据
             var getResult = await Task.Run(() => ChartDao.StatisticsSiteRequestResultAsync(Infos.SiteSelected, Infos.Logs));
-            LineChartCollection = getResult.Item1;
+            Infos.LineChartCollection = getResult.Item1;
             Infos.BarChart = getResult.Item2;
             Lengend = await ChartDao.SetLineChartLengendAsync(Infos.SiteSelected);
-            //默认显示全部
-            RequestResultType = "All";
+
             //图表加载完毕后切换加载状态
             Infos.State3 = Visibility.Collapsed;
             Infos.State1 = Visibility.Visible;
@@ -146,8 +119,7 @@ namespace ServerMonitor.ViewModels
             ChartDao = new ChartUtilImpl();
             siteDao = new SiteDaoImpl();
             logDao = new LogDaoImpl();
-            LineChartCollection = new ObservableCollection<ObservableCollection<LineChartData>>();
-            Infos.LineChartCollectionCopy = new ObservableCollection<ObservableCollection<LineChartData>>();
+            Infos.LineChartCollection = new ObservableCollection<ObservableCollection<LineChartData>>();
             Infos.SiteInfoCompleted = new ObservableCollection<AddSiteInfo>();
             Infos.SiteSelected = new List<SiteModel>();
             Infos.Logs = new List<LogModel>();
@@ -183,41 +155,6 @@ namespace ServerMonitor.ViewModels
 
         #region 响应事件
         /// <summary>
-        /// 切换类型 创建: fjl
-        /// </summary>
-        /// <param name="type">当前所选请求结果类型</param>
-        public bool TypeChanged(string type)
-        {
-            if (Infos != null)
-            {
-                //重新计算需清空（前台所绑定属性）
-                Infos.LineChartCollectionCopy.Clear();
-                //根据所选类型从图表1序列集合中选择符合的数据
-                foreach (var items in LineChartCollection)
-                {
-                    if (type.Equals("All"))
-                    {
-                        Infos.LineChartCollectionCopy.Add(items);
-                    }
-                    else
-                    {
-                        //每个站点序列
-                        ObservableCollection<LineChartData> dataItem = new ObservableCollection<LineChartData>();
-                        //请求结果符合当前所选类别时，添加到序列(Linq 查询表达式)
-                        foreach (var item in items.Where(i => i.Result.Equals(type)).Select(i => i))
-                        {
-                            dataItem.Add(item);
-                        }
-                        //序列集合
-                        Infos.LineChartCollectionCopy.Add(dataItem);
-                    }  
-                }
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
         /// 切换至选择站点页面 创建: fjl
         /// </summary>
         public void ChartFliterClick()
@@ -234,8 +171,8 @@ namespace ServerMonitor.ViewModels
             //清空数据，重新统计
             Infos.SiteSelected.Clear();
             Lengend.Clear();
-            LineChartCollection.Clear();
             Infos.BarChart.Clear();
+            Infos.LineChartCollection.Clear();
             foreach (var item in Infos.SiteInfoCompleted.Where(i => i.IsSelected == true).Select(i => i.Site))
             {
                 //获取选择的站点
@@ -253,14 +190,12 @@ namespace ServerMonitor.ViewModels
                 Infos.State2 = Visibility.Collapsed;
                 Infos.State3 = Visibility.Visible;
                 Lengend = await ChartDao.SetLineChartLengendAsync(Infos.SiteSelected);
-                //重新统计数据
+                //对选择的站点统计其数据
                 var getResult = await ChartDao.StatisticsSiteRequestResultAsync(Infos.SiteSelected, Infos.Logs);
-                LineChartCollection = getResult.Item1;
+                Infos.LineChartCollection = getResult.Item1;
                 Infos.BarChart = getResult.Item2;
                 Infos.State3 = Visibility.Collapsed;
                 Infos.State1 = Visibility.Visible;
-                //统计完成后触发此方法，计算前台需要显示的数据
-                TypeChanged(RequestResultType);
                 return true;
             }
         }
@@ -277,17 +212,14 @@ namespace ServerMonitor.ViewModels
                 case 0:
                     Infos.HAxisProperties.MaxnumDateTime = DateTime.Now;
                     Infos.HAxisProperties.MinnumDateTime = DateTime.Now.AddHours(-23);
-                    Infos.HAxisProperties.ChartTitle = "Results within the last 24 hours";
                     return _selectedIndex;
                 case 1:
                     Infos.HAxisProperties.MaxnumDateTime = DateTime.Now;
                     Infos.HAxisProperties.MinnumDateTime = DateTime.Now.AddDays(-2);
-                    Infos.HAxisProperties.ChartTitle = "Nearly three days of request results";
                     return _selectedIndex;
                 case 2:
                     Infos.HAxisProperties.MaxnumDateTime = DateTime.Now;
                     Infos.HAxisProperties.MinnumDateTime = DateTime.Now.AddDays(-6);
-                    Infos.HAxisProperties.ChartTitle = "Nearly a week of request results";
                     return _selectedIndex;
                 default:
                     break;
@@ -359,8 +291,8 @@ namespace ServerMonitor.ViewModels
             // The owner parameter is the Axis instance which labels are currently formatted
             var axis = owner as DateTimeContinuousAxis;
             var con = Convert.ToDateTime(content);
-
-            if(axis.Title.ToString().Contains("three days") || axis.Title.ToString().Contains("week"))
+            //若最小时间在最近二十四小时之前
+            if(axis.Minimum.CompareTo(DateTime.Now.AddHours(-24)) < 0)
             {
                 var con_str = String.Format("{0:MM-dd HH:mm}", con);
                 return con_str;
@@ -403,13 +335,6 @@ namespace ServerMonitor.ViewModels
         private DateTime maxnumDateTime = DateTime.Now;
         //图表1 坐标轴时间线起始值
         private DateTime minnumDateTime = DateTime.Now.Date;
-        private string chartTitle;
-
-        public string ChartTitle
-        {
-            get { return chartTitle; }
-            set { chartTitle = value; RaisePropertyChanged(() => ChartTitle); }
-        }
 
         public DateTime MaxnumDateTime
         {
@@ -513,14 +438,6 @@ namespace ServerMonitor.ViewModels
             get { return responseTime; }
             set { responseTime = value; RaisePropertyChanged(() => ResponseTime); }
         }
-        //记录请求结果
-        private string result;
-
-        public string Result
-        {
-            get { return result; }
-            set { result = value; RaisePropertyChanged(() => Result); }
-        }
     }
     /// <summary>
     /// 创建：fjl  创建时间：2018/05/26
@@ -621,7 +538,7 @@ namespace ServerMonitor.ViewModels
         //柱形图数据
         private ObservableCollection<BarChartData> barChart;
         //图表1所有系列集合
-        ObservableCollection<ObservableCollection<LineChartData>> lineChartCollectionCopy;
+        ObservableCollection<ObservableCollection<LineChartData>> lineChartCollection;
         #endregion
 
         #region 属性
@@ -676,13 +593,13 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        public ObservableCollection<ObservableCollection<LineChartData>> LineChartCollectionCopy
+        public ObservableCollection<ObservableCollection<LineChartData>> LineChartCollection
         {
-            get { return lineChartCollectionCopy; }
+            get { return lineChartCollection; }
             set
             {
-                lineChartCollectionCopy = value;
-                RaisePropertyChanged(() => LineChartCollectionCopy);
+                lineChartCollection = value;
+                RaisePropertyChanged(() => LineChartCollection);
             }
         }
 
