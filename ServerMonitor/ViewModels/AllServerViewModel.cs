@@ -255,18 +255,19 @@ namespace ServerMonitor.ViewModels
                     site_status = "Disable";
                 }
 
-                if (q[i].Is_server)
+                if (q[i].Is_server) //服务器
                 {
                     ServerItems.Add(new ServerItem()
                     {
                         Site_id = q[i].Id,
                         Site_name = q[i].Site_name,
                         Site_address = q[i].Site_address,
-                        Site_status_codes = q[i].Status_code,
+                        Site_status_codes = "--",
                         Is_Monitor = q[i].Is_Monitor,
                         Site_type = "Server",
                         Site_status = site_status,
                         Image_path = "/Images/ic_server.png",
+                        Protocol_type = q[i].Protocol_type,
                     });
                 }
                 else
@@ -281,6 +282,7 @@ namespace ServerMonitor.ViewModels
                         Site_type = "WebSite",
                         Site_status = site_status,
                         Image_path = "/Images/ic_website.png",
+                        Protocol_type = q[i].Protocol_type,
                     });
                 }
             }
@@ -357,6 +359,19 @@ namespace ServerMonitor.ViewModels
         string site_type;
         bool is_Monitor;
         string site_status;//站点开关状态
+        string protocol_type;
+        /// <summary>
+        /// 站点协议类型
+        /// </summary>
+        public string Protocol_type
+        {
+            get => protocol_type;
+            set
+            {
+                protocol_type = value;
+                RaisePropertyChanged(() => Protocol_type);
+            }
+        }
         public string Site_status
         {
             get => site_status;
@@ -393,6 +408,9 @@ namespace ServerMonitor.ViewModels
                 RaisePropertyChanged(() => Site_address);
             }
         }
+        /// <summary>
+        /// 站点上次请求返回码
+        /// </summary>
         public string Site_status_codes
         {
             get => site_status_codes;

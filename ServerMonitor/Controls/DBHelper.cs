@@ -498,8 +498,8 @@ namespace ServerMonitor.Controls
             {
                 ExceptionType = e.GetType().ToString(),
                 CreateTime = DateTime.Now,
-                ExceptionContent = e.StackTrace,
-                Others = string.Format("Exception Message : {0} \t Exception Source : {0} \t Exception HResult : {1}", e.Message, e.Source, e.HResult)
+                ExceptionContent = string.Format("Exception Message:{0} Exception StackTrace:{1}",e.Message ,e.StackTrace), 
+                Others = string.Format("Exception CreateTime:{0} Exception Source : {1} \t Exception HResult : {2}",DateTime.Now.ToLocalTime().ToString() ,e.Source, e.HResult)
             };
 
             // 开始插入
@@ -508,7 +508,7 @@ namespace ServerMonitor.Controls
                 using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DBPath))
                 {
                     result = conn.Insert(log);
-                    Debug.WriteLine("写入错误日志:");
+                    Debug.WriteLine("写入错误日志:" + log.ToString());
                 }
             }
             catch (Exception) {

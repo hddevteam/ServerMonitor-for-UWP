@@ -46,7 +46,7 @@ namespace ServerMonitor.Models
 
         public override string ToString()
         {
-            return string.Format("时间：{0}\t错误类型：{1}\t错误内容:{2}", CreateTime.ToString(),ExceptionType,ExceptionContent);
+            return string.Format("时间：{0}\t错误类型：{1}\t错误内容:{2}", CreateTime.ToLocalTime().ToString(),ExceptionType,ExceptionContent);
         }
 
     }
