@@ -133,12 +133,13 @@
                 </Grid>
                 <ScrollViewer x:Name="sitelist_scroll" HorizontalScrollBarVisibility="Disabled" Grid.Row="1"
                               VerticalScrollBarVisibility="Auto" Margin="0,24,0,0">
-                    <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Vertical" Margin="20,0,20,0">
                         <GridView x:Name="sitelist" ItemsSource="{Binding SiteItems}"
-                                  AllowDrop="True" HorizontalAlignment="Center"
+                                  AllowDrop="True"
                                   CanReorderItems="True" SelectionMode="Single"
                                   Tapped="{x:Bind ViewModel.SiteList_Tapped}"
-                                  Padding="24,0,20,0" RightTapped="SiteList_RightTapped">
+                                  RightTapped="SiteList_RightTapped"
+                                  SizeChanged="OnGridViewSizeChanged">
                             <GridView.Resources>
                                 <MenuFlyout x:Name="site_flyout">
                                     <MenuFlyout.Items>
@@ -150,19 +151,32 @@
                             </GridView.Resources>
                             <GridView.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Background="{Binding ResultColor}" Width="208" Height="100">
+                                    <Grid Background="{Binding ResultColor}" Height="100">
                                         <Image Source="{Binding Image_path}" Width="32" Height="32"
                                                Margin="4,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                                         <TextBlock Text="{Binding Id}" Margin="0,4,4,0" Foreground="White"
                                                    HorizontalAlignment="Right" VerticalAlignment="Top">
                                         </TextBlock>
                                         <TextBlock Text="{Binding Site_name}" Foreground="White" FontSize="28" TextTrimming="CharacterEllipsis"
-                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" Margin="4 0 4 0"/>
                                         <TextBlock Text="{Binding Last_result}" Margin="0,0,4,4" Foreground="LightGray"
                                                    HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
                                     </Grid>
                                 </DataTemplate>
                             </GridView.ItemTemplate>
+                            <GridView.ItemContainerStyle>
+                                <Style TargetType="GridViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="Margin" Value="0"/>
+                                    <Setter Property="Padding" Value="4"/>
+                                </Style>
+                            </GridView.ItemContainerStyle>
+                            <GridView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <ItemsWrapGrid Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </GridView.ItemsPanel>
                         </GridView>
                         <!--site detail-->
                         <!--<Grid Margin="24,24,0,0">
