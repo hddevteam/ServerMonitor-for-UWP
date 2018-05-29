@@ -85,11 +85,12 @@
             </Grid.RowDefinitions>
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Height="48" Background="DimGray">
-                <TextBlock Text="Id" Width="24" FontSize="16" Margin="16 0 0 0" Foreground="White" FontWeight="Black" VerticalAlignment="Center"/>
-                <TextBlock Text="Type" Width="42" Margin="12 0 12 0" FontSize="16" Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
+                <TextBlock Text="Id" Width="24" FontSize="16" Margin="16 0 12 0" Foreground="White" FontWeight="Black" VerticalAlignment="Center"/>
+                <TextBlock Text="Type" Width="42" Margin="0 0 24 0" FontSize="16" Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
+                <TextBlock Text="Protocol" Width="80" Margin="0 0 12 0" FontSize="16" Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
                 <TextBlock Text="Name" Width="200" FontSize="16" Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
                 <TextBlock Text="Status Codes" Width="120" FontSize="16" Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
-                <TextBlock Text="Monitor Status"  FontSize="16" Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
+                <TextBlock Text="IsMonitoring"  FontSize="16" Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
             </StackPanel>
 
             <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" VerticalAlignment="Top">
@@ -112,8 +113,9 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding Site_id}" Foreground="White" Width="16" Margin="4 0 0 0" VerticalAlignment="Center"/>
-                                <Image Source="{Binding Image_path}" Margin="16 0 12 0" Width="36" Height="36"/>
+                                <TextBlock Text="{Binding Site_id}" Foreground="White" Width="16" Margin="4 0 16 0" VerticalAlignment="Center"/>
+                                <Image Source="{Binding Image_path}" Margin="0 0 36 0" Width="36" Height="36"/>
+                                <TextBlock Text="{Binding Protocol_type}" Foreground="White" Width="56" Margin="0 0 36 0" VerticalAlignment="Center"/>
                                 <StackPanel Width="200"  VerticalAlignment="Center"  HorizontalAlignment="Center">
                                     <TextBlock Text="{Binding Site_name}" FontWeight="Bold" Foreground="White" />
                                     <TextBlock Text="{Binding Site_address}" Foreground="White"/>
@@ -177,6 +179,11 @@
                                            FontWeight="SemiBold" Foreground="Black" FontSize="16"/>
                         </StackPanel>
                         <StackPanel Orientation="Vertical" Margin="0,12,0,0">
+                            <TextBlock Text="Protocol" Foreground="Gray" FontSize="16"/>
+                            <TextBlock Text="{Binding ElementName=ServerList,Path=SelectedItem.Protocol_type}" 
+                                           FontWeight="SemiBold" Foreground="Black" FontSize="16"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="0,12,0,0">
                             <TextBlock Text="Status code" Foreground="Gray" FontSize="16"/>
                             <TextBlock Text="{Binding ElementName=ServerList,Path=SelectedItem.Site_status_codes}"
                                            FontWeight="SemiBold" Foreground="Black" FontSize="16"/>
@@ -188,7 +195,7 @@
                           ItemsSource="{Binding BindingContact}" Foreground="White">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="0,8,8,8">
+                                <Grid Margin="8,8,8,8">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="*"/>

@@ -106,5 +106,11 @@ namespace ServerMonitor.Views
                 site_flyout.ShowAt(sitelist, e.GetPosition(this.sitelist));
             }
         }
+
+        private void OnGridViewSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var columns = Math.Ceiling(sitelist.ActualWidth / 300);
+            ((ItemsWrapGrid)sitelist.ItemsPanelRoot).ItemWidth = e.NewSize.Width / columns;
+        }
     }
 }
