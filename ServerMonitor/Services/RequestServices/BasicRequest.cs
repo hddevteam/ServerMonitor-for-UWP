@@ -12,7 +12,7 @@ namespace ServerMonitor.Services.RequestServices
         /// <summary>
         /// 请求花费的时间
         /// </summary>
-        private short timeCost;
+        private int timeCost;
         /// <summary>
         /// 定义的请求超时时长
         /// </summary>
@@ -31,7 +31,7 @@ namespace ServerMonitor.Services.RequestServices
         private Exception errorException;       
 
         public DateTime CreateTime { get => createTime; set => createTime = value; }
-        public short TimeCost { get => timeCost; set => timeCost = value; }
+        public int TimeCost { get => timeCost; set => timeCost = value; }
         public short OverTime { get => overTime; set => overTime = value; }
         public string Status { get => status; set => status = value; }
         public string Others { get => others; set => others = value; }

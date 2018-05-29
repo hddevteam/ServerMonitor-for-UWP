@@ -4,8 +4,14 @@ using System.Diagnostics;
 using ServerMonitor.Services.RequestServices;
 using System;
 
+/// <summary>
+/// 测试协议请求域   创建：xb 创建时间：2018/04
+/// </summary>
 namespace TestServerMonitor.TestRequest
 {
+    /// <summary>
+    /// 测试DNS协议请求模块  创建人：xb 创建时间：2018/04
+    /// </summary>
     [TestClass]
     public class TestDNSRequest// Dns请求模块测试
     {
@@ -13,6 +19,9 @@ namespace TestServerMonitor.TestRequest
         private static string testDomainName = "www.baidu.com";
         private DNSRequest dnsRequest = new DNSRequest(testIpAddress, testDomainName);
 
+        /// <summary>
+        /// 每个测试初始化时执行的方法
+        /// </summary>
         [Owner("Bin")]
         [TestInitialize()] // 测试类生成预处理
         public void Initialize()
@@ -20,8 +29,9 @@ namespace TestServerMonitor.TestRequest
             Debug.WriteLine("TestInitialize 方法调用");
         }
 
-
-
+        /// <summary>
+        /// 测试MakeRequest，测试用例为正常登入的测试用例
+        /// </summary>
         [Owner("Bin")]// Owner 标签标识测试方法创建者
         [TestMethod]
         [Priority(1)]// 优先级

@@ -99,7 +99,7 @@ namespace ServerMonitor.Services.RequestServices
                         // Dns服务器状态良好
                         Status = "1000";
                         // 请求耗时应该在2^15-1(ms)内完成
-                        TimeCost = (short)stopwatch.ElapsedMilliseconds;         //计算请求时间
+                        TimeCost = (int)stopwatch.ElapsedMilliseconds;         //计算请求时间
                         ActualResult = ASCII.GetString(RecvFullMessage);         //记录请求结果
                         return true;                                            //停止循环，返回true
                     }
@@ -108,7 +108,7 @@ namespace ServerMonitor.Services.RequestServices
                         // Dns服务器状态未知，但是该域名无法解析
                         Status = "1001";
                         // 请求耗时应该在2^15-1(ms)内完成
-                        TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                        TimeCost = (int)stopwatch.ElapsedMilliseconds;
 
                         return false;
                     }
@@ -118,7 +118,7 @@ namespace ServerMonitor.Services.RequestServices
                     // Dns服务器状态未知，但是该域名无法解析
                     Status = "1001";
                     // 请求耗时应该在2^15-1(ms)内完成
-                    TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                    TimeCost = (int)stopwatch.ElapsedMilliseconds;
                     return false;
                 }
             }

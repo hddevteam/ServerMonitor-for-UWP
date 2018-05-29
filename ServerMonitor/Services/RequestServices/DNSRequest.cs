@@ -76,7 +76,7 @@ namespace ServerMonitor.Services.RequestServices
                 // 收集捕获到的异常
                 ErrorException = new ArgumentNullException("Dns Server IP value or DomainName value is null!");
                 // 请求耗时设置为超时上限
-                TimeCost = (short)(OverTime * ErrorQuality);
+                TimeCost = (int)(OverTime * ErrorQuality);
                 requestInfos = "Dns Server IP value or DomainName value is null!";
                 return false;
             }
@@ -128,7 +128,7 @@ namespace ServerMonitor.Services.RequestServices
                     // Dns服务器状态良好
                     Status = "1000";
                     // 请求耗时应该在2^15-1(ms)内完成
-                    TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                    TimeCost = (int)stopwatch.ElapsedMilliseconds;
                     // 记录解析记录
                     actualResult = new HashSet<string>();
                     foreach (var item in response.Answers)
@@ -145,7 +145,7 @@ namespace ServerMonitor.Services.RequestServices
                     // Dns服务器状态未知，但是该域名无法解析
                     Status = "1001";
                     // 请求耗时应该在2^15-1(ms)内完成
-                    TimeCost = (short)(OverTime * ErrorQuality);
+                    TimeCost = (int)(OverTime * ErrorQuality);
                     actualResult.Add("No Data!");
                     requestInfos = "Request Failed!";
                     return false;
@@ -183,7 +183,7 @@ namespace ServerMonitor.Services.RequestServices
                 // 收集捕获到的异常
                 ErrorException = e;
                 // 请求耗时设置为超时上限
-                TimeCost = (short)(OverTime * ErrorQuality);
+                TimeCost = (int)(OverTime * ErrorQuality);
                 requestInfos = e.Message;
                 return false;
             }

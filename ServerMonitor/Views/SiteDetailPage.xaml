@@ -240,7 +240,7 @@
 
                         <!-- 改为线性图 -->
                         <!--开始设置显示的数据的方式-->
-                        <telerik:LineSeries ItemsSource="{x:Bind Path=ViewModel.Infos.Logs,Mode=OneWay}" >
+                        <telerik:LineSeries ItemsSource="{x:Bind Path=ViewModel.Infos.SuccessLogs,Mode=OneWay}" >
                             <telerik:LineSeries.CategoryBinding>
                                 <telerik:PropertyNameDataPointBinding PropertyName="Create_Time"/>
                             </telerik:LineSeries.CategoryBinding>

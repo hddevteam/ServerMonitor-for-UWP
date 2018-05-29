@@ -104,8 +104,7 @@ namespace ServerMonitor.ViewModels
             {
                 // 初始化记录变量
                 Logs = new ObservableCollection<LogModel>(),
-                //RequestTimeList = new ObservableCollection<LogModel>(),
-                LogCollections = new ObservableCollection<ObservableCollection<LogModel>>()
+                SuccessLogs = new ObservableCollection<LogModel>()
             };
             // 初始化工具接口
             utilObject = new SiteDetailUtilImpl();
@@ -118,12 +117,12 @@ namespace ServerMonitor.ViewModels
         // 析构函数
         ~SiteDetailViewModel()
         {
-            //testMessageDailog();
+
         }
         #endregion               
         #region 初始化界面的函数部分
         /// <summary>
-        /// 初始化生成数据
+        /// 初始化生成数据  创建：xb
         /// </summary>
         public async Task InitData()
         {
@@ -158,14 +157,6 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public void InitLogsData()
         {
-            // 新建三个存储集合，分别存储成功记录、失败记录、超时记录
-            ObservableCollection<LogModel> SuccessLogs = new ObservableCollection<LogModel>();
-            ObservableCollection<LogModel> ErrorLogs = new ObservableCollection<LogModel>();
-            ObservableCollection<LogModel> OverTimeLogs = new ObservableCollection<LogModel>();
-            // 将其添加至总的记录变量中
-            infos.LogCollections.Add(SuccessLogs);
-            infos.LogCollections.Add(OverTimeLogs);
-            infos.LogCollections.Add(ErrorLogs);
             List<LogModel> l = logDao.GetLogsBySiteId(id);
             if (l.Count == 0)
             {
@@ -176,23 +167,20 @@ namespace ServerMonitor.ViewModels
             }
             else
             {
+                DateTime pioneerDate = l.First().Create_Time;
                 foreach (var log in l)
                 {
                     // 这里加上这句话是为把数据库里的Utc时间转换为LocalTime
                     log.Create_Time = log.Create_Time.ToLocalTime();
                     Infos.Logs.Add(log);
-                    #region 将数据分为三类   新添加
-                    InsertLogWithCategory(infos.LogCollections, log);
-                    #endregion
-                    #region 对数据做log处理   暂时不做处理
-                    //var log_temp = new LogModel
-                    //{
-                    //    Create_time = log.Create_time,
-                    //    //Request_time = Math.Log10(log.Request_time)
-                    //    Request_time = log.Request_time
-                    //};
-                    //Infos.RequestTimeList.Add(log_temp);
-                    #endregion
+                    if (!log.Is_error)
+                    {
+                        // 大于两倍的请求周期
+                        //if (log.Create_Time.Subtract(pioneerDate).TotalMinutes >= 30) {
+                        //    Infos.SuccessLogs.Add(null);
+                        //}
+                        Infos.SuccessLogs.Add(log);
+                    }
                 }
                 Infos.LastRequest = l.Last<LogModel>();
                 infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
@@ -328,48 +316,6 @@ namespace ServerMonitor.ViewModels
         #endregion
         #region 更新数据的一些操作方法
         /// <summary>
-        /// 带有分类地插入日志
-        /// </summary>
-        /// <param name="logs"></param>
-        /// <param name="log"></param>
-        public void InsertLogWithCategory(ObservableCollection<ObservableCollection<LogModel>> logs, LogModel log)
-        {
-            // logs[i] i-> 0 : Success ,1 : OverTime, 2 : Error
-            if (infos.IsWebSite)
-            {
-                if (log.Is_error)
-                {
-                    if ("1002".Equals(log.Status_code))
-                    {
-                        logs[1].Add(log);
-                    }
-                    else
-                    {
-                        logs[2].Add(log);
-                    }
-                }
-                else
-                {
-                    logs[0].Add(log);
-                }
-            }
-            else
-            {
-                switch (log.Status_code)
-                {
-                    case "1000":
-                        logs[0].Add(log);
-                        break;
-                    case "1001":
-                        logs[2].Add(log);
-                        break;
-                    case "1002":
-                        logs[1].Add(log);
-                        break;
-                }
-            }
-        }
-        /// <summary>
         /// 计算平均请求时间以及请求时间中位值
         /// </summary>
         /// <param name="logs"></param>
@@ -475,7 +421,7 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public void UpdateBindLine()
         {
-            Tuple<double, double> t = CountAverageMax(Infos.LogCollections[0]);
+            Tuple<double, double> t = CountAverageMax(Infos.SuccessLogs);
             //Infos.AverageValue = Math.Log10(t.Item1);
             //Infos.MedianValue = Math.Log10(t.Item2);
             Infos.AverageValue = t.Item1;
@@ -491,23 +437,16 @@ namespace ServerMonitor.ViewModels
             {
                 Debug.WriteLine("成功插入一条日志数据! 日志内容为：" + log.ToString());
                 Infos.Logs.Add(log);
-                InsertLogWithCategory(infos.LogCollections, log);
-                #region 暂时不适用的取对数的部分
-                //var log_temp = new LogModel
-                //{
-                //    Create_time = log.Create_time,
-                //    //Request_time = Math.Log10(log.Request_time)
-                //    Request_time = log.Request_time
-                //};
-                //Infos.RequestTimeList.Add(log_temp);
-                #endregion
+                if (!log.Is_error)
+                {
+                    Infos.SuccessLogs.Add(log);
+                }
             }
             else
             {
                 Debug.WriteLine("插入失败，记录失败操作!");
                 throw new Exception("插入请求日志操作失败!");
             }
-
             UpdateChart(log);
         }
         /// <summary>
@@ -704,10 +643,7 @@ namespace ServerMonitor.ViewModels
             siteDao.UpdateSite(Infos.Detail_Site);
             // 重新获取界面信息
             Infos.Logs.Clear();
-            foreach (var item in infos.LogCollections)
-            {
-                item.Clear();
-            }
+            Infos.SuccessLogs.Clear();
             //Infos.RequestTimeList.Clear();
             #region 清空Re和PieInfo集合每一项的值
             foreach (var item in Infos.Re)
@@ -1135,13 +1071,13 @@ namespace ServerMonitor.ViewModels
         private string lastRequestWords;
         private double medianValue;
         private double averageValue;
-        //private ObservableCollection<LogModel> requestTimeList;
         private FirstChartAxisProperties firstChartAxisProperties;
         private ObservableCollection<ContactModel> contactCollection;
         private bool loadAsyncStat = false;
         private bool requestAsyncStat = true;
         private bool isContactEmpty = true;
-        private ObservableCollection<ObservableCollection<LogModel>> logCollections;
+        //private ObservableCollection<ObservableCollection<LogModel>> logCollections;
+        private ObservableCollection<LogModel> successLogs;
         private Uri site_Address;
         private LogModel previousRequestLog;
         private string previousRequestLogWords;
@@ -1329,19 +1265,6 @@ namespace ServerMonitor.ViewModels
                 RaisePropertyChanged(() => RequestAsyncStat);
             }
         }
-
-        /// <summary>
-        /// 封装多个请求序列的变量
-        /// </summary>
-        public ObservableCollection<ObservableCollection<LogModel>> LogCollections
-        {
-            get => logCollections;
-            set
-            {
-                logCollections = value;
-                RaisePropertyChanged(() => LogCollections);
-            }
-        }
         /// <summary>
         /// 标识站点的Uri地址
         /// </summary>
@@ -1351,7 +1274,8 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public LogModel PreviousRequestLog
         {
-            get => previousRequestLog; set
+            get => previousRequestLog;
+            set
             {
                 previousRequestLog = value;
                 RaisePropertyChanged(() => PreviousRequestLog);
@@ -1360,7 +1284,8 @@ namespace ServerMonitor.ViewModels
 
         public string PreviousRequestLogWords
         {
-            get => previousRequestLogWords; set
+            get => previousRequestLogWords;
+            set
             {
                 previousRequestLogWords = value;
                 RaisePropertyChanged(() => PreviousRequestLogWords);
@@ -1368,10 +1293,23 @@ namespace ServerMonitor.ViewModels
         }
         public bool IsContactEmpty
         {
-            get => isContactEmpty; set
+            get => isContactEmpty;
+            set
             {
                 isContactEmpty = value;
                 RaisePropertyChanged(() => IsContactEmpty);
+            }
+        }
+        /// <summary>
+        /// 成功记录的集合
+        /// </summary>
+        public ObservableCollection<LogModel> SuccessLogs
+        {
+            get => successLogs;
+            set
+            {
+                successLogs = value;
+                RaisePropertyChanged(() => SuccessLogs);
             }
         }
     }

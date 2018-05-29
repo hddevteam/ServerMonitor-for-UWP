@@ -82,7 +82,7 @@ namespace ServerMonitor.Services.RequestServices
                     //请求失败计算时间
                     DateTime end_time = DateTime.Now;
                     TimeSpan timeSpan = end_time - start_time;
-                    TimeCost = (short)timeSpan.TotalMilliseconds;
+                    TimeCost = (int)timeSpan.TotalMilliseconds;
                     //请求失败状态码
                     Status = ((int)Enum.Parse(typeof(System.Net.HttpStatusCode), message.StatusCode.ToString())).ToString();//状态码strign to num                    
                 }
@@ -112,7 +112,7 @@ namespace ServerMonitor.Services.RequestServices
             {
                 Debug.WriteLine("请求失败" + e.Message);
                 DBHelper.InsertErrorLog(e);
-                TimeCost = (short)(OverTime * 1.5);
+                TimeCost = (int)(OverTime * 1.5);
                 ErrorException = e;
                 Status = "1001";
                 requestInfo = e.Message;

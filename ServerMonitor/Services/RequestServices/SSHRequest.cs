@@ -61,7 +61,7 @@ namespace ServerMonitor.Services.RequestServices
                 {
                     stopwatch.Stop();
                     Status = "1000";
-                    TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                    TimeCost = (int)stopwatch.ElapsedMilliseconds;
                     return true;
                 }
             }
@@ -113,7 +113,7 @@ namespace ServerMonitor.Services.RequestServices
                 }
             }
             Status = "1001";
-            TimeCost = (short)(OverTime * 1.5);
+            TimeCost = (int)(OverTime * 1.5);
             return false;
         }
     }

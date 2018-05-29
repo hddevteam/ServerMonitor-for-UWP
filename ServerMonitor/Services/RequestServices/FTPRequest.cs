@@ -108,7 +108,7 @@ namespace ServerMonitor.Services.RequestServices
                 default:
                     // ftp请求登陆模式异常
                     CreateTime = DateTime.Now;
-                    TimeCost = (short)(OverTime * ErrorQuality);
+                    TimeCost = (int)(OverTime * ErrorQuality);
                     Status = "1001";
                     ErrorException = new Exception("User identifyType is invalid!");
                     protocalInfo = "User identifyType is invalid!";
@@ -122,7 +122,7 @@ namespace ServerMonitor.Services.RequestServices
             // 检测服务器的IPAddress是否合法
             if (! ValidateIPv4(ftpServer.ToString()))
             {
-                TimeCost = (short)(OverTime * ErrorQuality);
+                TimeCost = (int)(OverTime * ErrorQuality);
                 Status = "1001";
                 ErrorException = new Exception("Server address is invalid!");
                 protocalInfo = "Server address is invalid!";
@@ -182,20 +182,20 @@ namespace ServerMonitor.Services.RequestServices
                                     // 请求成功
                                     case 2:
                                     case 3:
-                                        TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                                        TimeCost = (int)stopwatch.ElapsedMilliseconds;
                                         Status = "1000";
                                         protocalInfo = strRet;
                                         break;
                                     // 请求失败 
                                     case 4:
                                     case 5:
-                                        TimeCost = (short)(OverTime * ErrorQuality);
+                                        TimeCost = (int)(OverTime * ErrorQuality);
                                         Status = "1001";
                                         protocalInfo = strRet;
                                         break;
                                     // 请求未知
                                     default:
-                                        TimeCost = (short)(OverTime * ErrorQuality);
+                                        TimeCost = (int)(OverTime * ErrorQuality);
                                         Status = "1001";
                                         protocalInfo = strRet;
                                         break;
@@ -205,7 +205,7 @@ namespace ServerMonitor.Services.RequestServices
                             {
                                 // 未连接，将秒表停止，此次请求作为失败的请求
                                 stopwatch.Stop();
-                                TimeCost = (short)(OverTime * ErrorQuality);
+                                TimeCost = (int)(OverTime * ErrorQuality);
                                 Status = "1001";
                                 protocalInfo = "Connect failed!";
                             }
@@ -213,7 +213,7 @@ namespace ServerMonitor.Services.RequestServices
                         catch (Exception e)
                         {
                             stopwatch.Stop();
-                            TimeCost = (short)(OverTime * ErrorQuality);
+                            TimeCost = (int)(OverTime * ErrorQuality);
                             Status = "1001";
                             protocalInfo = e.ToString();
                             ErrorException = e;
@@ -239,7 +239,7 @@ namespace ServerMonitor.Services.RequestServices
                 {
                     // 输入的指令格式不正确 ，此次请求作为失败的请求
                     stopwatch.Stop();
-                    TimeCost = (short)(OverTime * ErrorQuality);
+                    TimeCost = (int)(OverTime * ErrorQuality);
                     Status = "1001";
                     protocalInfo = e.ToString();
                     ErrorException = e;
@@ -258,7 +258,7 @@ namespace ServerMonitor.Services.RequestServices
                             ErrorException = e;
                             break;
                         default:
-                            TimeCost = (short)(OverTime * ErrorQuality);
+                            TimeCost = (int)(OverTime * ErrorQuality);
                             Status = "1001";
                             protocalInfo = e.Message;
                             break;
@@ -269,7 +269,7 @@ namespace ServerMonitor.Services.RequestServices
                 {
                     // 出现未捕获到的异常，此次请求作为失败的请求
                     stopwatch.Stop();
-                    TimeCost = (short)(OverTime * ErrorQuality);
+                    TimeCost = (int)(OverTime * ErrorQuality);
                     Status = "1001";
                     protocalInfo = e.ToString();
                     ErrorException = e;
