@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace ServerMonitor.ViewModels.BLL
     public class ChartUtilImpl : IChartUtil
     {
         const int OVERTIME = 5000;//超时时间
+        const double MAXTIMEINTERVAL = 1800;//最大时间间隔 30min*60=1800s
 
         public ChartPalette DefaultPalette{ get{ return ChartPalettes.DefaultLight;} }
 
@@ -99,40 +101,50 @@ namespace ServerMonitor.ViewModels.BLL
                 ObservableCollection<LineChartData> chart1Series = new ObservableCollection<LineChartData>();
                 //站点各项请求结果统计
                 int successCount = 0, errorCount = 0, overtimeCount = 0;
+
                 foreach (var log in logs)
                 {
                     #region 统计站点信息
                     if (log.Site_id == site.Id)
                     {
-                        //该条记录结果统计
-                        string result = "";
                         //判断并记录该条log是成功，失败，还是超时
                         if (!log.Is_error)
                         {
                             //成功
                             successCount++;
-                            result = "Success";
                             //把数据库里的Utc时间转换为LocalTime
                             log.Create_Time = log.Create_Time.ToLocalTime();
-                            chart1Series.Add(new LineChartData() { RequestTime = log.Create_Time, Result = result, ResponseTime = log.TimeCost });
+                            //若相邻两个记录时间差大于30分钟，且最近一条记录不是错误记录，则中间插入一条错误记录，使图表在此处断开
+                            if (chart1Series.Count != 0 && chart1Series[chart1Series.Count - 1].ResponseTime != null 
+                                && await CompareTimeInterval(chart1Series[chart1Series.Count - 1].RequestTime, log.Create_Time))
+                            {
+                                //在当前记录的前三十分钟添加一条错误记录
+                                chart1Series.Add(new LineChartData() { RequestTime = log.Create_Time.AddMinutes(-30), ResponseTime = null });
+                            }
+                            chart1Series.Add(new LineChartData() { RequestTime = log.Create_Time, ResponseTime = log.TimeCost });
                         }
                         else if (log.Status_code == "1002") //状态码为1002时表示请求超时
                         {
                             //超时
                             overtimeCount++;
-                            result = "OverTime";
                             //把数据库里的Utc时间转换为LocalTime
                             log.Create_Time = log.Create_Time.ToLocalTime();
-                            chart1Series.Add(new LineChartData() { RequestTime = log.Create_Time, Result = result, ResponseTime = OVERTIME });
+                            //若相邻两个记录时间差大于30分钟，且最近一条记录不是错误记录，则中间插入一条错误记录，使图表在此处断开
+                            if (chart1Series.Count != 0 && chart1Series[chart1Series.Count - 1].ResponseTime != null
+                                && await CompareTimeInterval(chart1Series[chart1Series.Count - 1].RequestTime, log.Create_Time))
+                            {
+                                //在当前记录的前三十分钟添加一条错误记录
+                                chart1Series.Add(new LineChartData() { RequestTime = log.Create_Time.AddMinutes(-30), ResponseTime = null });
+                            }
+                            chart1Series.Add(new LineChartData() { RequestTime = log.Create_Time, ResponseTime = OVERTIME });
                         }
                         else
                         {
                             //失败
                             errorCount++;
-                            result = "Error";
                             //把数据库里的Utc时间转换为LocalTime
                             log.Create_Time = log.Create_Time.ToLocalTime();
-                            chart1Series.Add(new LineChartData() { RequestTime = log.Create_Time, Result = result, ResponseTime = null });
+                            chart1Series.Add(new LineChartData() { RequestTime = log.Create_Time, ResponseTime = null });
                         }
                     }
                     #endregion
@@ -151,6 +163,23 @@ namespace ServerMonitor.ViewModels.BLL
             }
             await Task.CompletedTask;
             return new Tuple<ObservableCollection<ObservableCollection<LineChartData>>, ObservableCollection<BarChartData>>(chart1Collection, BarChart);
+        }
+
+        /// <summary>
+        /// 判断两个时间的时间间隔是否大于30分钟 创建：fjl
+        /// </summary>
+        /// <param name="t1">第一个时间</param>
+        /// <param name="t2">第二个时间</param>
+        /// <returns>大于返回true，其他返回false</returns>
+        public async Task<bool> CompareTimeInterval(DateTime t1,DateTime t2)
+        {
+            await Task.CompletedTask;
+            TimeSpan timeSpan = t2.Subtract(t1);
+            if (timeSpan.TotalSeconds > MAXTIMEINTERVAL)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

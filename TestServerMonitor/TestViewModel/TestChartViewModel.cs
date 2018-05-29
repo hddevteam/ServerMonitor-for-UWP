@@ -67,7 +67,6 @@ namespace TestServerMonitor.TestViewModel
                 await Task.CompletedTask;
                 return new Tuple<ObservableCollection<ObservableCollection<LineChartData>>, ObservableCollection<BarChartData>>(data1, data2);
             }, Times.Twice);
-            viewModel.RequestResultType = "All";
             //less
             Assert.IsTrue(viewModel.AcceptClickAsync().Result);
             //equal
@@ -99,39 +98,6 @@ namespace TestServerMonitor.TestViewModel
         }
 
         /// <summary>
-        /// 测试TypeChanged方法
-        /// 用例说明：测试方法是否执行,返回true
-        ///           测试方法计算是否正确，返回期待值
-        /// </summary>
-        [TestMethod]
-        public void TestTypeChanged_CalculationCorrect_ShouldReturnTrue()
-        {
-            Assert.IsTrue(viewModel.InitAsync().Result);
-
-            ObservableCollection<LineChartData> item = new ObservableCollection<LineChartData>
-            {
-                new LineChartData() { Result = "Error" },
-                new LineChartData() { Result = "Success" },
-                new LineChartData() { Result = "OverTime" },
-                new LineChartData() { Result = "Success" },
-                new LineChartData() { Result = "Error" }
-            };
-            viewModel.LineChartCollection.Add(item);
-
-            Assert.IsTrue(viewModel.TypeChanged("All"));
-            Assert.AreEqual(5, viewModel.Infos.LineChartCollectionCopy[0].Count);
-
-            Assert.IsTrue(viewModel.TypeChanged("Success"));
-            Assert.AreEqual(2, viewModel.Infos.LineChartCollectionCopy[0].Count);
-
-            Assert.IsTrue(viewModel.TypeChanged("Error"));
-            Assert.AreEqual(2, viewModel.Infos.LineChartCollectionCopy[0].Count);
-
-            Assert.IsTrue(viewModel.TypeChanged("OverTime"));
-            Assert.AreEqual(1, viewModel.Infos.LineChartCollectionCopy[0].Count);
-        }
-
-        /// <summary>
         /// 测试PivotSelectionChanged方法
         /// 用例说明：测试方法对输入值大于2是否做出正确响应，返回ERROR_CODE=4
         ///           其他情况下输入==输出
@@ -147,7 +113,7 @@ namespace TestServerMonitor.TestViewModel
         }
         #endregion
 
-        #region ChartUtilImpl_Test Author:lyy
+        #region ChartUtilImpl_Test Author:lyy  Update:fjl
         /// <summary>
         /// 测试AddInfoForSiteAsync方法
         /// 用例说明：测试选中的前五个被监测站点是否为选中状态，完善站点信息
@@ -256,50 +222,28 @@ namespace TestServerMonitor.TestViewModel
             var arg2 = new List<LogModel>()
             {
                 new LogModel()
+                { Is_error = false,Status_code = "1000",TimeCost = 2720,Site_id = 1,Create_Time = DateTime.Now.AddMinutes(-90)},//success
+                new LogModel()
+                { Is_error = true,Status_code = "1001",TimeCost = 220,Site_id = 1,Create_Time = DateTime.Now.AddMinutes(-60)},//error
+                new LogModel()
+                { Is_error = true,Status_code = "1002",TimeCost = 220,Site_id = 1,Create_Time = DateTime.Now.AddMinutes(-40) },//overtime
+                new LogModel()
+                { Is_error = false,Status_code = "1000",TimeCost = 2220,Site_id = 1,Create_Time = DateTime.Now.AddMinutes(-10)},//success
+                new LogModel()
                 { Is_error = true,Status_code = "1002",TimeCost = 220,Site_id = 1,Create_Time = DateTime.Now},//overtime
                 new LogModel()
-                { Is_error = false,Status_code = "1000",TimeCost = 2220,Site_id = 1,Create_Time = DateTime.Now},//success
-                new LogModel()
-                { Is_error = true,Status_code = "1001",TimeCost = 220,Site_id = 1,Create_Time = DateTime.Now},//error
-                new LogModel()
-                { Is_error = false,Status_code = "1000",TimeCost = 2720,Site_id = 1,Create_Time = DateTime.Now},//success
-                new LogModel()
-                { Is_error = true,Status_code = "1001",TimeCost = 2720,Site_id = 1,Create_Time = DateTime.Now},//error
-                new LogModel()
-                { Is_error = true,Status_code = "1002",TimeCost = 220,Site_id = 1,Create_Time = DateTime.Now },//overtime
+                { Is_error = false,Status_code = "1000",TimeCost = 2720,Site_id = 1,Create_Time = DateTime.Now.AddMinutes(40)},//success    
             };
             //创建期待值
-            foreach (var item in arg2)
-            {
-                if (!item.Is_error)//成功
-                {
-                    exp1.Add(new LineChartData()
-                    {
-                        Result = "Success",
-                        ResponseTime = item.TimeCost,
-                        RequestTime = item.Create_Time
-                    });
-                }
-                else if (item.Status_code == "1002")//超时
-                {
-                    exp1.Add(new LineChartData()
-                    {
-                        Result = "OverTime",
-                        ResponseTime = 5000,
-                        RequestTime = item.Create_Time
-                    });
-                }
-                else//失败
-                {
-                    exp1.Add(new LineChartData()
-                    {
-                        Result = "Error",
-                        ResponseTime = null,
-                        RequestTime = item.Create_Time
-                    });
-                }
-            }
-            exp2.Add(new BarChartData() { SiteId = "1", SiteName = "#1 SiteTest", Error = 2, Success = 2, Overtime = 2 });
+            exp1.Add(new LineChartData() { ResponseTime = 2720, RequestTime = arg2[0].Create_Time });
+            exp1.Add(new LineChartData() { ResponseTime = null, RequestTime = arg2[1].Create_Time });
+            exp1.Add(new LineChartData() { ResponseTime = 5000, RequestTime = arg2[2].Create_Time });
+            exp1.Add(new LineChartData() { ResponseTime = 2220, RequestTime = arg2[3].Create_Time });
+            exp1.Add(new LineChartData() { ResponseTime = 5000, RequestTime = arg2[4].Create_Time });
+            exp1.Add(new LineChartData() { ResponseTime = null, RequestTime = arg2[5].Create_Time.AddMinutes(-30) });
+            exp1.Add(new LineChartData() { ResponseTime = 2720, RequestTime = arg2[5].Create_Time });
+
+            exp2.Add(new BarChartData() { SiteId = "1", SiteName = "#1 SiteTest", Error = 1, Success = 3, Overtime = 2 });
 
             var res = chartUtil.StatisticsSiteRequestResultAsync(arg1, arg2).Result;
             var actual1 = res.Item1;
@@ -327,6 +271,24 @@ namespace TestServerMonitor.TestViewModel
 
         }
 
+        /// <summary>
+        /// 测试CompareTimeInterval方法
+        /// 用例说明：测试两个时间间隔是否大于30min
+        /// </summary>
+        [TestMethod]
+        public void TestCompareTimeInterval()
+        {
+            var t1 = DateTime.Now;
+            var t2 = t1.AddMinutes(20);
+            var t3 = t1.AddMinutes(30);
+            var t4 = t1.AddMinutes(40);
+
+            //小于等于返回false
+            Assert.IsFalse(chartUtil.CompareTimeInterval(t1, t2).Result);
+            Assert.IsFalse(chartUtil.CompareTimeInterval(t1, t3).Result);
+            //大于返回true
+            Assert.IsTrue(chartUtil.CompareTimeInterval(t1, t4).Result);
+        }
         #region 重写相等比较器
         //重写相等比较器，比较两个SelectSite对象是否相等
         public class SelectSiteComparer : IEqualityComparer<AddSiteInfo>
@@ -369,8 +331,7 @@ namespace TestServerMonitor.TestViewModel
             public bool Equals(LineChartData x, LineChartData y)
             {
                 return DateTime.Compare(x.RequestTime, y.RequestTime) == 0
-                    && x.ResponseTime == y.ResponseTime
-                    && x.Result == y.Result;
+                    && x.ResponseTime == y.ResponseTime;
             }
             public int GetHashCode(LineChartData obj)
             {
