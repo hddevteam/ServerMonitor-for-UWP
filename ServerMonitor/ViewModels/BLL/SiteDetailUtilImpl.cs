@@ -106,6 +106,14 @@ namespace ServerMonitor.ViewModels.BLL
         /// <param name="request">请求对象</param>
         public async Task<LogModel> AccessFTPServer(SiteModel site, FTPRequest request)
         {
+            #region 初始化log
+            LogModel log = new LogModel
+            {
+                Site_id = site.Id,
+                Create_Time = DateTime.Now
+
+            };
+            #endregion
             if (null != site.Site_address && !("".Equals(site.Site_address)))
             {
                 // 检测并赋值DNS服务器IP
@@ -113,32 +121,33 @@ namespace ServerMonitor.ViewModels.BLL
                 // IP 不合法
                 if (null == ip)
                 {
-                    return null;
+                    log.TimeCost = 7500;
+                    log.Status_code = "1001";
+                    log.Is_error = true;
+                    log.Log_Record = "Address Format Is Invalid!";
                 }
-                request.FtpServer = IPAddress.Parse(site.Site_address);
-                // 获取保存的用户验证的信息
-                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
-                try {
-                    request.Identification = new IdentificationInfo() { Username = js["username"].ToString(), Password = js["password"].ToString() };
-                    request.IdentifyType = (LoginType)Enum.Parse(typeof(LoginType),js["type"].ToString());
-                } catch (NullReferenceException){
-                    request.Identification = new IdentificationInfo() {Password=null};
-                    request.IdentifyType = LoginType.Anonymous;
-                }
-                #region 初始化log
-                LogModel log = new LogModel
-                {
-                    Site_id = site.Id,
-                    Create_Time = DateTime.Now
+                else {
+                    request.FtpServer = IPAddress.Parse(site.Site_address);
+                    // 获取保存的用户验证的信息
+                    JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
+                    try
+                    {
+                        request.Identification = new IdentificationInfo() { Username = js["username"].ToString(), Password = js["password"].ToString() };
+                        request.IdentifyType = (LoginType)Enum.Parse(typeof(LoginType), js["type"].ToString());
+                    }
+                    catch (NullReferenceException)
+                    {
+                        request.Identification = new IdentificationInfo() { Password = null };
+                        request.IdentifyType = LoginType.Anonymous;
+                    }
 
-                };
-                #endregion                
-                // 开始请求
-                bool result = await request.MakeRequest();
-                // 处理请求记录
-                CreateLogWithRequestServerResult(log, request);
-                // 补充额外添加的判断
-                log.Log_Record = request.ProtocalInfo;
+                    // 开始请求
+                    bool result = await request.MakeRequest();
+                    // 处理请求记录
+                    CreateLogWithRequestServerResult(log, request);
+                    // 补充额外添加的判断
+                    log.Log_Record = request.ProtocalInfo;
+                }                               
                 // 更新站点信息
                 UpdateSiteStatus(site, log);
                 return log;
@@ -327,6 +336,9 @@ namespace ServerMonitor.ViewModels.BLL
                 else if (https)
                 {
                     url = url.Substring(8);//
+                }
+                else {
+                    return null;
                 }
                 IPAddress[] hostEntry = await Dns.GetHostAddressesAsync(url);
                 for (int m = 0; m < hostEntry.Length; m++)

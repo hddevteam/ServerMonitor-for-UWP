@@ -71,14 +71,6 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public LogModel Refresh_log { get => refresh_log; set { Set(ref refresh_log, value); RaisePropertyChanged(() => Refresh_log); } }
         /// <summary>
-        /// 站点记录类型  用于柱形图的不同类型的记录的不同颜色显示
-        /// </summary>
-        public List<FirstChartLengend> LogType = new List<FirstChartLengend>() {
-            new FirstChartLengend(){Title="SUCCESS",Fill = ChartPalettes.DefaultLight.FillEntries.Brushes[0]},
-            new FirstChartLengend(){Title="OVERTIME",Fill = ChartPalettes.DefaultLight.FillEntries.Brushes[1]},
-            new FirstChartLengend(){Title="ERROR",Fill = ChartPalettes.DefaultLight.FillEntries.Brushes[2]}
-        };
-        /// <summary>
         /// 临时变量  站点id  ->  由字符串转换来的
         /// </summary>
         public int id = 0;
@@ -176,7 +168,8 @@ namespace ServerMonitor.ViewModels
                     if (!log.Is_error)
                     {
                         // 大于两倍的请求周期
-                        //if (log.Create_Time.Subtract(pioneerDate).TotalMinutes >= 30) {
+                        //if (log.Create_Time.Subtract(pioneerDate).TotalMinutes >= 30)
+                        //{
                         //    Infos.SuccessLogs.Add(null);
                         //}
                         Infos.SuccessLogs.Add(log);
@@ -193,7 +186,7 @@ namespace ServerMonitor.ViewModels
                 else
                 {
                     Infos.PreviousRequestLog = new LogModel();
-                    Infos.PreviousRequestLogWords = "None Data!";
+                    Infos.PreviousRequestLogWords = "No Data!";
                 }
             }
         }
@@ -998,7 +991,7 @@ namespace ServerMonitor.ViewModels
     public enum RequestType { SUCCESS, ERROR, OVERTIME };
 
     /// <summary>
-    /// 封装用于第三个图表(饼图)的信息结构
+    /// 封装用于第三个图表(饼图)的信息结构 创建人：xb 创建时间：2018/03
     /// </summary>
     public class PieChartInfo : ObservableObject
     {
@@ -1024,7 +1017,7 @@ namespace ServerMonitor.ViewModels
     }
 
     /// <summary>
-    /// 封装用于第二个BarSeries表的信息结构
+    /// 封装用于第二个BarSeries表的信息结构  创建人：xb 创建时间：2018/03
     /// </summary>
     public class RequestCountInfo : ObservableObject
     {
@@ -1055,7 +1048,7 @@ namespace ServerMonitor.ViewModels
     }
 
     /// <summary>
-    /// 封装页面所需的所有信息
+    /// 封装页面所需的所有信息 创建人：xb 创建时间：2018/03
     /// </summary>
     public class ViewInfo : ObservableObject
     {
@@ -1315,7 +1308,7 @@ namespace ServerMonitor.ViewModels
     }
 
     /// <summary>
-    /// 封装第一个图表坐标轴响应式变化属性
+    /// 封装第一个图表坐标轴响应式变化属性 创建人：xb 创建时间：2018/04
     /// </summary>
     public class FirstChartAxisProperties : ObservableObject
     {
@@ -1360,7 +1353,7 @@ namespace ServerMonitor.ViewModels
     }
 
     /// <summary>
-    /// 封装DateTimeContinuousAxis坐标轴使用的属性
+    /// 封装DateTimeContinuousAxis坐标轴使用的属性 创建人：xb 创建时间：2018/04
     /// </summary>
     public class DateTimeContinuousAxisProperties : ObservableObject
     {
@@ -1397,25 +1390,6 @@ namespace ServerMonitor.ViewModels
             MajorStep = 6;
             MajorStepUnit = TimeInterval.Hour;
         }
-    }
-
-    public class FirstChartLengend : ObservableObject
-    {
-        private string title;
-
-        public string Title
-        {
-            get { return title; }
-            set { title = value; RaisePropertyChanged(() => Title); }
-        }
-        private Brush fill;
-
-        public Brush Fill
-        {
-            get { return fill; }
-            set { fill = value; RaisePropertyChanged(() => Fill); }
-        }
-
     }
     #endregion
     #region 图表标签格式化类
