@@ -75,8 +75,8 @@
                                     <Setter Property="Margin" Value="0 -16 0 0"/>
                                 </Style>
                             </MenuFlyout.MenuFlyoutPresenterStyle>
-                            <MenuFlyoutItem Text="ADD Server " Name="addserver" Tag="1" Click="{x:Bind ViewModel.Add_Server}" />
-                            <MenuFlyoutItem Text="ADD Website" Name="addwebsite" Tag="2" Click="{x:Bind ViewModel.Add_Website}"/>
+                            <MenuFlyoutItem Text="Add Server " Name="addserver" Tag="1" Click="{x:Bind ViewModel.Add_Server}" />
+                            <MenuFlyoutItem Text="Add Website" Name="addwebsite" Tag="2" Click="{x:Bind ViewModel.Add_Website}"/>
                         </MenuFlyout>
                     </AppBarButton.Flyout>
                 </AppBarButton>

@@ -279,7 +279,7 @@ namespace ServerMonitor.ViewModels
                         Site_address = q[i].Site_address,
                         Site_status_codes = q[i].Status_code,
                         Is_Monitor = q[i].Is_Monitor,
-                        Site_type = "WebSite",
+                        Site_type = "Website",
                         Site_status = site_status,
                         Image_path = "/Images/ic_website.png",
                         Protocol_type = q[i].Protocol_type,
