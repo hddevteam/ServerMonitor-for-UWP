@@ -8,7 +8,7 @@ namespace TestServerMonitor.TestRequest
     public class TestFTPRequest
     {
         private static FTPRequest request = new FTPRequest(LoginType.Identify);
-        private const string TestFTPIP = "192.168.1.121";
+        private const string TestFTPIP = "47.94.251.85";
         private bool result = false;
 
         [TestInitialize()] // 测试类生成预处理

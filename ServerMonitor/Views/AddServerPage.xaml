@@ -58,8 +58,8 @@
             </Button>
 
             <Grid Grid.Column="2" Width="1" Background="DarkGray"/>
-            <Button Grid.Column="3" Background="{x:Null}" Click="TestServerConnection">
-                <StackPanel Orientation="Horizontal" >
+            <Button Grid.Column="3" Background="{x:Null}">
+                <StackPanel Orientation="Horizontal">
                     <Image Source="/Images/test.png" Width="16" Height="16"/>
                     <TextBlock Text="TEST" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
                 </StackPanel>

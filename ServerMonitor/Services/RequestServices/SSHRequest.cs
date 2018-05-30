@@ -61,7 +61,6 @@ namespace ServerMonitor.Services.RequestServices
                 {
                     stopwatch.Stop();
                     Status = "1000";
-                    ProtocolInfo = "success";
                     TimeCost = (short)stopwatch.ElapsedMilliseconds;
                     return true;
                 }
