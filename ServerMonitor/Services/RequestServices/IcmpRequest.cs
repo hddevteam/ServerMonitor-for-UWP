@@ -101,6 +101,7 @@ namespace ServerMonitor.Services.RequestServices
                     try
                     {
                         Nbytes = socket.SendTo(Senddata, Packetsize, SocketFlags.None, hostEndpoint);
+
                         if (Nbytes == -1)
                         {
                             //exception.Text = "无法传送";

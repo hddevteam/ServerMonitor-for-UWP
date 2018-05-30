@@ -52,9 +52,10 @@ namespace ServerMonitor.Services.RequestServices
 
         // 将协议内容设置成只读的，旨在提高封装程度，去除外部的入口
         public string ProtocalInfo { get => protocalInfo; }
-        public LoginType IdentifyType { get => identifyType; set => identifyType = value; }
+        //public LoginType IdentifyType { get => identifyType; set => identifyType = value; }
         public IdentificationInfo Identification { get => identification; set => identification = value; }
         public IPAddress FtpServer { get => ftpServer; set => ftpServer = value; }
+        public LoginType IdentifyType { get => identifyType; set => identifyType = value; }
         /// <summary>
         /// 线程安全的请求对象 --完全延迟加载
         /// </summary>

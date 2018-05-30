@@ -115,6 +115,7 @@ namespace ServerMonitor.Services.RequestServices
                     Exception e = new TaskCanceledException("Overtime");
                     requestInfos = e.ToString();
                     ErrorException = e;
+
                     // 清除请求缓存
                     resolver.ClearCache();
                     return false;

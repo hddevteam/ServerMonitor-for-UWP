@@ -144,7 +144,7 @@ namespace ServerMonitor.Services.RequestServices
         {
             static Nested()
             {
-                //instance.Status = null;
+
             }
             internal static readonly HTTPRequest instance = new HTTPRequest();
         }
