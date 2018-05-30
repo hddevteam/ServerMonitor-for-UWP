@@ -32,7 +32,7 @@
 
         <controls:PageHeader x:Name="pageHeader" RelativePanel.AlignLeftWithPanel="True"
                              RelativePanel.AlignRightWithPanel="True"
-                             RelativePanel.AlignTopWithPanel="True" Text="Server Monitor">
+                             RelativePanel.AlignTopWithPanel="True">
 
             <controls:PageHeader.PrimaryCommands>
                 <AppBarButton Icon="Refresh" Foreground="White" Click = "{x:Bind ViewModel.RequestAll_Click}"/>

@@ -1,0 +1,74 @@
+﻿<UserControl
+    x:Class="ServerMonitor.Views.AboutUs"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ServerMonitor.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    >
+    <Grid HorizontalAlignment="Right" VerticalAlignment="Stretch" BorderThickness="3">
+        <Grid.BorderBrush>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="White"/>
+                <GradientStop Color="#BBBBBB" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.BorderBrush>
+        <Border x:Name="OutBorder" Background="#55000000" 
+                VerticalAlignment="Stretch" 
+                HorizontalAlignment="Stretch"/>
+        <StackPanel x:Name="ContentGrid" Background="White" 
+              Orientation="Vertical"
+              HorizontalAlignment="Right"
+              Padding="10" Height="auto" Margin="0,0,-3,-3" Width="310"  >
+            <Grid Padding="15" Tapped="SymbolIcon_Tapped">
+                <StackPanel Orientation="Horizontal">
+                    <SymbolIcon Symbol="Back" Margin="0,0,20,0" Tapped="SymbolIcon_Tapped"></SymbolIcon>
+                    <TextBlock FontSize="20">About Server Monitor</TextBlock>
+                </StackPanel>
+            </Grid>
+            <Grid>
+                <Line Stroke="Gray" StrokeThickness="3" X1="0" X2="300" Y1="0" Y2="0" StrokeStartLineCap="Round" StrokeEndLineCap="Round"></Line>
+            </Grid>
+            <Grid Padding="5">
+                <RichTextBlock Margin="10,1,0,0">
+                    <Paragraph FontSize="16">Server Monitor is a professional network tool to monitor servers and web sites.</Paragraph>
+                    <Paragraph FontSize="16" >You can easily view all server / site status in the same interface.</Paragraph>
+                    <Paragraph FontSize="16">Check the server / site status details.</Paragraph>
+                    <Paragraph FontSize="16" >View server / site status charts.</Paragraph>
+                    <Paragraph FontSize="16">Add contacts to server / site.</Paragraph>
+                    <Paragraph FontSize="16">You can monitor Web server, SSH Server, Email server, DNS server, FTP server, VPN server, etc.</Paragraph>
+                    <Paragraph FontSize="16">Monitor web sites based on the domain name / IP address, support HTTP / HTTPS protocol, you can manually add / modify HTTP return code for monitoring.</Paragraph>
+                </RichTextBlock>
+            </Grid>
+            <Grid Padding="10">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="Please contact us via"></TextBlock>
+                    <HyperlinkButton Name="email" Content="breet.jia@gmail.com" Tapped="HyperlinkButton_Tapped"></HyperlinkButton>
+                    <TextBlock  TextWrapping="Wrap">if you :<LineBreak/> 
+                              --have any suggestions or   comments</TextBlock>
+                    <TextBlock  FontSize="20" TextWrapping="Wrap">You can view or fork our project at</TextBlock>
+                    <HyperlinkButton FontSize="11"  NavigateUri="https://github.com/hddevteam/ServerMonitor-for-UWP">
+                        https://github.com/hddevteam/ 
+                        servermonitor-at uwp
+                    </HyperlinkButton>
+                </StackPanel>
+            </Grid>
+            <!--<Grid Padding="10">
+                <Button Grid.Column="0" x:Name="btnLeft" 
+                        Content="OK" 
+                        HorizontalContentAlignment="Center"
+                        VerticalAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        BorderThickness="0" 
+                        Click="LeftButton_Click"
+                        Background="#f90"
+                        Foreground="White"
+                        MaxWidth="150"
+                        Margin="15,-10,0,0"
+                        HorizontalAlignment="Left"
+                        />-->
+            <!--</Grid>-->
+        </StackPanel>
+    </Grid>
+</UserControl>
