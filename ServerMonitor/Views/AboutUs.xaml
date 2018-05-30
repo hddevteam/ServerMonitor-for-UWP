@@ -47,7 +47,7 @@
                     <HyperlinkButton Name="email" Content="breet.jia@gmail.com" Tapped="HyperlinkButton_Tapped"></HyperlinkButton>
                     <TextBlock  TextWrapping="Wrap">if you :<LineBreak/> 
                               --have any suggestions or   comments</TextBlock>
-                    <TextBlock  FontSize="20" TextWrapping="Wrap">You can view or fork our project at</TextBlock>
+                    <TextBlock  FontSize="16" TextWrapping="Wrap">You can view or fork our project at</TextBlock>
                     <HyperlinkButton FontSize="11"  NavigateUri="https://github.com/hddevteam/ServerMonitor-for-UWP">
                         https://github.com/hddevteam/ 
                         servermonitor-at uwp
