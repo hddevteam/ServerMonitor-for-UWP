@@ -113,12 +113,12 @@
                     <!--Authentication-->
                     <StackPanel Orientation="Vertical" Visibility ="{Binding NeedUser}">
                         <TextBlock Text="AUTHENTICATION" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8"/>
-                        <CheckBox Name="NoAnonymous" Content="No Anonymous" IsChecked="{Binding NoAnonymous, Mode=TwoWay}"/>
+                        <CheckBox Name="Anonymous" Content="Anonymous" IsChecked="{Binding Anonymous, Mode=TwoWay}" Click="{x:Bind ViewModel.Anonymous_Click}"/>
                         <TextBox Grid.Column="1" PlaceholderText="Username" Height="30" Margin="0,8,0,8" 
-                                 Visibility="{Binding ElementName=NoAnonymous,Path=IsChecked}"
+                                 Visibility="{Binding NoAnonymous}"
                                  Text="{Binding Username, Mode=TwoWay}"/>
                         <PasswordBox Grid.Column="1" PlaceholderText="Password" Height="30"
-                                 Visibility="{Binding ElementName=NoAnonymous,Path=IsChecked}"
+                                 Visibility="{Binding NoAnonymous}"
                                  Password="{Binding Password, Mode=TwoWay}"/>
                     </StackPanel>
                     
