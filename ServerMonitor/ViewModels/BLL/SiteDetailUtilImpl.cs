@@ -281,23 +281,29 @@ namespace ServerMonitor.ViewModels.BLL
         /// </summary>
         /// <param name="log"></param>
         /// <param name="request"></param>
-        public void CreateLogWithRequestServerResult(LogModel log, BasicRequest request)
+        public void CreateLogWithRequestServerResult(LogModel log, BasicRequest request=null)
         {
-            // 请求成功
-            log.Status_code = request.Status;
-            log.TimeCost = request.TimeCost;
-            // 请求失败
-            switch (log.Status_code)
+            if (null != request)
             {
-                case "1000":
-                    log.Is_error = false;
-                    break;
-                case "1001":
-                    log.Is_error = true;
-                    break;
-                case "1002":
-                    log.Is_error = true;
-                    break;
+                // 请求成功
+                log.Status_code = request.Status;
+                log.TimeCost = request.TimeCost;
+                // 请求失败
+                switch (log.Status_code)
+                {
+                    case "1000":
+                        log.Is_error = false;
+                        break;
+                    case "1001":
+                        log.Is_error = true;
+                        break;
+                    case "1002":
+                        log.Is_error = true;
+                        break;
+                }
+            }
+            else {
+
             }
         }
         /// <summary>
@@ -334,7 +340,14 @@ namespace ServerMonitor.ViewModels.BLL
             }
             else
             {
-                reIP = IPAddress.Parse(url);
+                try
+                {
+                    reIP = IPAddress.Parse(url);
+                }
+                catch (FormatException e) {
+                    DBHelper.InsertErrorLog(e);
+                    return null;
+                }
             }
             return reIP;
         }
