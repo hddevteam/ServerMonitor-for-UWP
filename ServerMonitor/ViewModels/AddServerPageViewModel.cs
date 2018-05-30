@@ -98,7 +98,7 @@ namespace ServerMonitor.ViewModels
         #region 绑定数据
 
         #region UI控件的显示与其他
-        private Boolean noAnonymous = true;  //true 用户登陆  false：匿名
+        private Boolean noAnonymous = false;  //true 用户登陆  false：匿名
         public Boolean NoAnonymous
         {
             get => noAnonymous;
@@ -108,7 +108,16 @@ namespace ServerMonitor.ViewModels
                 RaisePropertyChanged(() => NoAnonymous);
             }
         }
-
+        private Boolean anonymous = true;  //true 匿名  false：用户登陆
+        public Boolean Anonymous
+        {
+            get => anonymous;
+            set
+            {
+                anonymous = value;
+                RaisePropertyChanged(() => Anonymous);
+            }
+        }
         private Boolean livePort;  //Port是否可人为输入 true 可输入
         public Boolean LivePort
         {
@@ -517,6 +526,19 @@ namespace ServerMonitor.ViewModels
         {
             Jump();
         }
+
+        public void Anonymous_Click(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = sender as CheckBox;
+            if (checkBox.IsChecked == true) //匿名
+            {
+                NoAnonymous = false;
+            }
+            else
+            {
+                NoAnonymous = true;
+            }
+        }
         #endregion
 
         #region 异步辅助函数
@@ -654,10 +676,12 @@ namespace ServerMonitor.ViewModels
                     Username = js["username"].ToString();//用户名
                     Password = js["password"].ToString();//用户名
                     NoAnonymous = true;
+                    Anonymous = false;
                 }
                 else
                 {
                     NoAnonymous = false;
+                    Anonymous = true;
                 }
             }
             else if(ProtocolType == 4)
