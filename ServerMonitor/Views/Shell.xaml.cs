@@ -16,6 +16,7 @@ namespace ServerMonitor.Views
         public static Shell Instance { get; set; }
         public static HamburgerMenu HamburgerMenu => Instance.MyHamburgerMenu;
         Services.SettingsServices.SettingsService _settings;
+        public static bool about = false;
 
         public Shell()
         {
@@ -35,6 +36,12 @@ namespace ServerMonitor.Views
             HamburgerMenu.RefreshStyles(_settings.AppTheme, true);
             HamburgerMenu.IsFullScreen = _settings.IsFullScreen;
             HamburgerMenu.HamburgerButtonVisibility = _settings.ShowHamburgerButton ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void SymbolIcon_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+            AboutUs msgPopub = AboutUs.Instance;
+            msgPopub.ShowWIndow();
         }
     }
 }
