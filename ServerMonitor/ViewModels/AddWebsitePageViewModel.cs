@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using ServerMonitor.Controls;
 using ServerMonitor.DAOImpl;
 using ServerMonitor.Models;
+using ServerMonitor.Services.RequestServices;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,6 +15,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Template10.Mvvm;
 using Template10.Services.NavigationService;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -95,7 +97,10 @@ namespace ServerMonitor.ViewModels
         #endregion 系统函数
 
         #region 绑定数据
-        private Boolean isEnabled;   //save按钮是否可用
+        private Boolean isEnabled;
+        /// <summary>
+        /// save按钮是否可用
+        /// </summary>
         public Boolean IsEnabled
         {
             get => isEnabled;
@@ -299,7 +304,7 @@ namespace ServerMonitor.ViewModels
             //将界面数据保存下来
             site.Protocol_type = GetProtocolType(ProtocolType);
             site.Site_address = (ProtocolType == 0 ? "http://" : "https://") + SiteAddress;
-            site.Request_succeed_code = RequestSucceedCode;
+            site.Request_succeed_code = GetRequestSucceedCode(RequestSucceedCode);
             if (SiteName == null || SiteName.Equals(""))
             {
                 site.Site_name = SiteAddress;
@@ -340,7 +345,7 @@ namespace ServerMonitor.ViewModels
             //将界面数据保存下来
             site.Protocol_type = GetProtocolType(ProtocolType);
             site.Site_address = (ProtocolType == 0 ? "http://" : "https://") + SiteAddress;
-            site.Request_succeed_code = RequestSucceedCode;
+            site.Request_succeed_code = GetRequestSucceedCode(RequestSucceedCode);
             if (SiteName == null || SiteName.Equals(""))
             {
                 site.Site_name = SiteAddress;
@@ -379,6 +384,49 @@ namespace ServerMonitor.ViewModels
         public void CancelBack()
         {
             Jump();
+        }
+
+        /// <summary>
+        /// status code的get按钮事件，获取请求码
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public async void Get_Click(object sender, RoutedEventArgs e)
+        {
+            if(CheckDomain(SiteAddress) == false)
+            {
+                return; //不能访问，返回
+            }
+            Button button = sender as Button;
+            button.IsEnabled = false;  //get按钮在获取请求码期间不可用
+            //获取请求码
+            HTTPRequest request = HTTPRequest.Instance;
+            request.Status = null;//HTTPrequest在发送请求中发生异常时未给Status赋值，由于是单例模式会保存上次请求结果 设为null防止显示错误结果
+            request.Uri = (ProtocolType == 0 ? "http://" : "https://") + SiteAddress;
+            Task<bool> task = request.MakeRequest();
+            await task;
+            bool test = task.Result;
+            if (request.Status != null && test)
+            {
+                if (RequestSucceedCode.EndsWith(",")|| RequestSucceedCode.Equals(""))
+                {
+                    RequestSucceedCode += request.Status;
+                }
+                else if (RequestSucceedCode == null)
+                {
+                    RequestSucceedCode = request.Status;
+                }
+                else
+                {
+                    RequestSucceedCode += "," + request.Status;
+                }
+            }
+            else//请求失败处理
+            {
+                IsEnabled = false;
+                await new MessageDialog("域名错误或不存在").ShowAsync();
+            }
+            button.IsEnabled = true;
         }
         #endregion
 
@@ -594,6 +642,37 @@ namespace ServerMonitor.ViewModels
                     vs[contactS[i].ContactId] = true;
                 }
             }
+        }
+
+        /// <summary>
+        /// 去除重复的状态码
+        /// </summary>
+        /// <param name="code">以"，"号分割的状态码的字符串</param>
+        private string GetRequestSucceedCode(string codes)
+        {
+            string str="";
+            string[] arr = codes.Split(',');
+            List<string> vs = new List<string>();
+            for (int i = 0; i < arr.Count(); i++)
+            {
+                try
+                {
+                    int x = int.Parse(arr[i]);
+                }
+                catch (Exception)
+                {
+                    return "";
+                }
+                var q1 = (from t in vs
+                         where t.Equals(arr[i])
+                         select t).Count();
+                if (q1 == 0)
+                {
+                    vs.Add(arr[i]);
+                    str += arr[i] + ",";
+                }
+            }
+            return str.TrimEnd(',');
         }
         #endregion
     }

@@ -104,11 +104,13 @@
                     <TextBlock Text="STATUS CODES" Margin="0,24,0,8" Foreground="Black" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     <Grid Margin="0,8,0,0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="1" Text="{Binding RequestSucceedCode, Mode=TwoWay}" PlaceholderText="The expected status codes,separated by comma(,)"
+                        <TextBox Grid.Column="0" Text="{Binding RequestSucceedCode, Mode=TwoWay}"
+                                 PlaceholderText="The expected status codes,separated by comma(,)"
                                  Tag="2" TextChanged="{x:Bind ViewModel.Domain_TextChanged}"/>
+                        <Button Grid.Column="1" Content="Get" Margin="8,0,0,0" Width="64" Click="{x:Bind ViewModel.Get_Click}"/>
                     </Grid>
 
                     <!--PRIORITY-->
