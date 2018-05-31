@@ -63,7 +63,7 @@ namespace ServerMonitor.Views
                 };
                 series.CategoryBinding = new PropertyNameDataPointBinding("RequestTime");
                 series.ValueBinding = new PropertyNameDataPointBinding("ResponseTime");
-                series.SetBinding(ChartSeries.ItemsSourceProperty, new Binding() { Path = new PropertyPath("Infos.LineChartCollectionCopy[" + i + "]") });
+                series.SetBinding(ChartSeries.ItemsSourceProperty, new Binding() { Path = new PropertyPath("Infos.LineChartCollection[" + i + "]") });
                 series.ClipToPlotArea = false;
                 //序列添加到图表
                 chart.Series.Add(series);

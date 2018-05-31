@@ -58,7 +58,7 @@
             </Button>
 
             <Grid Grid.Column="2" Width="1" Background="DarkGray"/>
-            <Button Grid.Column="3" Background="{x:Null}">
+            <Button Grid.Column="3" Background="{x:Null}" Click="TestServerConnection">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Images/test.png" Width="16" Height="16"/>
                     <TextBlock Text="TEST" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
@@ -99,7 +99,7 @@
                                  Height="30" TextChanged="{x:Bind ViewModel.Domain_TextChanged}"/>
                     </Grid>
                     <StackPanel Margin="0,8,0,0" Orientation="Horizontal">
-                        <TextBox Text="{Binding Port,Mode=TwoWay}" PlaceholderText="Port(optional)"
+                        <TextBox Text="{Binding Port,Mode=TwoWay}" PlaceholderText="Port"
                                  Height="30" Width="120" Visibility="{Binding LivePort}" Tag="2"
                                  TextChanged="{x:Bind ViewModel.Domain_TextChanged}"/>
                         <TextBlock Padding="0,4,0,0" Text="Port : " Height="30" Width="40" Visibility="{Binding DiePort}"/>
@@ -113,12 +113,12 @@
                     <!--Authentication-->
                     <StackPanel Orientation="Vertical" Visibility ="{Binding NeedUser}">
                         <TextBlock Text="AUTHENTICATION" Foreground="Black" FontWeight="SemiBold" Margin="0,24,0,8"/>
-                        <CheckBox Name="NoAnonymous" Content="No Anonymous" IsChecked="{Binding NoAnonymous, Mode=TwoWay}"/>
+                        <CheckBox Name="Anonymous" Content="Anonymous" IsChecked="{Binding Anonymous, Mode=TwoWay}" Click="{x:Bind ViewModel.Anonymous_Click}"/>
                         <TextBox Grid.Column="1" PlaceholderText="Username" Height="30" Margin="0,8,0,8" 
-                                 Visibility="{Binding ElementName=NoAnonymous,Path=IsChecked}"
+                                 Visibility="{Binding NoAnonymous}"
                                  Text="{Binding Username, Mode=TwoWay}"/>
                         <PasswordBox Grid.Column="1" PlaceholderText="Password" Height="30"
-                                 Visibility="{Binding ElementName=NoAnonymous,Path=IsChecked}"
+                                 Visibility="{Binding NoAnonymous}"
                                  Password="{Binding Password, Mode=TwoWay}"/>
                     </StackPanel>
                     
