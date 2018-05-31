@@ -310,12 +310,9 @@ namespace ServerMonitor.ViewModels
                             log = await util.AccessSMTPServer(siteElement, _smtpRequest);
                             break;
                         // 补充之前欠缺的Socket服务器请求   --xb
-                        case "SOCKET":                            
+                        case "SOCKET":
                             // 初始化Socket请求对象
-                            SocketRequest _socketRequest = new SocketRequest
-                            {
-                                TargetEndPoint = new IPEndPoint(_siteAddress_redress, siteElement.Server_port)
-                            };
+                            SocketRequest _socketRequest = new SocketRequest();
                             // 请求指定终端，并生成对应的请求记录，最后更新站点信息
                             log = await util.ConnectToServerWithSocket(siteElement, _socketRequest);
                             break;

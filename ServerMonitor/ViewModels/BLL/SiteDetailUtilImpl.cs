@@ -334,10 +334,6 @@ namespace ServerMonitor.ViewModels.BLL
                         break;
                 }
             }
-            else
-            {
-
-            }
         }
         /// <summary>
         /// 更新指定站点状态 创建者: xb 创建时间：2018/05/10

@@ -87,32 +87,6 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         private ILogDAO logDao;
         #endregion
-        #region 构造以及析构
-        // 构造函数
-        public SiteDetailViewModel()
-        {
-            // 初始化界面变量
-            Infos = new ViewInfo
-            {
-                // 初始化记录变量
-                Logs = new ObservableCollection<LogModel>(),
-                SuccessLogs = new ObservableCollection<LogModel>(),
-                FirstLineChartData = new ObservableCollection<LineChartData>()
-            };
-            // 初始化工具接口
-            utilObject = new SiteDetailUtilImpl();
-            // 初始化Site的DAO操作接口
-            siteDao = new SiteDaoImpl();
-            // 初始化Log的DAO操作接口
-            logDao = new LogDaoImpl();
-            Debug.WriteLine("Construction function => SiteDetailViewModel();");
-        }
-        // 析构函数
-        ~SiteDetailViewModel()
-        {
-
-        }
-        #endregion               
         #region 初始化界面的函数部分
         /// <summary>
         /// 初始化生成数据  创建：xb
@@ -171,7 +145,7 @@ namespace ServerMonitor.ViewModels
                         Infos.SuccessLogs.Add(log);
                         object o = log.Create_Time.Subtract(pioneerDate).TotalMinutes;
                         // 大于两倍的请求周期
-                        if (log.Create_Time.Subtract(pioneerDate).TotalMinutes >= 30)
+                        if (log.Create_Time.Subtract(pioneerDate).TotalMinutes > 30)
                         {
                             Infos.FirstLineChartData.Add(new LineChartData() { RequestTime = log.Create_Time.AddMinutes(-30), ResponseTime = null });
                         }
