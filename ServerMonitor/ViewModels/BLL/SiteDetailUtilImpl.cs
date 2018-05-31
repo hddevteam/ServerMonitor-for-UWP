@@ -17,6 +17,9 @@ using ServerMonitor.SiteDb;
 
 namespace ServerMonitor.ViewModels.BLL
 {
+    /// <summary>
+    /// SiteDetail 界面的工具类 创建者: xb 创建时间：2018/05/10
+    /// </summary>
     public class SiteDetailUtilImpl : ISiteDetailUtil
     {
         #region 变量声明
@@ -40,7 +43,7 @@ namespace ServerMonitor.ViewModels.BLL
             logDao = new LogDaoImpl();
         }
         /// <summary>
-        /// 请求服务器状态
+        /// 请求服务器状态 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="serverProtocol"></param>
         /// <returns></returns>
@@ -101,7 +104,7 @@ namespace ServerMonitor.ViewModels.BLL
             return log;
         }
         /// <summary>
-        /// 请求FTP服务器的状态
+        /// 请求FTP服务器的状态 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="site">待请求的站点</param>
         /// <param name="request">请求对象</param>
@@ -157,7 +160,7 @@ namespace ServerMonitor.ViewModels.BLL
             return null;
         }
         /// <summary>
-        /// 请求SSH服务器的状态
+        /// 请求SSH服务器的状态 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="site">待请求的站点</param>
         /// <param name="request">请求对象</param>
@@ -196,7 +199,7 @@ namespace ServerMonitor.ViewModels.BLL
             return null;
         }
         /// <summary>
-        /// 请求SMTP服务器的状态
+        /// 请求SMTP服务器的状态 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="site">待请求的站点</param>
         /// <param name="request">请求对象</param>
@@ -227,7 +230,7 @@ namespace ServerMonitor.ViewModels.BLL
             return null;
         }
         /// <summary>
-        /// 使用ICMP 与服务器建立连接
+        /// 使用ICMP 与服务器建立连接 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <returns></returns>
         public async Task<LogModel> ConnectToServerWithICMP(SiteModel site, ICMPRequest request)
@@ -268,7 +271,7 @@ namespace ServerMonitor.ViewModels.BLL
             return log;
         }
         /// <summary>
-        /// 使用Socket 与服务器建立连接
+        /// 使用Socket 与服务器建立连接 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <returns></returns>
         public async Task<LogModel> ConnectToServerWithSocket(SiteModel site, SocketRequest request)
@@ -306,7 +309,7 @@ namespace ServerMonitor.ViewModels.BLL
 
         }
         /// <summary>
-        /// 处理请求记录
+        /// 处理请求记录 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="log"></param>
         /// <param name="request"></param>
@@ -337,7 +340,7 @@ namespace ServerMonitor.ViewModels.BLL
             }
         }
         /// <summary>
-        /// 更新指定站点状态
+        /// 更新指定站点状态 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="site">指定站点</param>
         /// <param name="log">请求的结果</param>
@@ -387,7 +390,7 @@ namespace ServerMonitor.ViewModels.BLL
             return reIP;
         }
         /// <summary>
-        /// 快速排序主体
+        /// 快速排序主体 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="a">待排数组</param>
         /// <param name="low">从哪开始</param>
@@ -415,7 +418,7 @@ namespace ServerMonitor.ViewModels.BLL
             }
         }
         /// <summary>
-        /// 一遍快速排序
+        /// 一遍快速排序 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="a">待排数组</param>
         /// <param name="low">排序起始值</param>
@@ -441,7 +444,7 @@ namespace ServerMonitor.ViewModels.BLL
             return low;
         }
         /// <summary>
-        /// 截取url部分判断是否能转换成ip
+        /// 截取url部分判断是否能转换成ip 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
@@ -466,7 +469,7 @@ namespace ServerMonitor.ViewModels.BLL
             Debug.WriteLine("请求了一次服务器!");
         }
         /// <summary>
-        /// 查看是否满足用户提出的成功Code
+        /// 查看是否满足用户提出的成功Code 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="site"></param>
         /// <param name="statusCode"></param>
@@ -485,7 +488,7 @@ namespace ServerMonitor.ViewModels.BLL
             return false;
         }
         /// <summary>
-        /// 获取服务器状态成功的状态码列表
+        /// 获取服务器状态成功的状态码列表 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="site"></param>
         /// <returns></returns>
@@ -501,7 +504,7 @@ namespace ServerMonitor.ViewModels.BLL
             }
         }
         /// <summary>
-        /// 请求网站，并存入一条记录
+        /// 请求网站，并存入一条记录 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <returns></returns>
         public async Task<LogModel> RequestHTTPSite(SiteModel site, HTTPRequest request)

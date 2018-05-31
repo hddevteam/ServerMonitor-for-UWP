@@ -11,6 +11,9 @@ using Windows.Networking.Sockets;
 
 namespace ServerMonitor.Services.RequestServices
 {
+    /// <summary>
+    /// 创建者:xb 创建时间: 2018/04
+    /// </summary>
     public class SocketRequest : BasicRequest, IRequest
     {
         // 继承的属性：CreateTime TimeCost OverTime Status Others ErrorException
@@ -22,6 +25,10 @@ namespace ServerMonitor.Services.RequestServices
         public IPEndPoint TargetEndPoint { get => targetEndPoint; set => targetEndPoint = value; }
         public string ProtocolInfo { get => protocolInfo;}
 
+        /// <summary>
+        /// 创建Socket请求 创建者:xb 创建时间: 2018/04
+        /// </summary>
+        /// <returns></returns>
         public async Task<bool> MakeRequest()
         {
             CreateTime = DateTime.Now;

@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.Services.RequestServices
 {
+    /// <summary>
+    /// DNS 请求模块 创建者:xb 创建时间: 2018/04
+    /// </summary>
     public class DNSRequest : BasicRequest,IRequest
     {
         // 继承的属性：CreateTime TimeCost OverTime Status Others ErrorException
@@ -52,7 +55,7 @@ namespace ServerMonitor.Services.RequestServices
         public string RequestInfos { get => requestInfos; }
 
         /// <summary>
-        /// 生成一个Dns请求对象
+        /// 生成一个Dns请求对象 创建者:xb 创建时间: 2018/04
         /// </summary>
         /// <param name="DnsServer">用于解析域名的Dns服务器</param>
         /// <param name="DomainName">待解析的域名</param>
@@ -63,7 +66,7 @@ namespace ServerMonitor.Services.RequestServices
         }
 
         /// <summary>
-        /// Dns请求
+        /// Dns请求 创建者:xb 创建时间: 2018/04
         /// </summary>
         /// <returns></returns>
         public async Task<bool> MakeRequest()
@@ -190,7 +193,7 @@ namespace ServerMonitor.Services.RequestServices
         }
 
         /// <summary>
-        /// 判断域名是否合法
+        /// 判断域名是否合法 创建者:xb 创建时间: 2018/04
         /// </summary>
         /// <param name="Domainname"></param>
         /// <returns></returns>
@@ -209,7 +212,7 @@ namespace ServerMonitor.Services.RequestServices
         }
 
         /// <summary>
-        /// 检查expectResult是否命中解析结果resultSet
+        /// 检查expectResult是否命中解析结果resultSet 创建者:xb 创建时间: 2018/04
         /// </summary>
         /// <param name="expectResult"></param>
         /// <param name="resultSet"></param>
@@ -220,7 +223,7 @@ namespace ServerMonitor.Services.RequestServices
         }
 
         /// <summary>
-        /// 用来获取枚举值得下标
+        /// 用来获取枚举值得下标 创建者:xb 创建时间: 2018/04
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
@@ -228,6 +231,11 @@ namespace ServerMonitor.Services.RequestServices
             return (QType)Enum.Parse(typeof(QType), index.ToString());
         }
 
+        /// <summary>
+        /// 根据类型名字返回类型对象 创建者:xb 创建时间: 2018/04
+        /// </summary>
+        /// <param name="typeName"></param>
+        /// <returns></returns>
         public static QType GetQTypeWithStringTypeName(string typeName) {
             return (QType)Enum.Parse(typeof(QType), typeName);
         }

@@ -10,11 +10,13 @@ using System.Threading.Tasks;
 namespace ServerMonitor.Models
 {
     /// <summary>
-    ///  自定义请求处理器 类似filter
+    ///  自定义请求处理器 类似filter 创建者:xb 创建时间: 2018/01
     /// </summary>
     class CustomHandler : DelegatingHandler
     {
-        // 此处放置构造和其它代码。
+        /// <summary>
+        /// 拦截请求 创建者:xb 创建时间: 2018/01
+        /// </summary>
         protected async override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken)
         {

@@ -167,24 +167,17 @@ namespace ServerMonitor.ViewModels
                     log.Create_Time = log.Create_Time.ToLocalTime();
                     Infos.Logs.Add(log);
                     if (!log.Is_error)
-                    {
-                        
-                        Infos.FirstLineChartData.Add(new LineChartData() { RequestTime = log.Create_Time, ResponseTime = log.TimeCost });
+                    {                                               
                         Infos.SuccessLogs.Add(log);
+                        object o = log.Create_Time.Subtract(pioneerDate).TotalMinutes;
                         // 大于两倍的请求周期
                         if (log.Create_Time.Subtract(pioneerDate).TotalMinutes >= 30)
                         {
                             Infos.FirstLineChartData.Add(new LineChartData() { RequestTime = log.Create_Time.AddMinutes(-30), ResponseTime = null });
                         }
-                        Infos.FirstLineChartData.Add(new LineChartData() { RequestTime = log.Create_Time, ResponseTime = log.TimeCost });
+                        Infos.FirstLineChartData.Add(new LineChartData() { RequestTime = log.Create_Time, ResponseTime = log.TimeCost });                       
                         pioneerDate = log.Create_Time;
-                    }
-                    //// 失败的情况插入一条请求耗时为null的记录
-                    //else
-                    //{
-                    //    Infos.FirstLineChartData.Add(new LineChartData() { RequestTime = log.Create_Time, ResponseTime = null });
-                    //}
-
+                    }                                     
                 }
                 Infos.LastRequest = l.Last<LogModel>();
                 infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
@@ -510,16 +503,16 @@ namespace ServerMonitor.ViewModels
             switch (index)
             {
                 case 0:
-                    Infos.FirstChartAxisProperties.Min.MajorStep = 2;
+                    Infos.FirstChartAxisProperties.Min.MajorStep = 1;
                     Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Hour;
                     break;
                 case 1:
-                    Infos.FirstChartAxisProperties.Min.MajorStep = 12;
+                    Infos.FirstChartAxisProperties.Min.MajorStep = 4;
                     Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Hour;
                     break;
                 case 2:
-                    Infos.FirstChartAxisProperties.Min.MajorStep = 1;
-                    Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Day;
+                    Infos.FirstChartAxisProperties.Min.MajorStep = 8;
+                    Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Hour;
                     break;
                 default:
                     break;
@@ -1400,7 +1393,9 @@ namespace ServerMonitor.ViewModels
     }
     #endregion
     #region 图表标签格式化类
-    //对数轴标签格式化
+    /// <summary>
+    /// 对数轴标签格式化 创建人：xb 创建时间：2018/04
+    /// </summary>
     public class CustomLogOperatorAxisLabelFormatter : IContentFormatter
     {
         public object Format(object owner, object content)
@@ -1419,7 +1414,9 @@ namespace ServerMonitor.ViewModels
             return content.ToString();
         }
     }
-    //时间轴标签格式化
+    /// <summary>
+    /// 时间轴标签格式化 创建人：xb 创建时间：2018/04
+    /// </summary>
     public class CustomOperatorDateTimeAxisLabelFormatter : IContentFormatter
     {
         public object Format(object owner, object content)
@@ -1428,7 +1425,7 @@ namespace ServerMonitor.ViewModels
             var axis = owner as DateTimeContinuousAxis;
             var con = Convert.ToDateTime(content);
 
-            if (axis.MajorStepUnit != TimeInterval.Hour || axis.MajorStep >= 12) //当时间间隔为天时，格式化显示天
+            if (axis.MajorStepUnit != TimeInterval.Hour || axis.MajorStep >= 4) //当时间间隔为天时，格式化显示天
             {
                 var con_str = String.Format("{0:MM-dd HH:mm}", con);
                 return con_str;
@@ -1440,7 +1437,9 @@ namespace ServerMonitor.ViewModels
             }
         }
     }
-    //分类轴标签格式化（柱状图）
+    /// <summary>
+    /// 分类轴标签格式化（柱状图）创建人：xb 创建时间：2018/04
+    /// </summary>
     public class CustomOperatorCategoricalAxisLabelFormatter : IContentFormatter
     {
         public object Format(object owner, object content)
@@ -1458,7 +1457,7 @@ namespace ServerMonitor.ViewModels
     #endregion
     #region 转换器
     /// <summary>
-    /// 取对数转换器
+    /// 取对数转换器 创建人：xb 创建时间：2018/04
     /// </summary>
     public class Log10Convert : IValueConverter
     {
@@ -1475,7 +1474,7 @@ namespace ServerMonitor.ViewModels
         }
     }
     /// <summary>
-    /// 中位数以及平均数转换器
+    /// 中位数以及平均数转换器 创建人：xb 创建时间：2018/04
     /// </summary>
     public class StringFormatConvert : IValueConverter
     {
@@ -1499,7 +1498,7 @@ namespace ServerMonitor.ViewModels
         }
     }
     /// <summary>
-    /// 联系人输出转换器
+    /// 联系人输出转换器 创建人：xb 创建时间：2018/04
     /// </summary>
     public class ContactFormatConvert : IValueConverter
     {
@@ -1514,7 +1513,7 @@ namespace ServerMonitor.ViewModels
         }
     }
     /// <summary>
-    /// 布尔值->Visibility
+    /// 布尔值->Visibility 创建人：xb 创建时间：2018/04
     /// </summary>
     public class BoolToVisbilityConvert : IValueConverter
     {
@@ -1530,7 +1529,7 @@ namespace ServerMonitor.ViewModels
         }
     }
     /// <summary>
-    /// 布尔值取反
+    /// 布尔值取反 创建人：xb 创建时间：2018/04
     /// </summary>
     public class BoolRevertConvert : IValueConverter
     {

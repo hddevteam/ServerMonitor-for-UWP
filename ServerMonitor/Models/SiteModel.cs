@@ -8,8 +8,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/// <summary>
+/// 创建者:xb 创建时间: 2018/04
+/// </summary>
 namespace ServerMonitor.Models
 {
+    /// <summary>
+    /// 创建者:xb 创建时间: 2018/04
+    /// </summary>
     // 对应的Site表
     [Table("Site")]
     public class SiteModel : ObservableObject, INotifyPropertyChanged

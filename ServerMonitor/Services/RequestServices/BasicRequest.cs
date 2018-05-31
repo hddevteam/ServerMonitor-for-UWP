@@ -2,11 +2,14 @@
 
 namespace ServerMonitor.Services.RequestServices
 {
+    /// <summary>
+    /// 请求模块的顶层类 创建者:xb 创建时间: 2018/04
+    /// </summary>
     public abstract class BasicRequest
     {
         public readonly double ErrorQuality = 1.5;
         /// <summary>
-        /// 请求创建的时间
+        /// 请求创建的时间 
         /// </summary>
         private DateTime createTime;
         /// <summary>

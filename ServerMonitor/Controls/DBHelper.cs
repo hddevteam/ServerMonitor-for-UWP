@@ -12,6 +12,9 @@ using Windows.Storage;
 
 namespace ServerMonitor.Controls
 {
+    /// <summary>
+    /// 数据访问层封装方法  创建者:xb 创建时间: 2018/03
+    /// </summary>
     public class DBHelper
     {
         private static string DbFilename;
@@ -33,7 +36,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 初始化数据库
+        /// 初始化数据库  创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="DBFilename">数据库名称</param>
         public static void InitDB(string DBFilename)
@@ -205,7 +208,7 @@ namespace ServerMonitor.Controls
 
 
         /// <summary>
-        /// 返回所有的站点
+        /// 返回所有的站点 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <returns></returns>
         public static List<SiteModel> GetAllSite()
@@ -219,8 +222,8 @@ namespace ServerMonitor.Controls
 
         }
 
-        /// <summary>
-        /// 返回所有的日志
+        /// <summary> 
+        /// 返回所有的日志 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <returns></returns>
         public static List<LogModel> GetAllLog()
@@ -234,7 +237,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 根据站点id获取站点
+        /// 根据站点id获取站点 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -256,7 +259,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 根据记录id获取记录
+        /// 根据记录id获取记录 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -278,7 +281,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 根据站点id获取日志
+        /// 根据站点id获取日志 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -300,7 +303,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 插入一个站点
+        /// 插入一个站点 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="site"></param>
         /// <returns></returns>
@@ -315,7 +318,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 插入一条记录
+        /// 插入一条记录 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="log"></param>
         /// <returns></returns>
@@ -330,7 +333,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 插入多条站点
+        /// 插入多条站点 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="sites"></param>
         /// <returns></returns>
@@ -345,7 +348,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 插入多条记录
+        /// 插入多条记录 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="logs"></param>
         /// <returns></returns>
@@ -360,7 +363,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 删除一个站点
+        /// 删除一个站点 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="siteId"></param>
         /// <returns></returns>
@@ -375,7 +378,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 删除一条记录
+        /// 删除一条记录 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="LogId"></param>
         /// <returns></returns>
@@ -390,7 +393,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 删除站点关联的日志
+        /// 删除站点关联的日志 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="siteId">站点ID</param>
         /// <returns>删除站点关联的日志条数</returns>
@@ -415,7 +418,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 更新站点信息
+        /// 更新站点信息 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="site"></param>
         /// <returns></returns>
@@ -441,7 +444,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 更新记录信息
+        /// 更新记录信息 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="log"></param>
         /// <returns></returns>
@@ -456,7 +459,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 更新站点列表
+        /// 更新站点列表 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="sites"></param>
         /// <returns></returns>
@@ -471,7 +474,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 更新信息列表
+        /// 更新信息列表 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="logs"></param>
         /// <returns></returns>
@@ -486,7 +489,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 插入一条错误日志
+        /// 插入一条错误日志 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="log"></param>
         /// <returns></returns>
@@ -519,7 +522,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 执行无返回对象的命令
+        /// 执行无返回对象的命令 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="command"></param>
         /// <param name="param"></param>
@@ -536,7 +539,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 执行有返回对象(Site)的命令
+        /// 执行有返回对象(Site)的命令 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="command"></param>
         /// <param name="param"></param>
@@ -553,7 +556,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 执行有返回对象(Log)的命令
+        /// 执行有返回对象(Log)的命令 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="command"></param>
         /// <param name="param"></param>
@@ -571,7 +574,7 @@ namespace ServerMonitor.Controls
 
         #region Contact表操作
         /// <summary>
-        /// 返回所有的联系人
+        /// 返回所有的联系人 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <returns></returns>
         public static List<ContactModel> GetAllContact()
@@ -582,10 +585,10 @@ namespace ServerMonitor.Controls
                 r = conn.Table<ContactModel>().ToList<ContactModel>();
             }
             return r;
-        }        
+        }
 
         /// <summary>
-        /// 插入一条联系人
+        /// 插入一条联系人 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="Contact"></param>
         /// <returns></returns>
@@ -600,7 +603,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 删除一个联系人
+        /// 删除一个联系人 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="contactId"></param>
         /// <returns></returns>
@@ -615,7 +618,7 @@ namespace ServerMonitor.Controls
         }
 
         /// <summary>
-        /// 更新联系人信息
+        /// 更新联系人信息 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <param name="contact"></param>
         /// <returns></returns>
@@ -643,7 +646,7 @@ namespace ServerMonitor.Controls
 
 
         /// <summary>
-        /// 自定义的toString方法
+        /// 自定义的toString方法 创建者:xb 创建时间: 2018/03
         /// </summary>
         /// <returns></returns>
         public override string ToString()
