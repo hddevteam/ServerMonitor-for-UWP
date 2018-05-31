@@ -239,22 +239,32 @@ namespace ServerMonitor.ViewModels.BLL
                 Create_Time = DateTime.Now
             };
             #endregion
-            await Task.CompletedTask;
-            #region 根据设计的ICMP请求修改的   --xb
-            bool icmpFlag = request.MakeRequest();
-            //请求完毕
-            RequestObj requestObj;//用于存储icmp请求结果的对象              
-            requestObj = DataHelper.GetProperty(request); // 处理下请求对象的数据                                   
-            // 生成请求记录            
-            CreateLogWithRequestServerResult(log, requestObj);
-            // 更新站点信息
-            UpdateSiteStatus(site, log);
-            if (icmpFlag == false)
+            // IP 不合法
+            if (null == request.MyIPAddress)
             {
-                site.Is_success = 0;
+                log.TimeCost = 7500;
+                log.Status_code = "1001";
+                log.Is_error = true;
+                log.Log_Record = "Address Format Is Invalid!";
             }
-            #endregion
+            else {
+                #region 根据设计的ICMP请求修改的   --xb
+                bool icmpFlag = request.MakeRequest();
+                //请求完毕
+                RequestObj requestObj;//用于存储icmp请求结果的对象              
+                requestObj = DataHelper.GetProperty(request); // 处理下请求对象的数据                                   
+                                                              // 生成请求记录            
+                CreateLogWithRequestServerResult(log, requestObj);
+                // 更新站点信息
+                UpdateSiteStatus(site, log);
+                if (icmpFlag == false)
+                {
+                    site.Is_success = 0;
+                }
+                #endregion
+            }
 
+            await Task.CompletedTask;                                   
             return log;
         }
         /// <summary>
@@ -277,7 +287,7 @@ namespace ServerMonitor.ViewModels.BLL
                 log.TimeCost = 7500;
                 log.Status_code = "1001";
                 log.Is_error = true;
-                log.Log_Record = "Address Format Is Invalid!";                
+                log.Log_Record = "Address Format Is Invalid!";
             }
             else
             {

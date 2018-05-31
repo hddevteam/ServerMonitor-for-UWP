@@ -96,7 +96,8 @@ namespace ServerMonitor.ViewModels
             {
                 // 初始化记录变量
                 Logs = new ObservableCollection<LogModel>(),
-                SuccessLogs = new ObservableCollection<LogModel>()
+                SuccessLogs = new ObservableCollection<LogModel>(),
+                FirstLineChartData = new ObservableCollection<LineChartData>()
             };
             // 初始化工具接口
             utilObject = new SiteDetailUtilImpl();
@@ -167,17 +168,26 @@ namespace ServerMonitor.ViewModels
                     Infos.Logs.Add(log);
                     if (!log.Is_error)
                     {
-                        // 大于两倍的请求周期
-                        //if (log.Create_Time.Subtract(pioneerDate).TotalMinutes >= 30)
-                        //{
-                        //    Infos.SuccessLogs.Add(null);
-                        //}
+                        
+                        Infos.FirstLineChartData.Add(new LineChartData() { RequestTime = log.Create_Time, ResponseTime = log.TimeCost });
                         Infos.SuccessLogs.Add(log);
+                        // 大于两倍的请求周期
+                        if (log.Create_Time.Subtract(pioneerDate).TotalMinutes >= 30)
+                        {
+                            Infos.FirstLineChartData.Add(new LineChartData() { RequestTime = log.Create_Time.AddMinutes(-30), ResponseTime = null });
+                        }
+                        Infos.FirstLineChartData.Add(new LineChartData() { RequestTime = log.Create_Time, ResponseTime = log.TimeCost });
+                        pioneerDate = log.Create_Time;
                     }
+                    //// 失败的情况插入一条请求耗时为null的记录
+                    //else
+                    //{
+                    //    Infos.FirstLineChartData.Add(new LineChartData() { RequestTime = log.Create_Time, ResponseTime = null });
+                    //}
+
                 }
                 Infos.LastRequest = l.Last<LogModel>();
                 infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
-
                 if (l.Count > 1)
                 {
                     infos.PreviousRequestLog = l[l.Count - 1];
@@ -433,6 +443,11 @@ namespace ServerMonitor.ViewModels
                 if (!log.Is_error)
                 {
                     Infos.SuccessLogs.Add(log);
+                    if (log.Create_Time.Subtract(Infos.SuccessLogs.Last().Create_Time).TotalMinutes >= 30)
+                    {
+                        Infos.FirstLineChartData.Add(new LineChartData() { RequestTime = log.Create_Time, ResponseTime = null });
+                    }
+                    Infos.FirstLineChartData.Add(new LineChartData() { RequestTime = log.Create_Time, ResponseTime = log.TimeCost });
                 }
             }
             else
@@ -495,34 +510,16 @@ namespace ServerMonitor.ViewModels
             switch (index)
             {
                 case 0:
-                    Infos.FirstChartAxisProperties.Min.MajorStep = 3;
+                    Infos.FirstChartAxisProperties.Min.MajorStep = 2;
                     Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Hour;
-                    //Infos.FirstChartAxisProperties.Min.MajorStep = 6;
-                    //Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Hour;
-                    //Infos.FirstChartAxisProperties.Mid.MajorStep = 4;
-                    //Infos.FirstChartAxisProperties.Mid.MajorStepUnit1 = TimeInterval.Hour;
-                    //Infos.FirstChartAxisProperties.Max.MajorStep = 2;
-                    //Infos.FirstChartAxisProperties.Max.MajorStepUnit1 = TimeInterval.Hour;
                     break;
                 case 1:
                     Infos.FirstChartAxisProperties.Min.MajorStep = 12;
                     Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Hour;
-                    //Infos.FirstChartAxisProperties.Min.MajorStep = 1.5;
-                    //Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Day;
-                    //Infos.FirstChartAxisProperties.Mid.MajorStep = 1;
-                    //Infos.FirstChartAxisProperties.Mid.MajorStepUnit1 = TimeInterval.Day;
-                    //Infos.FirstChartAxisProperties.Max.MajorStep = 12;
-                    //Infos.FirstChartAxisProperties.Max.MajorStepUnit1 = TimeInterval.Hour;
                     break;
                 case 2:
                     Infos.FirstChartAxisProperties.Min.MajorStep = 1;
                     Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Day;
-                    //Infos.FirstChartAxisProperties.Min.MajorStep = 3;
-                    //Infos.FirstChartAxisProperties.Min.MajorStepUnit1 = TimeInterval.Day;
-                    //Infos.FirstChartAxisProperties.Mid.MajorStep = 2;
-                    //Infos.FirstChartAxisProperties.Mid.MajorStepUnit1 = TimeInterval.Day;
-                    //Infos.FirstChartAxisProperties.Max.MajorStep = 1;
-                    //Infos.FirstChartAxisProperties.Max.MajorStepUnit1 = TimeInterval.Day;
                     break;
                 default:
                     break;
@@ -1074,6 +1071,7 @@ namespace ServerMonitor.ViewModels
         private Uri site_Address;
         private LogModel previousRequestLog;
         private string previousRequestLogWords;
+        private ObservableCollection<LineChartData> firstLineChartData;
 
         // 对应界面上的toggledSwitch 按钮的值，表示此站点是否正在监测
         public bool IsMonitor
@@ -1303,6 +1301,15 @@ namespace ServerMonitor.ViewModels
             {
                 successLogs = value;
                 RaisePropertyChanged(() => SuccessLogs);
+            }
+        }
+
+        public ObservableCollection<LineChartData> FirstLineChartData {
+            get => firstLineChartData;
+            set
+            {
+                firstLineChartData = value;
+                RaisePropertyChanged(() => FirstLineChartData);
             }
         }
     }
