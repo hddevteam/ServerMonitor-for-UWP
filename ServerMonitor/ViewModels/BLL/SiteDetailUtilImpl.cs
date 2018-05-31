@@ -17,6 +17,9 @@ using ServerMonitor.SiteDb;
 
 namespace ServerMonitor.ViewModels.BLL
 {
+    /// <summary>
+    /// SiteDetail 界面的工具类 创建者: xb 创建时间：2018/05/10
+    /// </summary>
     public class SiteDetailUtilImpl : ISiteDetailUtil
     {
         #region 变量声明
@@ -33,13 +36,14 @@ namespace ServerMonitor.ViewModels.BLL
         /// </summary>
         private static ILogDAO logDao;
         #endregion
-        static SiteDetailUtilImpl() {
+        static SiteDetailUtilImpl()
+        {
             utilObject = new SiteDetailUtilImpl();
             siteDao = new SiteDaoImpl();
             logDao = new LogDaoImpl();
         }
         /// <summary>
-        /// 请求服务器状态
+        /// 请求服务器状态 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="serverProtocol"></param>
         /// <returns></returns>
@@ -100,12 +104,20 @@ namespace ServerMonitor.ViewModels.BLL
             return log;
         }
         /// <summary>
-        /// 请求FTP服务器的状态
+        /// 请求FTP服务器的状态 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="site">待请求的站点</param>
         /// <param name="request">请求对象</param>
         public async Task<LogModel> AccessFTPServer(SiteModel site, FTPRequest request)
         {
+            #region 初始化log
+            LogModel log = new LogModel
+            {
+                Site_id = site.Id,
+                Create_Time = DateTime.Now
+
+            };
+            #endregion
             if (null != site.Site_address && !("".Equals(site.Site_address)))
             {
                 // 检测并赋值DNS服务器IP
@@ -113,32 +125,34 @@ namespace ServerMonitor.ViewModels.BLL
                 // IP 不合法
                 if (null == ip)
                 {
-                    return null;
+                    log.TimeCost = 7500;
+                    log.Status_code = "1001";
+                    log.Is_error = true;
+                    log.Log_Record = "Address Format Is Invalid!";
                 }
-                request.FtpServer = IPAddress.Parse(site.Site_address);
-                // 获取保存的用户验证的信息
-                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
-                try {
-                    request.Identification = new IdentificationInfo() { Username = js["username"].ToString(), Password = js["password"].ToString() };
-                    request.IdentifyType = (LoginType)Enum.Parse(typeof(LoginType),js["type"].ToString());
-                } catch (NullReferenceException){
-                    request.Identification = new IdentificationInfo() {Password=null};
-                    request.IdentifyType = LoginType.Anonymous;
-                }
-                #region 初始化log
-                LogModel log = new LogModel
+                else
                 {
-                    Site_id = site.Id,
-                    Create_Time = DateTime.Now
+                    request.FtpServer = IPAddress.Parse(site.Site_address);
+                    // 获取保存的用户验证的信息
+                    JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
+                    try
+                    {
+                        request.Identification = new IdentificationInfo() { Username = js["username"].ToString(), Password = js["password"].ToString() };
+                        request.IdentifyType = (LoginType)Enum.Parse(typeof(LoginType), js["type"].ToString());
+                    }
+                    catch (NullReferenceException)
+                    {
+                        request.Identification = new IdentificationInfo() { Password = null };
+                        request.IdentifyType = LoginType.Anonymous;
+                    }
 
-                };
-                #endregion                
-                // 开始请求
-                bool result = await request.MakeRequest();
-                // 处理请求记录
-                CreateLogWithRequestServerResult(log, request);
-                // 补充额外添加的判断
-                log.Log_Record = request.ProtocalInfo;
+                    // 开始请求
+                    bool result = await request.MakeRequest();
+                    // 处理请求记录
+                    CreateLogWithRequestServerResult(log, request);
+                    // 补充额外添加的判断
+                    log.Log_Record = request.ProtocalInfo;
+                }
                 // 更新站点信息
                 UpdateSiteStatus(site, log);
                 return log;
@@ -146,7 +160,7 @@ namespace ServerMonitor.ViewModels.BLL
             return null;
         }
         /// <summary>
-        /// 请求SSH服务器的状态
+        /// 请求SSH服务器的状态 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="site">待请求的站点</param>
         /// <param name="request">请求对象</param>
@@ -156,7 +170,7 @@ namespace ServerMonitor.ViewModels.BLL
             {
                 request.IPAddress = site.Site_address;
                 // 获取保存的用户验证的信息
-                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);                
+                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
                 try
                 {
                     request.Identification = new SshIdentificationInfo() { Username = js["username"].ToString(), Password = js["password"].ToString() };
@@ -185,7 +199,7 @@ namespace ServerMonitor.ViewModels.BLL
             return null;
         }
         /// <summary>
-        /// 请求SMTP服务器的状态
+        /// 请求SMTP服务器的状态 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="site">待请求的站点</param>
         /// <param name="request">请求对象</param>
@@ -216,7 +230,7 @@ namespace ServerMonitor.ViewModels.BLL
             return null;
         }
         /// <summary>
-        /// 使用ICMP 与服务器建立连接
+        /// 使用ICMP 与服务器建立连接 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <returns></returns>
         public async Task<LogModel> ConnectToServerWithICMP(SiteModel site, ICMPRequest request)
@@ -228,42 +242,60 @@ namespace ServerMonitor.ViewModels.BLL
                 Create_Time = DateTime.Now
             };
             #endregion
-            await Task.CompletedTask;
-            #region 根据设计的ICMP请求修改的   --xb
-            bool icmpFlag = request.MakeRequest();
-            //请求完毕
-            RequestObj requestObj;//用于存储icmp请求结果的对象              
-            requestObj = DataHelper.GetProperty(request); // 处理下请求对象的数据                                   
-            // 生成请求记录            
-            CreateLogWithRequestServerResult(log, requestObj);
-            // 更新站点信息
-            UpdateSiteStatus(site, log);
-            if (icmpFlag == false)
+            // IP 不合法
+            if (null == request.MyIPAddress)
             {
-                site.Is_success = 0;
+                log.TimeCost = 7500;
+                log.Status_code = "1001";
+                log.Is_error = true;
+                log.Log_Record = "Address Format Is Invalid!";
             }
-            #endregion
-       
+            else {
+                #region 根据设计的ICMP请求修改的   --xb
+                bool icmpFlag = request.MakeRequest();
+                //请求完毕
+                RequestObj requestObj;//用于存储icmp请求结果的对象              
+                requestObj = DataHelper.GetProperty(request); // 处理下请求对象的数据                                   
+                                                              // 生成请求记录            
+                CreateLogWithRequestServerResult(log, requestObj);
+                // 更新站点信息
+                UpdateSiteStatus(site, log);
+                if (icmpFlag == false)
+                {
+                    site.Is_success = 0;
+                }
+                #endregion
+            }
+
+            await Task.CompletedTask;                                   
             return log;
         }
         /// <summary>
-        /// 使用Socket 与服务器建立连接
+        /// 使用Socket 与服务器建立连接 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <returns></returns>
         public async Task<LogModel> ConnectToServerWithSocket(SiteModel site, SocketRequest request)
         {
-            IPAddress ip = await GetIPAddressAsync(site.Site_address);
-            IPEndPoint endPoint = new IPEndPoint(ip, site.Server_port);
-            if (null != endPoint.Address && !("".Equals(endPoint.Address)))
+            #region 初始化log
+            LogModel log = new LogModel
             {
+                Site_id = site.Id,
+                Create_Time = DateTime.Now
+            };
+            #endregion
+            IPAddress ip = await GetIPAddressAsync(site.Site_address);
+            // IP 不合法
+            if (null == ip)
+            {
+                log.TimeCost = 7500;
+                log.Status_code = "1001";
+                log.Is_error = true;
+                log.Log_Record = "Address Format Is Invalid!";
+            }
+            else
+            {
+                IPEndPoint endPoint = new IPEndPoint(ip, site.Server_port);
                 request.TargetEndPoint = endPoint;
-                #region 初始化log
-                LogModel log = new LogModel
-                {
-                    Site_id = site.Id,
-                    Create_Time = DateTime.Now
-                };
-                #endregion                
                 // 开始请求
                 bool result = await request.MakeRequest();
                 // 处理请求记录
@@ -272,36 +304,39 @@ namespace ServerMonitor.ViewModels.BLL
                 log.Log_Record = request.ProtocolInfo;
                 // 更新站点信息
                 UpdateSiteStatus(site, log);
-                return log;
             }
-            return null;
+            return log;
+
         }
         /// <summary>
-        /// 处理请求记录
+        /// 处理请求记录 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="log"></param>
         /// <param name="request"></param>
-        public void CreateLogWithRequestServerResult(LogModel log, BasicRequest request)
+        public void CreateLogWithRequestServerResult(LogModel log, BasicRequest request = null)
         {
-            // 请求成功
-            log.Status_code = request.Status;
-            log.TimeCost = request.TimeCost;
-            // 请求失败
-            switch (log.Status_code)
+            if (null != request)
             {
-                case "1000":
-                    log.Is_error = false;
-                    break;
-                case "1001":
-                    log.Is_error = true;
-                    break;
-                case "1002":
-                    log.Is_error = true;
-                    break;
+                // 请求成功
+                log.Status_code = request.Status;
+                log.TimeCost = request.TimeCost;
+                // 请求失败
+                switch (log.Status_code)
+                {
+                    case "1000":
+                        log.Is_error = false;
+                        break;
+                    case "1001":
+                        log.Is_error = true;
+                        break;
+                    case "1002":
+                        log.Is_error = true;
+                        break;
+                }
             }
         }
         /// <summary>
-        /// 更新指定站点状态
+        /// 更新指定站点状态 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="site">指定站点</param>
         /// <param name="log">请求的结果</param>
@@ -322,6 +357,10 @@ namespace ServerMonitor.ViewModels.BLL
                 {
                     url = url.Substring(8);//
                 }
+                else
+                {
+                    return null;
+                }
                 IPAddress[] hostEntry = await Dns.GetHostAddressesAsync(url);
                 for (int m = 0; m < hostEntry.Length; m++)
                 {
@@ -334,12 +373,20 @@ namespace ServerMonitor.ViewModels.BLL
             }
             else
             {
-                reIP = IPAddress.Parse(url);
+                try
+                {
+                    reIP = IPAddress.Parse(url);
+                }
+                catch (FormatException e)
+                {
+                    DBHelper.InsertErrorLog(e);
+                    return null;
+                }
             }
             return reIP;
         }
         /// <summary>
-        /// 快速排序主体
+        /// 快速排序主体 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="a">待排数组</param>
         /// <param name="low">从哪开始</param>
@@ -367,7 +414,7 @@ namespace ServerMonitor.ViewModels.BLL
             }
         }
         /// <summary>
-        /// 一遍快速排序
+        /// 一遍快速排序 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="a">待排数组</param>
         /// <param name="low">排序起始值</param>
@@ -393,7 +440,7 @@ namespace ServerMonitor.ViewModels.BLL
             return low;
         }
         /// <summary>
-        /// 截取url部分判断是否能转换成ip
+        /// 截取url部分判断是否能转换成ip 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
@@ -418,7 +465,7 @@ namespace ServerMonitor.ViewModels.BLL
             Debug.WriteLine("请求了一次服务器!");
         }
         /// <summary>
-        /// 查看是否满足用户提出的成功Code
+        /// 查看是否满足用户提出的成功Code 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="site"></param>
         /// <param name="statusCode"></param>
@@ -437,7 +484,7 @@ namespace ServerMonitor.ViewModels.BLL
             return false;
         }
         /// <summary>
-        /// 获取服务器状态成功的状态码列表
+        /// 获取服务器状态成功的状态码列表 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <param name="site"></param>
         /// <returns></returns>
@@ -453,7 +500,7 @@ namespace ServerMonitor.ViewModels.BLL
             }
         }
         /// <summary>
-        /// 请求网站，并存入一条记录
+        /// 请求网站，并存入一条记录 创建者: xb 创建时间：2018/05/10
         /// </summary>
         /// <returns></returns>
         public async Task<LogModel> RequestHTTPSite(SiteModel site, HTTPRequest request)
@@ -481,6 +528,6 @@ namespace ServerMonitor.ViewModels.BLL
                 return log;
             }
             return null;
-        }        
+        }
     }
 }

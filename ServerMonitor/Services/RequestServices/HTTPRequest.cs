@@ -11,6 +11,9 @@ namespace ServerMonitor.Services.RequestServices
      * Http 请求模块
      * 使用了单例模式 -- 完全延迟加载
      */
+    /// <summary>
+    /// 创建者:xb 创建时间: 2018/04
+    /// </summary>
     public class HTTPRequest : BasicRequest, IRequest
     {
         // 继承的属性：CreateTime TimeCost OverTime Status Others ErrorException  
@@ -52,7 +55,7 @@ namespace ServerMonitor.Services.RequestServices
         private HTTPRequest() { }
 
         /// <summary>
-        /// 发起一次HTTP请求，返回状态码和请求时间(ms)
+        /// 发起一次HTTP请求，返回状态码和请求时间(ms)  创建者:xb 创建时间: 2018/04
         /// </summary>
         /// <param name="uri">请求的URI</param>
         private async Task<bool> HttpRequest(string uri)
@@ -82,7 +85,7 @@ namespace ServerMonitor.Services.RequestServices
                     //请求失败计算时间
                     DateTime end_time = DateTime.Now;
                     TimeSpan timeSpan = end_time - start_time;
-                    TimeCost = (short)timeSpan.TotalMilliseconds;
+                    TimeCost = (int)timeSpan.TotalMilliseconds;
                     //请求失败状态码
                     Status = ((int)Enum.Parse(typeof(System.Net.HttpStatusCode), message.StatusCode.ToString())).ToString();//状态码strign to num                    
                 }
@@ -112,7 +115,7 @@ namespace ServerMonitor.Services.RequestServices
             {
                 Debug.WriteLine("请求失败" + e.Message);
                 DBHelper.InsertErrorLog(e);
-                TimeCost = (short)(OverTime * 1.5);
+                TimeCost = (int)(OverTime * 1.5);
                 ErrorException = e;
                 Status = "1001";
                 requestInfo = e.Message;
@@ -121,7 +124,7 @@ namespace ServerMonitor.Services.RequestServices
         }
 
         /// <summary>
-        /// http请求方法
+        /// http请求方法  创建者:xb 创建时间: 2018/04
         /// </summary>
         /// <returns></returns>
         public async Task<bool> MakeRequest()
@@ -138,7 +141,7 @@ namespace ServerMonitor.Services.RequestServices
         }
 
         /// <summary>
-        /// 用于控制线程安全的内部类
+        /// 用于控制线程安全的内部类 创建者:xb 创建时间: 2018/04
         /// </summary>
         private class Nested
         {
@@ -151,7 +154,7 @@ namespace ServerMonitor.Services.RequestServices
     }
 
     /// <summary>
-    /// 用户登入识别类型
+    /// 用户登入识别类型 创建者:xb 创建时间: 2018/04
     /// </summary>
     public enum TransportProtocol
     {

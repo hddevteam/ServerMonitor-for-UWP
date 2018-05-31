@@ -6,8 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/// <summary>
+/// 创建者:xb 创建时间: 2018/04
+/// </summary>
 namespace ServerMonitor.Models
 {
+    /// <summary>
+    /// 创建者:xb 创建时间: 2018/04
+    /// </summary>
     // 对应数据库里的Log表
     [Table("Log")]
     public class LogModel : ObservableObject
@@ -87,7 +93,7 @@ namespace ServerMonitor.Models
 
         public override string ToString()
         {
-            return string.Format("站点:{0}\t时间:{1}\t请求状态码:{2}",Site_id,timeCost,status_code);
+            return string.Format("站点:{0}\t创建时间:{3}\t时间:{1}\t请求状态码:{2}",Site_id,timeCost,status_code,create_time.ToLocalTime());
         }
     }
 }

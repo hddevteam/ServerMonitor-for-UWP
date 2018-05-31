@@ -44,7 +44,7 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        
+
         <controls:PageHeader x:Name="pageHeader" RelativePanel.AlignLeftWithPanel="True"
                              RelativePanel.AlignRightWithPanel="True"
                              RelativePanel.AlignTopWithPanel="True"
@@ -91,7 +91,7 @@
                     <PivotItem Header="Seven Days">
                     </PivotItem>
                 </Pivot>
-                <!--选择类型--><!-- 
+                <!--选择类型--><!--                
                 <ComboBox x:Name="selectionTypeCombo" Grid.Row="1" Grid.Column="0" Width="225"
                           HorizontalAlignment="Left" Height="40" Grid.ColumnSpan="2" 
                           ItemsSource="{Binding RequestResult}" Margin="10" SelectedItem="{x:Bind ViewModel.RequestResultType,Mode=TwoWay}">
@@ -179,7 +179,7 @@
                         </ListBox.ItemContainerStyle>
                     </ListBox>
                 </StackPanel>
-                
+
                 <!--柱形图-->
                 <StackPanel x:Name="BarChart" Grid.Row="3" Grid.ColumnSpan="3" Padding="0,0,24,0">
                     <telerikPrimitives:RadLegendControl x:Name="barchartLegend" HorizontalAlignment="Right">
@@ -264,7 +264,7 @@
                                     </Style>
                                 </telerikGrid:DataGridTextColumn.HeaderStyle>
                             </telerikGrid:DataGridTextColumn>
-                        
+
                             <telerikGrid:DataGridNumericalColumn PropertyName="Success" Header="SUCCESS" CanUserFilter="False">
                                 <telerikGrid:DataGridNumericalColumn.HeaderStyle>
                                     <Style TargetType="gridPrimitives:DataGridColumnHeader">

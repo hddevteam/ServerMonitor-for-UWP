@@ -14,6 +14,9 @@ namespace ServerMonitor.Services.RequestServices
      * 
      * 没有做成单例模式的是因为考虑到有场景会需要多个request对象
      */
+    /// <summary>
+    /// 创建者:xb 创建时间: 2018/04
+    /// </summary>
     public class FTPRequest : BasicRequest,IRequest
     {
         // 继承的属性：CreateTime TimeCost OverTime Status Others ErrorException               
@@ -68,8 +71,8 @@ namespace ServerMonitor.Services.RequestServices
         }       
         private FTPRequest() { }
 
-        /// <summary>
-        /// 构造函数
+        /// <summary> 
+        /// 构造函数 创建者:xb 创建时间: 2018/04
         /// </summary>
         /// <param name="server">指定的ftp服务器</param>
         /// <param name="type">指定的登入类型</param>
@@ -86,7 +89,7 @@ namespace ServerMonitor.Services.RequestServices
 
         // 需要自己手动加入一些垃圾回收的代码，以防内存泄漏（断开连接，释放连接）
         /// <summary>
-        /// 对指定的IPAddress发起登入请求
+        /// 对指定的IPAddress发起登入请求 创建者:xb 创建时间: 2018/04
         /// </summary>
         /// <returns>true:成功|false:失败</returns>
         public async Task<bool> MakeRequest()
@@ -108,7 +111,7 @@ namespace ServerMonitor.Services.RequestServices
                 default:
                     // ftp请求登陆模式异常
                     CreateTime = DateTime.Now;
-                    TimeCost = (short)(OverTime * ErrorQuality);
+                    TimeCost = (int)(OverTime * ErrorQuality);
                     Status = "1001";
                     ErrorException = new Exception("User identifyType is invalid!");
                     protocalInfo = "User identifyType is invalid!";
@@ -122,7 +125,7 @@ namespace ServerMonitor.Services.RequestServices
             // 检测服务器的IPAddress是否合法
             if (! ValidateIPv4(ftpServer.ToString()))
             {
-                TimeCost = (short)(OverTime * ErrorQuality);
+                TimeCost = (int)(OverTime * ErrorQuality);
                 Status = "1001";
                 ErrorException = new Exception("Server address is invalid!");
                 protocalInfo = "Server address is invalid!";
@@ -182,20 +185,20 @@ namespace ServerMonitor.Services.RequestServices
                                     // 请求成功
                                     case 2:
                                     case 3:
-                                        TimeCost = (short)stopwatch.ElapsedMilliseconds;
+                                        TimeCost = (int)stopwatch.ElapsedMilliseconds;
                                         Status = "1000";
                                         protocalInfo = strRet;
                                         break;
                                     // 请求失败 
                                     case 4:
                                     case 5:
-                                        TimeCost = (short)(OverTime * ErrorQuality);
+                                        TimeCost = (int)(OverTime * ErrorQuality);
                                         Status = "1001";
                                         protocalInfo = strRet;
                                         break;
                                     // 请求未知
                                     default:
-                                        TimeCost = (short)(OverTime * ErrorQuality);
+                                        TimeCost = (int)(OverTime * ErrorQuality);
                                         Status = "1001";
                                         protocalInfo = strRet;
                                         break;
@@ -205,7 +208,7 @@ namespace ServerMonitor.Services.RequestServices
                             {
                                 // 未连接，将秒表停止，此次请求作为失败的请求
                                 stopwatch.Stop();
-                                TimeCost = (short)(OverTime * ErrorQuality);
+                                TimeCost = (int)(OverTime * ErrorQuality);
                                 Status = "1001";
                                 protocalInfo = "Connect failed!";
                             }
@@ -213,7 +216,7 @@ namespace ServerMonitor.Services.RequestServices
                         catch (Exception e)
                         {
                             stopwatch.Stop();
-                            TimeCost = (short)(OverTime * ErrorQuality);
+                            TimeCost = (int)(OverTime * ErrorQuality);
                             Status = "1001";
                             protocalInfo = e.ToString();
                             ErrorException = e;
@@ -239,7 +242,7 @@ namespace ServerMonitor.Services.RequestServices
                 {
                     // 输入的指令格式不正确 ，此次请求作为失败的请求
                     stopwatch.Stop();
-                    TimeCost = (short)(OverTime * ErrorQuality);
+                    TimeCost = (int)(OverTime * ErrorQuality);
                     Status = "1001";
                     protocalInfo = e.ToString();
                     ErrorException = e;
@@ -258,7 +261,7 @@ namespace ServerMonitor.Services.RequestServices
                             ErrorException = e;
                             break;
                         default:
-                            TimeCost = (short)(OverTime * ErrorQuality);
+                            TimeCost = (int)(OverTime * ErrorQuality);
                             Status = "1001";
                             protocalInfo = e.Message;
                             break;
@@ -269,7 +272,7 @@ namespace ServerMonitor.Services.RequestServices
                 {
                     // 出现未捕获到的异常，此次请求作为失败的请求
                     stopwatch.Stop();
-                    TimeCost = (short)(OverTime * ErrorQuality);
+                    TimeCost = (int)(OverTime * ErrorQuality);
                     Status = "1001";
                     protocalInfo = e.ToString();
                     ErrorException = e;
@@ -292,7 +295,7 @@ namespace ServerMonitor.Services.RequestServices
         }
 
         /// <summary>
-        /// ftp用户名命令
+        /// ftp用户名命令  创建者:xb 创建时间: 2018/04
         /// </summary>
         /// <param name="Username"></param>
         /// <returns></returns>
@@ -302,7 +305,7 @@ namespace ServerMonitor.Services.RequestServices
         }
 
         /// <summary>
-        /// ftp密码命令
+        /// ftp密码命令  创建者:xb 创建时间: 2018/04
         /// </summary>
         /// <param name="Password"></param>
         /// <returns></returns>
@@ -312,7 +315,7 @@ namespace ServerMonitor.Services.RequestServices
         }
 
         /// <summary>
-        ///  用于判断ip是否合法
+        ///  用于判断ip是否合法 创建者:xb 创建时间: 2018/04
         /// </summary>
         /// <param name="ipString">IPAddress</param>
         /// <returns>yes:true|no:false</returns>
@@ -333,7 +336,7 @@ namespace ServerMonitor.Services.RequestServices
         }
 
         /// <summary>
-        /// 用于控制线程安全的内部类
+        /// 用于控制线程安全的内部类  创建者:xb 创建时间: 2018/04
         /// </summary>
         private class Nested
         {
@@ -346,7 +349,7 @@ namespace ServerMonitor.Services.RequestServices
     }
 
     /// <summary>
-    /// 用户身份验别信息
+    /// 用户身份验别信息  创建者:xb 创建时间: 2018/04
     /// </summary>
     public class IdentificationInfo
     {
@@ -372,7 +375,7 @@ namespace ServerMonitor.Services.RequestServices
     }
 
     /// <summary>
-    /// 用户登入识别类型
+    /// 用户登入识别类型  创建者:xb 创建时间: 2018/04
     /// </summary>
     public enum LoginType
     {

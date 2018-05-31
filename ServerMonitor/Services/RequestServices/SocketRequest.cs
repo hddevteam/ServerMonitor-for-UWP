@@ -11,6 +11,9 @@ using Windows.Networking.Sockets;
 
 namespace ServerMonitor.Services.RequestServices
 {
+    /// <summary>
+    /// 创建者:xb 创建时间: 2018/04
+    /// </summary>
     public class SocketRequest : BasicRequest, IRequest
     {
         // 继承的属性：CreateTime TimeCost OverTime Status Others ErrorException
@@ -22,6 +25,10 @@ namespace ServerMonitor.Services.RequestServices
         public IPEndPoint TargetEndPoint { get => targetEndPoint; set => targetEndPoint = value; }
         public string ProtocolInfo { get => protocolInfo;}
 
+        /// <summary>
+        /// 创建Socket请求 创建者:xb 创建时间: 2018/04
+        /// </summary>
+        /// <returns></returns>
         public async Task<bool> MakeRequest()
         {
             CreateTime = DateTime.Now;
@@ -52,7 +59,7 @@ namespace ServerMonitor.Services.RequestServices
                                                                  remoteIp, s.ElapsedMilliseconds));
                     #region 修改返回数据
                     Status = "1000";
-                    TimeCost = (short)s.ElapsedMilliseconds;
+                    TimeCost = (int)s.ElapsedMilliseconds;
                     protocolInfo = String.Format("Success, remote server contacted at IP address {0},and the connecting work cost {1} millsseconds!", remoteIp, s.ElapsedMilliseconds);
                     #endregion
                     // 释放连接
@@ -80,7 +87,7 @@ namespace ServerMonitor.Services.RequestServices
                 {
                     #region 修改返回数据
                     Status = "1001";
-                    TimeCost = (short)(OverTime * 1.5);
+                    TimeCost = (int)(OverTime * 1.5);
                     protocolInfo = String.Format("Success, remote server contacted at IP address {0},and the connecting work cost {1} millsseconds!", targetEndPoint.Address, s.ElapsedMilliseconds);
                     #endregion
                     Debug.WriteLine("Error: No such host is known");
@@ -102,7 +109,7 @@ namespace ServerMonitor.Services.RequestServices
                 {
                     #region 修改返回数据
                     Status = "1001";
-                    TimeCost = (short)(OverTime * 1.5);
+                    TimeCost = (int)(OverTime * 1.5);
                     protocolInfo = "Error: Timeout when connecting (check hostname and port)";
                     #endregion
                     Debug.WriteLine("Error: Timeout when connecting (check hostname and port)");
