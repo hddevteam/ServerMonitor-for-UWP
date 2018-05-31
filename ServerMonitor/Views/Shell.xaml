@@ -44,43 +44,8 @@
             </Controls:HamburgerButtonInfo>
         </Controls:HamburgerMenu.PrimaryButtons>
         <Controls:HamburgerMenu.SecondaryButtons>
-            <!--  profile button  自带的测试button  可以删除  -->
-            <Controls:HamburgerButtonInfo ButtonType="Command">
-                <Interactivity:Interaction.Behaviors>
-                    <Core:EventTriggerBehavior EventName="Tapped">
-                        <behaviors:MessageDialogAction Title="Show profile" Content="This is an example of a Command-type hamburger button. It does not navigate, only raises the Tapped event for some custom implementation." />
-                    </Core:EventTriggerBehavior>
-                </Interactivity:Interaction.Behaviors>
-                <StackPanel Orientation="Horizontal">
-                    <ToolTipService.ToolTip>
-                        <TextBlock MaxWidth="225"
-                                   Text="This is the tooltip for the Show Profile command button. Remember to localize."
-                                   TextWrapping="Wrap" />
-                    </ToolTipService.ToolTip>
-                    <SymbolIcon Width="48"
-                                Height="48"
-                                Symbol="Remote" />
-                    <TextBlock Margin="12,0,0,0"
-                               VerticalAlignment="Center"
-                               Text="User Profile" />
-                </StackPanel>
-            </Controls:HamburgerButtonInfo>
-             <!-- Backup and Restore Page Button-->
-            <Controls:HamburgerButtonInfo x:Name="BackupRestore" PageParameter="0" PageType="views:BackupPage">
-                <Controls:HamburgerButtonInfo.NavigationTransitionInfo>
-                    <SuppressNavigationTransitionInfo/>
-                </Controls:HamburgerButtonInfo.NavigationTransitionInfo>
-                <StackPanel Orientation="Horizontal">
-                    <SymbolIcon Width="48"
-                                Height="48"
-                                Symbol="Rotate" />
-                    <TextBlock Margin="12,0,0,0"
-                               VerticalAlignment="Center"                                  
-                               Text="Backup Restore" />
-                </StackPanel>
-            </Controls:HamburgerButtonInfo>
             <!--  settingspage button  -->
-            <Controls:HamburgerButtonInfo x:Name="SettingsButton"
+            <!--<Controls:HamburgerButtonInfo x:Name="SettingsButton"
                                           PageParameter="0"
                                           PageType="views:SettingsPage">
                 <Controls:HamburgerButtonInfo.NavigationTransitionInfo>
@@ -95,24 +60,36 @@
                                VerticalAlignment="Center"
                                Text="Settings" />
                     </StackPanel>
-
                 </StackPanel>
-            </Controls:HamburgerButtonInfo>
-            <!--version 说明  -->
-            <Controls:HamburgerButtonInfo x:Name="version" ButtonType="Command">
-                <Interactivity:Interaction.Behaviors>
-                    <Core:EventTriggerBehavior EventName="Tapped">
-                        <behaviors:MessageDialogAction Title="Version" Content="This version is 0.1 of ServerMonitor." />
-                    </Core:EventTriggerBehavior>
-                </Interactivity:Interaction.Behaviors>
+            </Controls:HamburgerButtonInfo>-->
+            <!--<Controls:HamburgerButtonInfo x:Name="aboutus" ClearHistory="True" ButtonType="Command">
+
                 <StackPanel Orientation="Horizontal">
                     <StackPanel Orientation="Horizontal">
                         <SymbolIcon Width="48"
                                 Height="48"
-                                Symbol="ReportHacked" />
+                                Symbol="Help"  Tapped="SymbolIcon_Tapped"/>
                         <TextBlock Margin="12,0,0,0"
                                VerticalAlignment="Center"
-                               Text="0.1" />
+                               Text="AboutUs"  Tapped="SymbolIcon_Tapped"/>
+                    </StackPanel>
+                </StackPanel>
+            </Controls:HamburgerButtonInfo>-->
+            <!--version 说明  -->
+            <Controls:HamburgerButtonInfo x:Name="version" ButtonType="Command">
+                <!--<Interactivity:Interaction.Behaviors>
+                    <Core:EventTriggerBehavior EventName="Tapped">
+                        <behaviors:MessageDialogAction Title="Version" Content="This is version 1.0.0 of Server Monitor." />
+
+                    </Core:EventTriggerBehavior>
+                </Interactivity:Interaction.Behaviors>-->
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="ms-appx:///Assets/Version Number.png" Width="32" Height="32" Margin="8" Tapped="SymbolIcon_Tapped"></Image>
+                        <!--<BitmapIcon UriSource="ms-appx:///Assets/Version Number.png" Height="48" Width="48"></BitmapIcon>-->
+                        <TextBlock Margin="12,0,0,0"
+                               VerticalAlignment="Center"
+                               Text="1.0.0" Tapped="SymbolIcon_Tapped" />
                     </StackPanel>
                 </StackPanel>
             </Controls:HamburgerButtonInfo>
