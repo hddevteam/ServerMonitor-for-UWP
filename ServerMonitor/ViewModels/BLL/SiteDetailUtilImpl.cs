@@ -33,7 +33,8 @@ namespace ServerMonitor.ViewModels.BLL
         /// </summary>
         private static ILogDAO logDao;
         #endregion
-        static SiteDetailUtilImpl() {
+        static SiteDetailUtilImpl()
+        {
             utilObject = new SiteDetailUtilImpl();
             siteDao = new SiteDaoImpl();
             logDao = new LogDaoImpl();
@@ -126,7 +127,8 @@ namespace ServerMonitor.ViewModels.BLL
                     log.Is_error = true;
                     log.Log_Record = "Address Format Is Invalid!";
                 }
-                else {
+                else
+                {
                     request.FtpServer = IPAddress.Parse(site.Site_address);
                     // 获取保存的用户验证的信息
                     JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
@@ -147,7 +149,7 @@ namespace ServerMonitor.ViewModels.BLL
                     CreateLogWithRequestServerResult(log, request);
                     // 补充额外添加的判断
                     log.Log_Record = request.ProtocalInfo;
-                }                               
+                }
                 // 更新站点信息
                 UpdateSiteStatus(site, log);
                 return log;
@@ -165,7 +167,7 @@ namespace ServerMonitor.ViewModels.BLL
             {
                 request.IPAddress = site.Site_address;
                 // 获取保存的用户验证的信息
-                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);                
+                JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
                 try
                 {
                     request.Identification = new SshIdentificationInfo() { Username = js["username"].ToString(), Password = js["password"].ToString() };
@@ -252,7 +254,7 @@ namespace ServerMonitor.ViewModels.BLL
                 site.Is_success = 0;
             }
             #endregion
-       
+
             return log;
         }
         /// <summary>
@@ -261,18 +263,26 @@ namespace ServerMonitor.ViewModels.BLL
         /// <returns></returns>
         public async Task<LogModel> ConnectToServerWithSocket(SiteModel site, SocketRequest request)
         {
-            IPAddress ip = await GetIPAddressAsync(site.Site_address);
-            IPEndPoint endPoint = new IPEndPoint(ip, site.Server_port);
-            if (null != endPoint.Address && !("".Equals(endPoint.Address)))
+            #region 初始化log
+            LogModel log = new LogModel
             {
+                Site_id = site.Id,
+                Create_Time = DateTime.Now
+            };
+            #endregion
+            IPAddress ip = await GetIPAddressAsync(site.Site_address);
+            // IP 不合法
+            if (null == ip)
+            {
+                log.TimeCost = 7500;
+                log.Status_code = "1001";
+                log.Is_error = true;
+                log.Log_Record = "Address Format Is Invalid!";                
+            }
+            else
+            {
+                IPEndPoint endPoint = new IPEndPoint(ip, site.Server_port);
                 request.TargetEndPoint = endPoint;
-                #region 初始化log
-                LogModel log = new LogModel
-                {
-                    Site_id = site.Id,
-                    Create_Time = DateTime.Now
-                };
-                #endregion                
                 // 开始请求
                 bool result = await request.MakeRequest();
                 // 处理请求记录
@@ -281,16 +291,16 @@ namespace ServerMonitor.ViewModels.BLL
                 log.Log_Record = request.ProtocolInfo;
                 // 更新站点信息
                 UpdateSiteStatus(site, log);
-                return log;
             }
-            return null;
+            return log;
+
         }
         /// <summary>
         /// 处理请求记录
         /// </summary>
         /// <param name="log"></param>
         /// <param name="request"></param>
-        public void CreateLogWithRequestServerResult(LogModel log, BasicRequest request=null)
+        public void CreateLogWithRequestServerResult(LogModel log, BasicRequest request = null)
         {
             if (null != request)
             {
@@ -311,7 +321,8 @@ namespace ServerMonitor.ViewModels.BLL
                         break;
                 }
             }
-            else {
+            else
+            {
 
             }
         }
@@ -337,7 +348,8 @@ namespace ServerMonitor.ViewModels.BLL
                 {
                     url = url.Substring(8);//
                 }
-                else {
+                else
+                {
                     return null;
                 }
                 IPAddress[] hostEntry = await Dns.GetHostAddressesAsync(url);
@@ -356,7 +368,8 @@ namespace ServerMonitor.ViewModels.BLL
                 {
                     reIP = IPAddress.Parse(url);
                 }
-                catch (FormatException e) {
+                catch (FormatException e)
+                {
                     DBHelper.InsertErrorLog(e);
                     return null;
                 }
@@ -506,6 +519,6 @@ namespace ServerMonitor.ViewModels.BLL
                 return log;
             }
             return null;
-        }        
+        }
     }
 }

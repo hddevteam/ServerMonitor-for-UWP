@@ -117,34 +117,9 @@
                             <TextBlock  Text="{x:Bind ViewModel.Infos.MedianValue,Mode=OneWay,Converter={StaticResource StringFormatConvert},ConverterParameter=Median}" 
                                     TextAlignment="Center" FontSize="16" Width="200" Foreground="RoyalBlue" />
                             <TextBlock Text="{x:Bind ViewModel.Infos.AverageValue,Mode=OneWay,Converter={StaticResource StringFormatConvert},ConverterParameter=Average}"
-                                     TextAlignment="Center" FontSize="16" Width="200" Foreground="Purple" />                            
+                                     TextAlignment="Center" FontSize="16" Width="200" Foreground="Purple" />
 
                         </StackPanel>
-
-                        <!--<StackPanel HorizontalAlignment="Right" Grid.Column="1">-->
-                        <!-- 柱状图图释 -->
-                        <!--<telerikPrimitives:RadLegendControl x:Name="barchartLegend" HorizontalAlignment="Right" >
-                                <telerikPrimitives:RadLegendControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal"/>
-                                    </ItemsPanelTemplate>
-                                </telerikPrimitives:RadLegendControl.ItemsPanel>
-                                <telerikPrimitives:RadLegendControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal">
-                                            <Ellipse Fill="{Binding Fill}" Stroke="{Binding Stroke}" StrokeThickness="1" Width="10" Height="10"/>
-                                            <TextBlock Text="{Binding Title}" Foreground="{Binding Fill}" Margin="10">
-                                            </TextBlock>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </telerikPrimitives:RadLegendControl.ItemTemplate>
-                                <telerikPrimitives:RadLegendControl.LegendItems>
-                                    <telerikPrimitives:LegendItem Fill="#1E98E4" Stroke="#1E98E4" Title="SUCCESS"/>
-                                    <telerikPrimitives:LegendItem Fill="#FFC500" Stroke="#FFC500" Title="OVERTIME"/>
-                                    <telerikPrimitives:LegendItem Fill="#FF2A00" Stroke="#FF2A00" Title="ERROR"/>
-                                </telerikPrimitives:RadLegendControl.LegendItems>
-                            </telerikPrimitives:RadLegendControl>-->
-                        <!--</StackPanel>-->
                     </Grid>
                     <!-- 开始绘制表格 >0< 这是最上面的图表 -->
                     <telerik:RadCartesianChart x:Name="RequestTimeBarChar" 
@@ -156,6 +131,13 @@
                         <telerik:RadCartesianChart.Resources>
                             <local1:CustomConverter x:Key="Converter"/>
                             <local1:CustomConverterBrush x:Key="BrushConverter"/>
+                            <DataTemplate x:Key="MyPointTemplate">
+                                <Rectangle Width="2" Height="3" Fill="White"/>
+                                <!--<Ellipse Width="9" Height="9" Fill="AliceBlue"/>-->
+                            </DataTemplate>
+                            <Style x:Key="BorderStyle" TargetType="Border">
+                                <Setter Property="Background" Value="White" />
+                            </Style>
                         </telerik:RadCartesianChart.Resources>
                         <!--end-->
 
@@ -203,9 +185,7 @@
                             </telerik:DateTimeContinuousAxis>
                         </telerik:RadCartesianChart.HorizontalAxis>
                         <telerik:RadCartesianChart.VerticalAxis>
-                            <telerik:LogarithmicAxis 
-                                                     LogarithmBase="10"
-                                                        x:Name="VerticalAxis">
+                            <telerik:LogarithmicAxis LogarithmBase="10"  x:Name="VerticalAxis">                                                                                                                                          
                                 <telerik:LogarithmicAxis.LabelFormatter>
                                     <vm:CustomLogOperatorAxisLabelFormatter/>
                                 </telerik:LogarithmicAxis.LabelFormatter>
@@ -217,53 +197,22 @@
                         <!-- 这里开始定义RadCartesianChart 表格的一些看上去的属性(视觉效果)-->
                         <telerik:RadCartesianChart.Grid>
                             <!-- MajorLinesVisibility属性是指的在表格需不需要显示网格线(获取或设置主要网格线的可见性) -->
-                            <telerik:CartesianChartGrid MajorLinesVisibility="XY" StripLinesVisibility="XY">
+                            <telerik:CartesianChartGrid MajorLinesVisibility="XY" >
                             </telerik:CartesianChartGrid>
                             <!--end-->
                         </telerik:RadCartesianChart.Grid>
                         <!--end-->
-
-                        <!-- 设置 一些与数据绑定显示的基本属性 (当前选择的是柱状图)-->
-                        <!--<telerik:BarSeries ItemsSource="{x:Bind Path=ViewModel.Infos.Logs,Mode=TwoWay}" 
-                                           PaletteMode="Series" 
-                                           >
-                            -->
-                        <!-- 开始设置显示的数据的方式 -->
-                        <!--
-                            <telerik:BarSeries.ValueBinding>
-                                <telerik:PropertyNameDataPointBinding PropertyName="Request_time"/>
-                            </telerik:BarSeries.ValueBinding>
-                            <telerik:BarSeries.CategoryBinding>
-                                <telerik:PropertyNameDataPointBinding PropertyName="Create_time"/>
-                            </telerik:BarSeries.CategoryBinding>
-                        </telerik:BarSeries>-->
-
                         <!-- 改为线性图 -->
                         <!--开始设置显示的数据的方式-->
-                        <telerik:LineSeries ItemsSource="{x:Bind Path=ViewModel.Infos.SuccessLogs,Mode=OneWay}" >
+                        <telerik:LineSeries ItemsSource="{x:Bind Path=ViewModel.Infos.FirstLineChartData,Mode=OneWay}" 
+                                            PointTemplate="{StaticResource MyPointTemplate}" StrokeThickness="3">
                             <telerik:LineSeries.CategoryBinding>
-                                <telerik:PropertyNameDataPointBinding PropertyName="Create_Time"/>
+                                <telerik:PropertyNameDataPointBinding PropertyName="RequestTime"/>
                             </telerik:LineSeries.CategoryBinding>
                             <telerik:LineSeries.ValueBinding>
-                                <telerik:PropertyNameDataPointBinding PropertyName="TimeCost"/>
+                                <telerik:PropertyNameDataPointBinding PropertyName="ResponseTime"/>
                             </telerik:LineSeries.ValueBinding>
                         </telerik:LineSeries >
-
-                        <!-- 这是采用分类的柱状图-->
-                        <!--<telerik:RadCartesianChart.SeriesProvider >
-                            <telerik:ChartSeriesProvider x:Name="provider" Source="{x:Bind ViewModel.Infos.LogCollections,Mode=OneWay}">
-                                <telerik:ChartSeriesProvider.SeriesDescriptors>
-                                    <telerik:CategoricalSeriesDescriptor ValuePath="TimeCost" CategoryPath="Create_Time">
-                                        <telerik:CategoricalSeriesDescriptor.Style>
-                                            <Style TargetType="telerik:BarSeries">
-                                                <Setter Property="CombineMode" Value="Cluster"/>
-                                            </Style>
-                                        </telerik:CategoricalSeriesDescriptor.Style>
-                                    </telerik:CategoricalSeriesDescriptor>
-                                </telerik:ChartSeriesProvider.SeriesDescriptors>
-                            </telerik:ChartSeriesProvider>
-                        </telerik:RadCartesianChart.SeriesProvider>-->
-
                     </telerik:RadCartesianChart>
 
                     <!-- 这是装有下面两个图表的Grid -->
@@ -377,32 +326,7 @@
                         </Grid>
                         <Rectangle Fill="#aaa" VerticalAlignment="Top" Height="1" Grid.Row="0" Grid.ColumnSpan="3"/>
                     </StackPanel>
-
-                    <!--<ListView ItemsSource="{x:Bind ViewModel.Infos.ContactCollection}" SelectionMode="None">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Border Grid.Column="0" Width="80" Height="80" Margin="0,0,50,0">
-                                        <Image Source="/Images/head.png" Stretch="UniformToFill"/>
-                                    </Border>
-                                    <Grid Grid.Column="1">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="*"/>
-                                            <RowDefinition Height="*"/>
-                                            <RowDefinition Height="*"/>
-                                        </Grid.RowDefinitions>
-                                        <TextBox Name="contactName" Text="{Binding Contact_name,Converter={StaticResource ContactFormatConvert},ConverterParameter=Name,FallbackValue=Empty}" BorderThickness="0" IsReadOnly="True" Grid.Row="0" FontSize="18" FontFamily="Consolas"/>
-                                        <TextBox Name="contactEmail" Text="{Binding Contact_email,Converter={StaticResource ContactFormatConvert},ConverterParameter=Email,FallbackValue=Empty}" BorderThickness="0" IsReadOnly="True" Grid.Row="1" FontSize="18" FontFamily="Consolas"/>
-                                        <TextBox Name="contactPhone" Text="{Binding Telephone,Converter={StaticResource ContactFormatConvert},ConverterParameter=MobilePhone,FallbackValue=Empty}" BorderThickness="0" IsReadOnly="True" Grid.Row="2" FontSize="18" FontFamily="Consolas"/>
-                                    </Grid>
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>-->
+                    
                     <StackPanel Visibility="{Binding Infos.IsContactEmpty,Mode=OneWay,Converter={StaticResource BoolToVisbilityConvert}}">
                         <TextBox Text="Contact" FontSize="20" BorderThickness="0" IsReadOnly="True"/>
                         <Rectangle Fill="#aaa" VerticalAlignment="Top" Height="2" />
