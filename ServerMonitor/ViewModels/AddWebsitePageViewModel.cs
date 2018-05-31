@@ -148,17 +148,17 @@ namespace ServerMonitor.ViewModels
             }
         }
         
-        private string statusCodes = "200,";
+        private string requestSucceedCode = "200";
         /// <summary>
         /// 站点状态码 以英文逗号分隔
         /// </summary>
-        public string StatusCodes
+        public string RequestSucceedCode
         {
-            get => statusCodes;
+            get => requestSucceedCode;
             set
             {
-                statusCodes = value;
-                RaisePropertyChanged(() => StatusCodes);
+                requestSucceedCode = value;
+                RaisePropertyChanged(() => RequestSucceedCode);
             }
         }
         //PRIORITY
@@ -246,7 +246,7 @@ namespace ServerMonitor.ViewModels
                 //domain没问题了，看看状态码有没有问题 --xn
                 if (flag)
                 {
-                    flag = CheckCodes(StatusCodes);
+                    flag = CheckCodes(RequestSucceedCode);
                 }
             }
             else   //检查状态码
@@ -299,7 +299,7 @@ namespace ServerMonitor.ViewModels
             //将界面数据保存下来
             site.Protocol_type = GetProtocolType(ProtocolType);
             site.Site_address = (ProtocolType == 0 ? "http://" : "https://") + SiteAddress;
-            site.Request_succeed_code = StatusCodes;
+            site.Request_succeed_code = RequestSucceedCode;
             if (SiteName == null || SiteName.Equals(""))
             {
                 site.Site_name = SiteAddress;
@@ -340,7 +340,7 @@ namespace ServerMonitor.ViewModels
             //将界面数据保存下来
             site.Protocol_type = GetProtocolType(ProtocolType);
             site.Site_address = (ProtocolType == 0 ? "http://" : "https://") + SiteAddress;
-            site.Request_succeed_code = StatusCodes;
+            site.Request_succeed_code = RequestSucceedCode;
             if (SiteName == null || SiteName.Equals(""))
             {
                 site.Site_name = SiteAddress;
@@ -418,7 +418,7 @@ namespace ServerMonitor.ViewModels
             rightFrame1 = grid;   //侧边栏
             this.contactList = contactList;   //侧边栏联系人列表
             rightFrame1.Visibility = Visibility.Collapsed;  //关闭侧边栏
-            IsEnabled = (CheckDomain(SiteAddress) && CheckCodes(StatusCodes));  //检验设置Sava是否可用
+            IsEnabled = (CheckDomain(SiteAddress) && CheckCodes(RequestSucceedCode));  //检验设置Sava是否可用
         }
 
         /// <summary>
@@ -453,11 +453,8 @@ namespace ServerMonitor.ViewModels
                 SiteAddress = site.Site_address.Substring(8);
             }
             SiteName = site.Site_name;
-            if (site.Status_code.Length>=5)
-            {
-                StatusCodes = site.Status_code;
 
-            }
+            RequestSucceedCode = site.Request_succeed_code;
         }
 
         /// <summary>
