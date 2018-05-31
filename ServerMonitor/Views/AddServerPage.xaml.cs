@@ -44,10 +44,9 @@ namespace ServerMonitor.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void TestServerConnection(object sender, RoutedEventArgs e)
+        private void TestServerConnection(object sender,RoutedEventArgs e)
         {
-            switch (model.ProtocolType)
-            {
+            switch (model.ProtocolType) {
                 case 0://ICMP
                     SendICMPRequest();
                     break;
@@ -180,7 +179,7 @@ namespace ServerMonitor.Views
         /// <summary>
         /// 发送测试DNS请求
         /// </summary>
-        private async void SendDNSRequestAsync()
+        private async void  SendDNSRequestAsync()
         {
             DNSRequest request = DNSRequest.Instance;
             IPAddress server;
@@ -227,9 +226,7 @@ namespace ServerMonitor.Views
             try//检测IP是否合法
             {
                 address = IPAddress.Parse(model.SiteAddress);
-            }
-            catch
-            {
+            } catch {
                 await new MessageDialog("It's a wrong Address").ShowAsync();
                 return;
             }
