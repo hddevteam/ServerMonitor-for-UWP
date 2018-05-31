@@ -40,6 +40,7 @@ namespace ServerMonitor.Views
             model.OnLoaded(contactList, this.RightFrame1);
         }
         /// <summary>
+        /// Test按钮的测试请求
         /// LiuYang 2018/5/27
         /// </summary>
         /// <param name="sender"></param>
