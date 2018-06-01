@@ -127,7 +127,7 @@ namespace ServerMonitor.Controls
                         new SiteModel()
                         {
                             Site_name = "Google",
-                            Site_address = "https://www.google.com",
+                            Site_address = "8.8.8.8",
                             Is_server = true,
                             Protocol_type = "ICMP",
                             Server_port = 53,
