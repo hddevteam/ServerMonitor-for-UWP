@@ -105,7 +105,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid x:Name="precheck_btn" Height="52" Margin="24,24,24,0"
-                      Background="{Binding PreCheckColor}">
+                      Background="{Binding PreCheckColor}" Tapped="{x:Bind ViewModel.Precheck_Tapped}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -135,8 +135,7 @@
                               VerticalScrollBarVisibility="Auto" Margin="0,24,0,0">
                     <StackPanel Orientation="Vertical" Margin="20,0,20,0">
                         <GridView x:Name="sitelist" ItemsSource="{Binding SiteItems}"
-                                  AllowDrop="True"
-                                  CanReorderItems="True" SelectionMode="Single"
+                                  AllowDrop="True" CanReorderItems="True" SelectionMode="Single"
                                   Tapped="{x:Bind ViewModel.SiteList_Tapped}"
                                   RightTapped="SiteList_RightTapped"
                                   SizeChanged="OnGridViewSizeChanged">

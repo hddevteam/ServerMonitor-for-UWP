@@ -37,7 +37,7 @@ namespace ServerMonitor.ViewModels
         private Grid rightFrame1;    //右部侧边栏
         Dictionary<int, bool> vs = new Dictionary<int, bool>(); //记录绑定联系人的结果
         Dictionary<int, bool> tempVs = new Dictionary<int, bool>(); //记录绑定联系人过程中的选择变化
-        int page = 1;  //1MainPage, 2 AllServerPage
+        int page = 1;  //1 MainPage, 2 AllServerPage，3 SiteDetail
         int siteId = -1;  //-1没有id是新建site  ，不为-1代表Edit那个站点
 
         private string _Value = "Default";  //保存传过来的信息  为 "page,siteId"
@@ -913,9 +913,13 @@ namespace ServerMonitor.ViewModels
             {
                 NavigationService.Navigate(typeof(Views.MainPage));
             }
-            if (page == 2)
+            else if (page == 2)
             {
                 NavigationService.Navigate(typeof(Views.AllServer));
+            }
+            else if (page == 3)
+            {
+                NavigationService.Navigate(typeof(Views.SiteDetail), siteId);
             }
         }
 
