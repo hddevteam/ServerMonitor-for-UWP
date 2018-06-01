@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using ServerMonitor.Controls;
 using System;
 using System.Collections.Generic;
@@ -15,6 +15,10 @@ using System.Threading.Tasks;
 
 namespace ServerMonitor.Services.RequestServices
 {
+    /// <summary>
+    /// icmp请求方法
+    /// wzp 2018/5/31
+    /// </summary>
     public class ICMPRequest
     {
         public static Dictionary<string, string> backData = new Dictionary<string, string>();
@@ -39,7 +43,6 @@ namespace ServerMonitor.Services.RequestServices
                     {
                         CreateTime = DateTime.Now
                     };//创建一个请求对象
-                    //CreateTime = DateTime.Now;
                     Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();//记录耗时
                     int Datasize = 4;
@@ -51,18 +54,9 @@ namespace ServerMonitor.Services.RequestServices
                     int index = packet.CountByte(myBuffer);
                     if (index != Packetsize)
                     {
-                        //exception.Text = "报文出现问题";
-                        //backData.Add("报文出现问题", "-1");
-                        //IcmpReturn information = new IcmpReturn
-                        //{
-                        //    Color = "0"//错误
-                        //};
-                        //string backJson = JsonConvert.SerializeObject(information);
-                        //backData.Add("1", backJson);
-                        //Color = "0";
                         request.Color = "0";
                         request.Status = "1001";
-                        request.TimeCost = (int)(request.OverTime * request.ErrorQuality);
+                        request.TimeCost = (short)(request.OverTime * request.ErrorQuality);
                         Requests.Add(request);
                         return false;
                     }
@@ -83,14 +77,9 @@ namespace ServerMonitor.Services.RequestServices
                     //报文出错
                     if (index != Packetsize)
                     {
-                        //exception.Text = "报文出错2";
-                        //backData.Add("报文出现问题", "0");
-                        //Color = "0";
                         request.Color = "0";
                         request.Status = "1001";
-                        request.TimeCost = (int)(request.OverTime * request.ErrorQuality);
-                        //string backJson = JsonConvert.SerializeObject(information);
-                        //backData.Add("1", backJson);
+                        request.TimeCost = (short)(request.OverTime * request.ErrorQuality);
                         Requests.Add(request);
                         return false;
                     }
@@ -115,8 +104,8 @@ namespace ServerMonitor.Services.RequestServices
                             //Color = "0";//访问被拒绝
                             request.Color = "0";
                             request.Status = "1001";
-                            request.TimeCost = (int)(request.OverTime * request.ErrorQuality);
-                            //TimeCost = stopwatch.ElapsedMilliseconds;
+                            request.TimeCost = (short)(request.OverTime * request.ErrorQuality);
+                            //TimeCost = (short)stopwatch.ElapsedMilliseconds;
                             Requests.Add(request);
                             return false;
                         }
@@ -139,8 +128,9 @@ namespace ServerMonitor.Services.RequestServices
                             {
                                 //服务器连接失败一类的异常
                                 Nbytes = -1;
-                                //Debug.WriteLine(e.ToString());                               
-                                DBHelper.InsertErrorLog(e.InnerException);
+                                //Debug.WriteLine(e.ToString());
+                                DBHelper.InsertErrorLog(e);
+                                request.ErrorException = e;
                             }
                             EndPoint correctEndpoint = (EndPoint)new IPEndPoint(MyIPAddress, 0);
                             if (hostEndpoint.GetHashCode() != correctEndpoint.GetHashCode())//对host取哈希判断是否是正确主机
@@ -148,65 +138,35 @@ namespace ServerMonitor.Services.RequestServices
                                 //不是正确的主机进行回复
                                 request.Color = "0";
                                 request.Status = "1001";
-                                //string backJson = JsonConvert.SerializeObject(information);
-                                //backData.Add(i.ToString(), backJson);
-                                //return backData;
-                                request.TimeCost = (int)(request.OverTime * request.ErrorQuality);
+                                request.TimeCost = (short)(request.OverTime * request.ErrorQuality);
                                 Requests.Add(request);
                                 break;
                             }
                             if (Nbytes == -1)
                             {
-                                //exception.Text = "主机未响应";
-                                //backData.Add("主机未响应", "404");
-                                //IcmpReturn information = new IcmpReturn
-                                //{
-                                //    Color = "0"//错误
-                                //};
+                                //主机未响应
                                 request.Color = "0";
                                 request.Status = "1001";
-                                //string backJson = JsonConvert.SerializeObject(information);
-                                //backData.Add(i.ToString(), backJson);
-                                //return backData;
-                                request.TimeCost = (int)(request.OverTime * request.ErrorQuality);
+                                request.TimeCost = (short)(request.OverTime * request.ErrorQuality);
                                 Requests.Add(request);
                                 break;
                             }
                             else if (Nbytes > 0)
                             {
-                                timeconsume = System.Environment.TickCount - starttime;
-                                //得到与发送间隔时间
-                                //exception.Text += "reply from: " + hostep4.ToString() + "  In " + timeconsume + "ms:  bytes Received" + Nbytes + "\r\n";
-                                //IcmpReturn information = new IcmpReturn
-                                //{
-                                //    Time = timeconsume.ToString(),
-                                //    TTL = socket.Ttl.ToString(),
-                                //    Bytes = Nbytes.ToString(),
-                                //    Color = "1"
-                                //};
-                                //string backJson = JsonConvert.SerializeObject(information);
-                                //backData.Add(i.ToString(), backJson);
+                                timeconsume = System.Environment.TickCount - starttime;                             
                                 request.Color = "1";
                                 request.Status = "1000";
-                                request.TimeCost = (int)stopwatch.ElapsedMilliseconds;
+                                request.TimeCost = (short)stopwatch.ElapsedMilliseconds;
                                 Requests.Add(request);
                                 break;
                             }
                             timeconsume = Environment.TickCount - starttime;
                             if (timeconsume > 1000)
                             {
-                                //exception.Text = "time out";
-                                //backData.Add("超时", "404");
-                                //IcmpReturn information = new IcmpReturn
-                                //{
-                                //    Color = "-1"//超时
-                                //};
+                                //超时
                                 request.Color = "-1";
                                 request.Status = "1002";
-                                //string backJson = JsonConvert.SerializeObject(information);
-                                //backData.Add(i.ToString(), backJson);
-                                //return backData;
-                                request.TimeCost = (int)stopwatch.ElapsedMilliseconds;
+                                request.TimeCost = (short)stopwatch.ElapsedMilliseconds;
                                 Requests.Add(request);
                                 break;
                             }
@@ -214,17 +174,12 @@ namespace ServerMonitor.Services.RequestServices
                         socket.Dispose();
                     }
                     catch (Exception ex)
-                    {
+                    {   //捕捉未知异常
                         string s = ex.Message;
-                        //IcmpReturn information = new IcmpReturn
-                        //{
-                        //    Color = "0"/
-                        //};
+                        DBHelper.InsertErrorLog(ex);
                         request.Color = "0";
                         request.Status = "1001";
-                        //string backJson = JsonConvert.SerializeObject(information);
-                        //backData.Add(i.ToString(), backJson);
-                        request.TimeCost = (int)(request.OverTime * request.ErrorQuality);
+                        request.TimeCost = (short)(request.OverTime * request.ErrorQuality);
                         request.ErrorException = ex;
                         Requests.Add(request);
                         return false;
@@ -234,18 +189,13 @@ namespace ServerMonitor.Services.RequestServices
             }
             else
             {
-                //backData.Add("ip地址不规范", "-1");
-                //IcmpReturn information = new IcmpReturn
-                //{
-                //    Color = "0"//错误
-                //};
                 RequestObj request = new RequestObj
                 {
                     CreateTime = DateTime.Now
                 };//创建一个请求对象
                 request.Color = "0";
                 request.Status = "1001";
-                request.TimeCost = (int)(request.OverTime * request.ErrorQuality);       
+                request.TimeCost = (short)(request.OverTime * request.ErrorQuality);       
                 return false;
             }
         }
