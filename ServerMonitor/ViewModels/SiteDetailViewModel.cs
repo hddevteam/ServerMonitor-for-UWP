@@ -698,11 +698,11 @@ namespace ServerMonitor.ViewModels
         {
             if (infos.IsWebSite)
             {
-                NavigationService.Navigate(typeof(Views.AddWebsitePage), "2," + infos.Detail_Site.Id);
+                NavigationService.Navigate(typeof(Views.AddWebsitePage), "3," + infos.Detail_Site.Id);
             }
             else
             {
-                NavigationService.Navigate(typeof(Views.AddServerPage), "2," + infos.Detail_Site.Id);
+                NavigationService.Navigate(typeof(Views.AddServerPage), "3," + infos.Detail_Site.Id);
             }
         }
 

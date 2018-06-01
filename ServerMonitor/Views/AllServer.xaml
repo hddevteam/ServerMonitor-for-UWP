@@ -89,7 +89,7 @@
                 <TextBlock Text="Protocol" Width="80" Margin="0 0 78 0" FontSize="16" Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
                 <TextBlock Text="Server" Width="200" FontSize="16" Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
                 <TextBlock Text="Status Codes" Width="120" FontSize="16" Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
-                <TextBlock Text="IsMonitoring"  FontSize="16" Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
+                <TextBlock Text="Monitoring"  FontSize="16" Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
             </StackPanel>
 
             <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" VerticalAlignment="Top">

@@ -383,6 +383,16 @@ namespace ServerMonitor.ViewModels
                 (sender as GridView).SelectedIndex = -1;
             }
         }
+
+        /// <summary>
+        /// PreCheck的点击事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void Precheck_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            NavigationService.Navigate(typeof(Views.SiteDetail), preCheck.Id);
+        }
         /// <summary>
         /// 站点列表右击列表 得到右击的站点id
         /// </summary>
