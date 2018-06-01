@@ -1,6 +1,7 @@
 ﻿using Heijden.DNS;
 using ServerMonitor.Services.RequestServices;
 using ServerMonitor.ViewModels;
+using ServerMonitor.ViewModels.BLL;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,10 +30,12 @@ namespace ServerMonitor.Views
     public sealed partial class AddServerPage : Page
     {
         AddServerPageViewModel model;
+        ISiteDetailUtil util;
         public AddServerPage()
         {
             this.InitializeComponent();
             this.Loaded += AddServerPage_Loaded;
+            util = new SiteDetailUtilImpl();
         }
         private void AddServerPage_Loaded(object sender, RoutedEventArgs e)
         {
@@ -78,7 +81,7 @@ namespace ServerMonitor.Views
         {
             int port;
             if (!int.TryParse(model.Port, out port))
-            {//检测端口号是否为书字
+            {//检测端口号是否为数字
                 await new MessageDialog("the port is not a number").ShowAsync();
             }
             SMTPRequest request = new SMTPRequest(model.SiteAddress, port);
@@ -90,14 +93,12 @@ namespace ServerMonitor.Views
         /// </summary>
         private async void SendFTPRequest()
         {
-            IPAddress address = null;
-            try//检测IP是否合法
+            Task<IPAddress> getAddress = util.GetIPAddressAsync(model.SiteAddress);//获取IP地址
+            await getAddress;
+            IPAddress address = getAddress.Result;
+            if (address == null)//如果IPAddress为null说明域名错误
             {
-                address = IPAddress.Parse(model.SiteAddress);
-            }
-            catch
-            {
-                await new MessageDialog("wrong address").ShowAsync();
+                await new MessageDialog("the domain name is wrong ").ShowAsync();
                 return;
             }
             IdentificationInfo userInfo = new IdentificationInfo();//用户输入信息
@@ -143,16 +144,15 @@ namespace ServerMonitor.Views
         /// </summary>
         private async void SendICMPRequest()
         {
-            IPAddress address;
-            try//检测IP是否合法
+            Task<IPAddress> getAddress = util.GetIPAddressAsync(model.SiteAddress);//获取IP地址
+            await getAddress;
+            IPAddress address=getAddress.Result;
+            if (address == null)//如果IPAddress为null说明域名错误
             {
-                address = IPAddress.Parse(model.SiteAddress);
-            }
-            catch
-            {
-                await new MessageDialog("It's a wrong Address").ShowAsync();
+                await new MessageDialog("the domain name is wrong ").ShowAsync();
                 return;
             }
+          
             ICMPRequest request = new ICMPRequest(address);
             request.MakeRequest();
             List<RequestObj> objs = request.Requests;
@@ -190,7 +190,7 @@ namespace ServerMonitor.Views
             }
             catch
             {
-                await new MessageDialog("SiteAddress is wrong").ShowAsync();
+                await new MessageDialog("ServerAddress is wrong").ShowAsync();
                 return;
             }
             QType type = QType.A;//默认值为A
@@ -223,12 +223,12 @@ namespace ServerMonitor.Views
         private async void SendSocketRequest()
         {
             SocketRequest request = new SocketRequest();
-            IPAddress address = null;
-            try//检测IP是否合法
+            Task<IPAddress> getAddress = util.GetIPAddressAsync(model.SiteAddress);//获取IP地址
+            await getAddress;
+            IPAddress address = getAddress.Result;
+            if (address == null)//如果IPAddress为null说明域名错误
             {
-                address = IPAddress.Parse(model.SiteAddress);
-            } catch {
-                await new MessageDialog("It's a wrong Address").ShowAsync();
+                await new MessageDialog("the domain name is wrong ").ShowAsync();
                 return;
             }
             int port = 0;
