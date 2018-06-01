@@ -87,12 +87,40 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         private ILogDAO logDao;
         #endregion
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public SiteDetailViewModel()
+        {
+            // 初始化界面变量	
+            Infos = new ViewInfo
+            {
+                // 初始化记录变量	
+                Logs = new ObservableCollection<LogModel>(),
+                SuccessLogs = new ObservableCollection<LogModel>(),
+                FirstLineChartData = new ObservableCollection<LineChartData>(),
+                FirstChartAxisProperties = new FirstChartAxisProperties()
+            };
+            // 初始化工具接口	
+            utilObject = new SiteDetailUtilImpl();
+            // 初始化Site的DAO操作接口	
+            siteDao = new SiteDaoImpl();
+            // 初始化Log的DAO操作接口	
+            logDao = new LogDaoImpl();
+            Debug.WriteLine("Construction function => SiteDetailViewModel();");
+        }
         #region 初始化界面的函数部分
         /// <summary>
         /// 初始化生成数据  创建：xb
         /// </summary>
         public async Task InitData()
         {
+            // 初始化引用的对象
+            utilObject = new SiteDetailUtilImpl();
+            siteDao = new SiteDaoImpl();
+            logDao = new LogDaoImpl();
+
             // 计算时间坐标轴的起始时间以及终止时间
             DateTime start = DateTime.Now.AddDays(-1);
             DateTime end = DateTime.Now;
@@ -141,7 +169,7 @@ namespace ServerMonitor.ViewModels
                     log.Create_Time = log.Create_Time.ToLocalTime();
                     Infos.Logs.Add(log);
                     if (!log.Is_error)
-                    {                                               
+                    {
                         Infos.SuccessLogs.Add(log);
                         object o = log.Create_Time.Subtract(pioneerDate).TotalMinutes;
                         // 大于两倍的请求周期
@@ -149,9 +177,9 @@ namespace ServerMonitor.ViewModels
                         {
                             Infos.FirstLineChartData.Add(new LineChartData() { RequestTime = log.Create_Time.AddMinutes(-30), ResponseTime = null });
                         }
-                        Infos.FirstLineChartData.Add(new LineChartData() { RequestTime = log.Create_Time, ResponseTime = log.TimeCost });                       
+                        Infos.FirstLineChartData.Add(new LineChartData() { RequestTime = log.Create_Time, ResponseTime = log.TimeCost });
                         pioneerDate = log.Create_Time;
-                    }                                     
+                    }
                 }
                 Infos.LastRequest = l.Last<LogModel>();
                 infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
@@ -540,7 +568,6 @@ namespace ServerMonitor.ViewModels
         /// <param name="args"></param>
         public void Load_Loading(FrameworkElement sender, object args)
         {
-            Infos.FirstChartAxisProperties = new FirstChartAxisProperties();
             ChangeStepUnitStep(0);
             Debug.WriteLine("load_Loading() Excute!");
         }
@@ -1271,7 +1298,8 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        public ObservableCollection<LineChartData> FirstLineChartData {
+        public ObservableCollection<LineChartData> FirstLineChartData
+        {
             get => firstLineChartData;
             set
             {
