@@ -71,7 +71,7 @@ namespace ServerMonitor.Controls
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
                             Request_succeed_code = "200",
-                            Is_success = 0
+                            Is_success = 2
                         },
                         new SiteModel()
                         {
@@ -88,7 +88,7 @@ namespace ServerMonitor.Controls
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
                             Request_succeed_code = "200",
-                            Is_success = 1
+                            Is_success = 2
                         },
                         new SiteModel()
                         {
@@ -105,7 +105,7 @@ namespace ServerMonitor.Controls
                             Update_time = DateTime.Now,
                             Is_pre_check = false,
                             Request_succeed_code = "200",
-                            Is_success = -1
+                            Is_success = 2
                         },
                         new SiteModel()
                         {
@@ -147,55 +147,6 @@ namespace ServerMonitor.Controls
                     //    l_site.Add(new Site() { Site_name = "Baidu" + i, Is_server = false, Request_succeed_code = "200" });
                     //}
                     InsertListSite(l_site);
-                    List<LogModel> l_log = new List<LogModel>
-                    {
-                        new LogModel()
-                        {
-                            Site_id = 1,
-                            Status_code = "200",
-                            TimeCost = 30,
-                            Create_Time = DateTime.Now.AddDays(-2),
-                            Is_error = false,
-                            Log_Record = null
-                        },
-                        new LogModel()
-                        {
-                            Site_id = 2,
-                            Status_code = "200",
-                            TimeCost = 20,
-                            Create_Time = DateTime.Now,
-                            Is_error = false,
-                            Log_Record = null
-                        },
-                        new LogModel()
-                        {
-                            Site_id = 3,
-                            Status_code = "1000",
-                            TimeCost = 40,
-                            Create_Time = DateTime.Now.AddDays(-5),
-                            Is_error = false,
-                            Log_Record = null
-                        },
-                        new LogModel()
-                        {
-                            Site_id = 4,
-                            Status_code = "1000",
-                            TimeCost = 30,
-                            Create_Time = DateTime.Now.AddDays(-3),
-                            Is_error = false,
-                            Log_Record = null
-                        },
-                        new LogModel()
-                        {
-                            Site_id = 5,
-                            Status_code = "1000",
-                            TimeCost = 10,
-                            Create_Time = DateTime.Now.AddDays(-6),
-                            Is_error = false,
-                            Log_Record = null
-                        }
-                    };
-                    InsertListLog(l_log);
                 }
             }
             else
