@@ -56,7 +56,7 @@ namespace ServerMonitor
             {
                 DisableBackButtonWhenModal = true,
                 Content = new Views.Shell(service),
-                ModalContent = new Views.Busy(),
+                ModalContent = new Views.BusyPage(),
             };
         }
 

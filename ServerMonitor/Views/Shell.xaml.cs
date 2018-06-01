@@ -40,7 +40,7 @@ namespace ServerMonitor.Views
 
         private void SymbolIcon_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
-            AboutUs msgPopub = AboutUs.Instance;
+            AboutUsPage msgPopub = AboutUsPage.Instance;
             msgPopub.ShowWIndow();
         }
     }

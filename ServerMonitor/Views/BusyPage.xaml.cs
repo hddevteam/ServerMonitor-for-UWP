@@ -8,9 +8,9 @@ using Windows.UI.Xaml.Controls;
 
 namespace ServerMonitor.Views
 {
-    public sealed partial class Busy : UserControl
+    public sealed partial class BusyPage : UserControl
     {
-        public Busy()
+        public BusyPage()
         {
             InitializeComponent();
         }
@@ -21,7 +21,7 @@ namespace ServerMonitor.Views
             set { SetValue(BusyTextProperty, value); }
         }
         public static readonly DependencyProperty BusyTextProperty =
-            DependencyProperty.Register(nameof(BusyText), typeof(string), typeof(Busy), new PropertyMetadata("Please wait..."));
+            DependencyProperty.Register(nameof(BusyText), typeof(string), typeof(BusyPage), new PropertyMetadata("Please wait..."));
 
         public bool IsBusy
         {
@@ -29,7 +29,7 @@ namespace ServerMonitor.Views
             set { SetValue(IsBusyProperty, value); }
         }
         public static readonly DependencyProperty IsBusyProperty =
-            DependencyProperty.Register(nameof(IsBusy), typeof(bool), typeof(Busy), new PropertyMetadata(false));
+            DependencyProperty.Register(nameof(IsBusy), typeof(bool), typeof(BusyPage), new PropertyMetadata(false));
 
         // hide and show busy dialog
         public static void SetBusy(bool busy, string text = null)
@@ -37,9 +37,9 @@ namespace ServerMonitor.Views
             WindowWrapper.Current().Dispatcher.Dispatch(() =>
             {
                 var modal = Window.Current.Content as ModalDialog;
-                var view = modal.ModalContent as Busy;
+                var view = modal.ModalContent as BusyPage;
                 if (view == null)
-                    modal.ModalContent = view = new Busy();
+                    modal.ModalContent = view = new BusyPage();
                 modal.IsModal = view.IsBusy = busy;
                 view.BusyText = text;
             });

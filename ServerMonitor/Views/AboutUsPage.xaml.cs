@@ -27,11 +27,11 @@ namespace ServerMonitor.Views
     /// 用于aboutus窗口的显示  
     /// 2018/5/30   --wzp
     /// </summary>
-    public sealed partial class AboutUs : UserControl
+    public sealed partial class AboutUsPage : UserControl
     {
 
         private Popup m_Popup;
-        public static AboutUs Instance
+        public static AboutUsPage Instance
         {
             get
             {
@@ -39,7 +39,7 @@ namespace ServerMonitor.Views
             }
         }
         //实例化窗口
-        private AboutUs()
+        private AboutUsPage()
         {
             this.InitializeComponent();
             m_Popup = new Popup();
@@ -116,7 +116,7 @@ namespace ServerMonitor.Views
             {
 
             }
-            internal static readonly AboutUs instance = new AboutUs();
+            internal static readonly AboutUsPage instance = new AboutUsPage();
         }
     }
 }

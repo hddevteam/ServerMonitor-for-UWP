@@ -80,9 +80,9 @@ namespace ServerMonitor.ViewModels
         public DelegateCommand ShowBusyCommand
             => _ShowBusyCommand ?? (_ShowBusyCommand = new DelegateCommand(async () =>
             {
-                Views.Busy.SetBusy(true, _BusyText);
+                Views.BusyPage.SetBusy(true, _BusyText);
                 await Task.Delay(5000);
-                Views.Busy.SetBusy(false);
+                Views.BusyPage.SetBusy(false);
             }, () => !string.IsNullOrEmpty(BusyText)));
     }
 

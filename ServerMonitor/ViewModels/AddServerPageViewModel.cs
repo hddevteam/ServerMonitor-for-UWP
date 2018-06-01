@@ -771,10 +771,12 @@ namespace ServerMonitor.ViewModels
             {
                 password = "";
             }
-            Dictionary<string, string> protocolIdentification = new Dictionary<string, string>();
-            protocolIdentification.Add("username", Username);
-            protocolIdentification.Add("password", Password);
-            protocolIdentification.Add("type", type);
+            Dictionary<string, string> protocolIdentification = new Dictionary<string, string>
+            {
+                { "username", Username },
+                { "password", Password },
+                { "type", type }
+            };
             return JsonConvert.SerializeObject(protocolIdentification);
         }
         /// <summary>
@@ -915,11 +917,11 @@ namespace ServerMonitor.ViewModels
             }
             else if (page == 2)
             {
-                NavigationService.Navigate(typeof(Views.AllServer));
+                NavigationService.Navigate(typeof(Views.AllServerPage));
             }
             else if (page == 3)
             {
-                NavigationService.Navigate(typeof(Views.SiteDetail), siteId);
+                NavigationService.Navigate(typeof(Views.SiteDetailPage), siteId);
             }
         }
 

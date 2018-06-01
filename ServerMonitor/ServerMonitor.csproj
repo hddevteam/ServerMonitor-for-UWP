@@ -133,11 +133,9 @@
     <Compile Include="Services\RequestServices\SSHRequest.cs" />
     <Compile Include="Services\SettingsServices\SettingsService.cs" />
     <Compile Include="Util\MessageRemind.cs" />
-    <Compile Include="ViewModels\AddMonitorViewModel.cs" />
     <Compile Include="ViewModels\AddServerPageViewModel.cs" />
     <Compile Include="ViewModels\AddWebsitePageViewModel.cs" />
     <Compile Include="ViewModels\AllServerViewModel.cs" />
-    <Compile Include="ViewModels\AllServer_addserverViewModel.cs" />
     <Compile Include="ViewModels\BLL\AddServerUtilImpl.cs" />
     <Compile Include="ViewModels\BLL\ChartUtilImpl.cs" />
     <Compile Include="ViewModels\BLL\IAddServerUtil.cs" />
@@ -149,26 +147,20 @@
     <Compile Include="ViewModels\MainPageViewModel.cs" />
     <Compile Include="ViewModels\SettingsPageViewModel.cs" />
     <Compile Include="ViewModels\SiteDetailViewModel.cs" />
-    <Compile Include="Views\AddMonitor.xaml.cs">
-      <DependentUpon>AddMonitor.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\AddServerPage.xaml.cs">
       <DependentUpon>AddServerPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\AddWebsitePage.xaml.cs">
       <DependentUpon>AddWebsitePage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\AllServer.xaml.cs">
-      <DependentUpon>AllServer.xaml</DependentUpon>
+    <Compile Include="Views\AllServerPage.xaml.cs">
+      <DependentUpon>AllServerPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\AllServer_addserver.xaml.cs">
-      <DependentUpon>AllServer_addserver.xaml</DependentUpon>
+    <Compile Include="Views\BusyPage.xaml.cs">
+      <DependentUpon>BusyPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Busy.xaml.cs">
-      <DependentUpon>Busy.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Chart.xaml.cs">
-      <DependentUpon>Chart.xaml</DependentUpon>
+    <Compile Include="Views\ChartPage.xaml.cs">
+      <DependentUpon>ChartPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ContactPage.xaml.cs">
       <DependentUpon>ContactPage.xaml</DependentUpon>
@@ -176,8 +168,8 @@
     <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\AboutUs.xaml.cs">
-      <DependentUpon>AboutUs.xaml</DependentUpon>
+    <Compile Include="Views\AboutUsPage.xaml.cs">
+      <DependentUpon>AboutUsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SettingsPage.xaml.cs">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
@@ -309,10 +301,6 @@
       <Generator>MSBuild:Compile</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
-    <Page Include="Views\AddMonitor.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\AddServerPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -321,19 +309,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\AllServer.xaml">
+    <Page Include="Views\AllServerPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\AllServer_addserver.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Busy.xaml">
+    <Page Include="Views\BusyPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Chart.xaml">
+    <Page Include="Views\ChartPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -345,7 +329,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\AboutUs.xaml">
+    <Page Include="Views\AboutUsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

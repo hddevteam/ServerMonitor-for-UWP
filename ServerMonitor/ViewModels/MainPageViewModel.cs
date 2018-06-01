@@ -379,7 +379,7 @@ namespace ServerMonitor.ViewModels
             if (x >= 0)
             {
                 string siteId = ((SiteItem)((sender as GridView).Items[x])).Id + "";
-                NavigationService.Navigate(typeof(Views.SiteDetail), siteId);
+                NavigationService.Navigate(typeof(Views.SiteDetailPage), siteId);
                 (sender as GridView).SelectedIndex = -1;
             }
         }
@@ -391,7 +391,7 @@ namespace ServerMonitor.ViewModels
         /// <param name="e"></param>
         public void Precheck_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            NavigationService.Navigate(typeof(Views.SiteDetail), preCheck.Id);
+            NavigationService.Navigate(typeof(Views.SiteDetailPage), preCheck.Id);
         }
         /// <summary>
         /// 站点列表右击列表 得到右击的站点id

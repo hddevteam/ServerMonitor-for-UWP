@@ -181,7 +181,7 @@ namespace ServerMonitor.ViewModels
         //进入详细页面
         public void DetailFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(typeof(Views.SiteDetail), ServerContext.Site_id);
+            NavigationService.Navigate(typeof(Views.SiteDetailPage), ServerContext.Site_id);
         }
         //进入编辑页面
         public void EditFlyoutItem_Click(object sender, RoutedEventArgs e)

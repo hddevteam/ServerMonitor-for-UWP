@@ -22,14 +22,14 @@
                 </StackPanel>
             </Controls:HamburgerButtonInfo>
             <!--转向服务器图表页-->
-            <Controls:HamburgerButtonInfo ClearHistory="True" PageType="views:Chart">
+            <Controls:HamburgerButtonInfo ClearHistory="True" PageType="views:ChartPage">
                 <StackPanel Orientation="Horizontal">
                     <SymbolIcon Width="48" Height="48" Symbol="Pictures"/>
                     <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="Chart"/>
                 </StackPanel>
             </Controls:HamburgerButtonInfo>
             <!--转向所有服务器页面 all servers-->
-            <Controls:HamburgerButtonInfo ClearHistory="True" PageType="views:AllServer">
+            <Controls:HamburgerButtonInfo ClearHistory="True" PageType="views:AllServerPage">
                 <StackPanel Orientation="Horizontal">
                     <SymbolIcon Width="48" Height="48" Symbol="Globe"/>
                     <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="All Servers"/>

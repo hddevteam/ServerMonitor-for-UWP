@@ -31,11 +31,11 @@ namespace ServerMonitor.Views
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class Chart : Page
+    public sealed partial class ChartPage : Page
     {
         public ChartPalette DefaultPalette { get { return ChartPalettes.DefaultLight; } }
 
-        public Chart()
+        public ChartPage()
         {   
             this.InitializeComponent();
             NavigationCacheMode = NavigationCacheMode.Disabled;

@@ -622,11 +622,11 @@ namespace ServerMonitor.ViewModels
             }
             else if (page == 2)
             {
-                NavigationService.Navigate(typeof(Views.AllServer));
+                NavigationService.Navigate(typeof(Views.AllServerPage));
             }
             else if (page == 3)
             {
-                NavigationService.Navigate(typeof(Views.SiteDetail), siteId);
+                NavigationService.Navigate(typeof(Views.SiteDetailPage), siteId);
             }
         }
 

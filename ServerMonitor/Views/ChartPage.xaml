@@ -1,5 +1,5 @@
 ﻿<Page
-    x:Class="ServerMonitor.Views.Chart"
+    x:Class="ServerMonitor.Views.ChartPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:ServerMonitor.Views"

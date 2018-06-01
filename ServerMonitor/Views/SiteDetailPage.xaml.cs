@@ -9,10 +9,10 @@ namespace ServerMonitor.Views
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class SiteDetail : Page
+    public sealed partial class SiteDetailPage : Page
     {
 
-        public SiteDetail()
+        public SiteDetailPage()
         {
             InitializeComponent();
             // 确认界面是否采用缓存
