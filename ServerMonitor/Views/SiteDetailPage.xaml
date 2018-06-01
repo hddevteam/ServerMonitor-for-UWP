@@ -104,7 +104,6 @@
                             <local1:CustomConverter x:Key="Converter"/>
                             <local1:CustomConverterBrush x:Key="BrushConverter"/>
                             <DataTemplate x:Key="MyPointTemplate">
-                                <!--<Rectangle Width="2" Height="3" Fill="Black"/>-->
                                 <Ellipse Width="3" Height="3" Fill="#028CFD"/>
                             </DataTemplate>
                         </telerik:RadCartesianChart.Resources>
@@ -147,9 +146,8 @@
                                                             LabelFormat="{}{0,0:MM-dd HH:mm}"
                                                             x:Name="HorizontalAxis"
                                                             LabelFitMode="Rotate"
-                                                            LabelRotationAngle="90"
-                                                            Title="Requests Time"
-                                                            >
+                                                            LabelRotationAngle="320"
+                                                            Title="Requests Time">
                                 <telerik:DateTimeContinuousAxis.LabelFormatter>
                                     <vm:CustomOperatorDateTimeAxisLabelFormatter/>
                                 </telerik:DateTimeContinuousAxis.LabelFormatter>
