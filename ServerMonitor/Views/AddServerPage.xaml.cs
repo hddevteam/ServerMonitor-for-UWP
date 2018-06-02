@@ -82,7 +82,7 @@ namespace ServerMonitor.Views
             int port;
             if (!int.TryParse(model.Port, out port))
             {//检测端口号是否为数字
-                await new MessageDialog("the port is not a number").ShowAsync();
+                await new MessageDialog("The port is not a number").ShowAsync();
             }
             SMTPRequest request = new SMTPRequest(model.SiteAddress, port);
             await request.MakeRequest();
@@ -93,12 +93,21 @@ namespace ServerMonitor.Views
         /// </summary>
         private async void SendFTPRequest()
         {
-            Task<IPAddress> getAddress = util.GetIPAddressAsync(model.SiteAddress);//获取IP地址
-            await getAddress;
-            IPAddress address = getAddress.Result;
+            IPAddress address = null;
+            try
+            {
+                Task<IPAddress> getAddress = util.GetIPAddressAsync(model.SiteAddress);//获取IP地址
+                await getAddress;
+                address = getAddress.Result;
+            }
+            catch//域名解析失败
+            {
+                await new MessageDialog("The domain name is not exist ").ShowAsync();
+                return;
+            }
             if (address == null)//如果IPAddress为null说明域名错误
             {
-                await new MessageDialog("the domain name is wrong ").ShowAsync();
+                await new MessageDialog("The domain name is wrong ").ShowAsync();
                 return;
             }
             IdentificationInfo userInfo = new IdentificationInfo();//用户输入信息
@@ -144,12 +153,21 @@ namespace ServerMonitor.Views
         /// </summary>
         private async void SendICMPRequest()
         {
-            Task<IPAddress> getAddress = util.GetIPAddressAsync(model.SiteAddress);//获取IP地址
-            await getAddress;
-            IPAddress address=getAddress.Result;
+            IPAddress address = null;
+            try
+            {
+                Task<IPAddress> getAddress = util.GetIPAddressAsync(model.SiteAddress);//获取IP地址
+                await getAddress;
+                address= getAddress.Result;
+            }
+            catch//域名解析失败
+            {
+                await new MessageDialog("The domain name is not exist ").ShowAsync();
+                return;
+            }
             if (address == null)//如果IPAddress为null说明域名错误
             {
-                await new MessageDialog("the domain name is wrong ").ShowAsync();
+                await new MessageDialog("The domain name is wrong ").ShowAsync();
                 return;
             }
           
@@ -164,17 +182,17 @@ namespace ServerMonitor.Views
                 }
                 else
                 {
-                    await new MessageDialog("error:" + tmp.Status).ShowAsync();
+                    await new MessageDialog("Error:" + tmp.Status).ShowAsync();
                     return;
                 }
             }
             if (objs.Count == 5)//如果请求的个数不为5，并且所有请求都正常说明发生了未知的错误
             {
-                await new MessageDialog("success!").ShowAsync();
+                await new MessageDialog("Success!").ShowAsync();
             }
             else
             {
-                await new MessageDialog("has a unknown error").ShowAsync();
+                await new MessageDialog("Has a unknown error").ShowAsync();
             }
         }
         /// <summary>
@@ -223,18 +241,27 @@ namespace ServerMonitor.Views
         private async void SendSocketRequest()
         {
             SocketRequest request = new SocketRequest();
-            Task<IPAddress> getAddress = util.GetIPAddressAsync(model.SiteAddress);//获取IP地址
-            await getAddress;
-            IPAddress address = getAddress.Result;
+            IPAddress address = null;
+            try
+            {
+                Task<IPAddress> getAddress = util.GetIPAddressAsync(model.SiteAddress);//获取IP地址
+                await getAddress;
+                address = getAddress.Result;
+            }
+            catch//域名解析失败
+            {
+                await new MessageDialog("The domain name is not exist ").ShowAsync();
+                return;
+            }
             if (address == null)//如果IPAddress为null说明域名错误
             {
-                await new MessageDialog("the domain name is wrong ").ShowAsync();
+                await new MessageDialog("The domain name is wrong ").ShowAsync();
                 return;
             }
             int port = 0;
             if (!int.TryParse(model.Port, out port))//检测端口号是否为数字
             {
-                await new MessageDialog("the port is wrong").ShowAsync();
+                await new MessageDialog("The port is wrong").ShowAsync();
             }
             IPEndPoint iPEndPoint = new IPEndPoint(address, port);
             request.TargetEndPoint = iPEndPoint;
