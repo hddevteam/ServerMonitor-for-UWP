@@ -157,7 +157,7 @@ namespace ServerMonitor.SiteDb
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
-                SQLiteCommand cmd = conn.CreateCommand("update Site set Last_request_result = ?;", statusCode);
+                SQLiteCommand cmd = conn.CreateCommand("update Site set Is_success = ?;", statusCode);
                 result = cmd.ExecuteNonQuery();
             }
             return result;

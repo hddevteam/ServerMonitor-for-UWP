@@ -32,7 +32,7 @@
 
         <!--  header  -->
         <controls:PageHeader x:Name="pageHeader"
-                             Content="All Server"
+                             Content="All Servers"
                              OverflowButtonVisibility="Collapsed">
             <AppBarButton Label="SELECT" Icon="Filter" Foreground="White" Name="filter">
                 <AppBarButton.Flyout>

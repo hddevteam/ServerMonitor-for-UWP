@@ -852,7 +852,7 @@ namespace ServerMonitor.ViewModels
                         result = "Error in " + site.Request_TimeCost + "ms";
                         break;
                     case 1:
-                        result = "Port" + site.Server_port + " (open) in " + site.Request_TimeCost + "ms";
+                        result = "Port " + site.Server_port + " (open) in " + site.Request_TimeCost + "ms";
                         break;
                     case 2:
                         result = "Unknown";

@@ -19,6 +19,7 @@ using ServerMonitor.SiteDb;
 using ServerMonitor.LogDb;
 using System.ComponentModel;
 using System.Diagnostics;
+using Windows.UI.Popups;
 /// <summary>
 /// 创建：fjl  创建时间：2018/05/26 
 /// </summary>
@@ -181,7 +182,8 @@ namespace ServerMonitor.ViewModels
             //选择站点数量大于上限进行提示
             if (Infos.SiteSelected.Count > MAX_NUMBER_OF_SITE)
             {
-                var msgDialog = new Windows.UI.Popups.MessageDialog("站点最多选择五个！！") { Title = "错误提示" };
+                var msgDialog = new Windows.UI.Popups.MessageDialog("You can choose no more than five sites.");
+                msgDialog.Commands.Add(new UICommand("Close"));
                 await msgDialog.ShowAsync();
                 return false;
             }
