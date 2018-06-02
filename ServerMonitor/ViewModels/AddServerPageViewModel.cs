@@ -714,6 +714,17 @@ namespace ServerMonitor.ViewModels
                     Boolean _ipcheck = regIP.IsMatch(domain);
 
                     //域名的正则表达式
+                    var http = domain.StartsWith("http://");
+                    var https = domain.StartsWith("https://");
+                    if (http)
+                    {
+                        domain = domain.Substring(7);//去除http://
+                    }
+                    else if (https)
+                    {
+                        domain = domain.Substring(8);//去除https://
+                    }
+
                     Regex reg = new Regex(@"^[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+\.?$");
                     Boolean _domaincheck = reg.IsMatch(domain);
                     if (_ipcheck || _domaincheck)
