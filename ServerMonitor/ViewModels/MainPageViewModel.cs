@@ -238,7 +238,7 @@ namespace ServerMonitor.ViewModels
                     {
                         continue;
                     }
-                    IPAddress _siteAddress_redress = await util.GetIPAddressAsync(siteElement.Site_address);
+                    
                     switch (siteElement.Protocol_type)//根据协议请求站点
                     {
                         // HTTP/HTTPS协议请求   --xb
@@ -263,6 +263,7 @@ namespace ServerMonitor.ViewModels
                             break;
                         // ICMP协议请求   --xb
                         case "ICMP":
+                            IPAddress _siteAddress_redress = await util.GetIPAddressAsync(siteElement.Site_address);
                             ICMPRequest icmp = new ICMPRequest(_siteAddress_redress);
                             // 发起ICMP请求，生成请求记录并更新站点信息  --xb
                             log = await util.ConnectToServerWithICMP(siteElement, icmp);
