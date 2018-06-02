@@ -247,7 +247,7 @@ namespace ServerMonitor.ViewModels
         {
             string str = "";
             //手机号码
-            Regex regPho = new Regex(@"^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$");
+            Regex regPho = new Regex(@"^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|17[0|6|7|8]|18[0-9])\d{8}$");
 
             //国内电话号码(0511-4405222、021-87888822)
             Regex regPho1 = new Regex(@"\d{3}-\d{8}|\d{4}-\d{7}");
