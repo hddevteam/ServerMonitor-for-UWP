@@ -183,7 +183,7 @@
                         </telerikPrimitives:RadLegendControl.ItemTemplate>
                         <telerikPrimitives:RadLegendControl.LegendItems>
                             <telerikPrimitives:LegendItem Fill="#1E98E4" Stroke="#1E98E4" Title="SUCCESS"/>
-                            <telerikPrimitives:LegendItem Fill="#FFC500" Stroke="#FFC500" Title="TIMEROUT"/>
+                            <telerikPrimitives:LegendItem Fill="#FFC500" Stroke="#FFC500" Title="TIMEOUT"/>
                             <telerikPrimitives:LegendItem Fill="#FF2A00" Stroke="#FF2A00" Title="ERROR"/>
                         </telerikPrimitives:RadLegendControl.LegendItems>
                     </telerikPrimitives:RadLegendControl>
