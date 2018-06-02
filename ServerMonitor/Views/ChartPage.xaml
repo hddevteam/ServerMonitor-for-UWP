@@ -183,7 +183,7 @@
                         </telerikPrimitives:RadLegendControl.ItemTemplate>
                         <telerikPrimitives:RadLegendControl.LegendItems>
                             <telerikPrimitives:LegendItem Fill="#1E98E4" Stroke="#1E98E4" Title="SUCCESS"/>
-                            <telerikPrimitives:LegendItem Fill="#FFC500" Stroke="#FFC500" Title="OVERTIME"/>
+                            <telerikPrimitives:LegendItem Fill="#FFC500" Stroke="#FFC500" Title="TIMEROUT"/>
                             <telerikPrimitives:LegendItem Fill="#FF2A00" Stroke="#FF2A00" Title="ERROR"/>
                         </telerikPrimitives:RadLegendControl.LegendItems>
                     </telerikPrimitives:RadLegendControl>
@@ -233,7 +233,7 @@
                                          AutoGenerateColumns="False" VerticalAlignment="Center" HorizontalAlignment="Center" 
                                          IsTabStop="True" IsHitTestVisible="True" UserGroupMode="Disabled">
                         <telerikGrid:RadDataGrid.Columns>
-                            <telerikGrid:DataGridTextColumn PropertyName="SiteName" Header="SITE" CanUserFilter="False">
+                            <telerikGrid:DataGridTextColumn PropertyName="SiteName" Header="SERVER" CanUserFilter="False">
                                 <telerikGrid:DataGridTextColumn.HeaderStyle>
                                     <Style TargetType="gridPrimitives:DataGridColumnHeader">
                                         <Setter Property="Background" Value="AliceBlue"/>
@@ -264,7 +264,7 @@
                                     </Style>
                                 </telerikGrid:DataGridNumericalColumn.HeaderStyle>
                             </telerikGrid:DataGridNumericalColumn>
-                            <telerikGrid:DataGridNumericalColumn PropertyName="Overtime" Header="OVERTIME" CanUserFilter="False">
+                            <telerikGrid:DataGridNumericalColumn PropertyName="Overtime" Header="TIMEOUT" CanUserFilter="False">
                                 <telerikGrid:DataGridNumericalColumn.HeaderStyle>
                                     <Style TargetType="gridPrimitives:DataGridColumnHeader">
                                         <Setter Property="Background" Value="AliceBlue"/>
