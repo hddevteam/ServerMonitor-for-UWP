@@ -93,9 +93,18 @@ namespace ServerMonitor.Views
         /// </summary>
         private async void SendFTPRequest()
         {
-            Task<IPAddress> getAddress = util.GetIPAddressAsync(model.SiteAddress);//获取IP地址
-            await getAddress;
-            IPAddress address = getAddress.Result;
+            IPAddress address = null;
+            try
+            {
+                Task<IPAddress> getAddress = util.GetIPAddressAsync(model.SiteAddress);//获取IP地址
+                await getAddress;
+                address = getAddress.Result;
+            }
+            catch//域名解析失败
+            {
+                await new MessageDialog("the domain name is not exist ").ShowAsync();
+                return;
+            }
             if (address == null)//如果IPAddress为null说明域名错误
             {
                 await new MessageDialog("the domain name is wrong ").ShowAsync();
@@ -144,9 +153,18 @@ namespace ServerMonitor.Views
         /// </summary>
         private async void SendICMPRequest()
         {
-            Task<IPAddress> getAddress = util.GetIPAddressAsync(model.SiteAddress);//获取IP地址
-            await getAddress;
-            IPAddress address=getAddress.Result;
+            IPAddress address = null;
+            try
+            {
+                Task<IPAddress> getAddress = util.GetIPAddressAsync(model.SiteAddress);//获取IP地址
+                await getAddress;
+                address= getAddress.Result;
+            }
+            catch//域名解析失败
+            {
+                await new MessageDialog("the domain name is not exist ").ShowAsync();
+                return;
+            }
             if (address == null)//如果IPAddress为null说明域名错误
             {
                 await new MessageDialog("the domain name is wrong ").ShowAsync();
@@ -223,9 +241,18 @@ namespace ServerMonitor.Views
         private async void SendSocketRequest()
         {
             SocketRequest request = new SocketRequest();
-            Task<IPAddress> getAddress = util.GetIPAddressAsync(model.SiteAddress);//获取IP地址
-            await getAddress;
-            IPAddress address = getAddress.Result;
+            IPAddress address = null;
+            try
+            {
+                Task<IPAddress> getAddress = util.GetIPAddressAsync(model.SiteAddress);//获取IP地址
+                await getAddress;
+                address = getAddress.Result;
+            }
+            catch//域名解析失败
+            {
+                await new MessageDialog("the domain name is not exist ").ShowAsync();
+                return;
+            }
             if (address == null)//如果IPAddress为null说明域名错误
             {
                 await new MessageDialog("the domain name is wrong ").ShowAsync();
