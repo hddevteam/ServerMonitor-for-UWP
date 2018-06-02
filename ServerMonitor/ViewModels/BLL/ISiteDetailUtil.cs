@@ -92,5 +92,10 @@ namespace ServerMonitor.ViewModels.BLL
         /// <param name="site"></param>
         /// <returns></returns>
         string[] getSuccStatusCode(SiteModel site);
+        /// <summary>
+        /// 发起请求主体
+        /// </summary>
+        /// <returns>请求结果Log</returns>
+        Task<LogModel> MakeRequest(SiteModel site);
     }
 }
