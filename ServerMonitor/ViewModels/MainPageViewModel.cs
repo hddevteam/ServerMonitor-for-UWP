@@ -22,6 +22,7 @@ using ServerMonitor.ViewModels.BLL;
 using ServerMonitor.SiteDb;
 using Windows.UI.Xaml.Data;
 using ServerMonitor.LogDb;
+using System.Diagnostics;
 
 namespace ServerMonitor.ViewModels
 {
@@ -62,7 +63,7 @@ namespace ServerMonitor.ViewModels
             }
         }
         private string preCheckResult;  //preCheck的最近一次请求信息
-        public string PreCheckResult  
+        public string PreCheckResult
         {
             get => preCheckResult;
             set
@@ -182,60 +183,28 @@ namespace ServerMonitor.ViewModels
         /// <summary>
         /// 用于precheck方法
         /// </summary>
-        public async Task<bool> Pre_Check()
+        public async Task<bool> Pre_Check(SiteDetailUtilImpl util)
         {
+            // 将来这里需要修改为动态获取 Pre Check Site  --xb
             SiteModel _preCheckSite = DBHelper.GetSiteById(4);//初始化precheck记录，目前是ID 4 
+            // 引入消息提醒对象  --xb
             MessageRemind toast = new MessageRemind();
-            //对google dns进行pre check (8.8.8.8)
-            //IcmpRequest request = new IcmpRequest(IPAddress.Parse("8.8.8.8"));
-            //var data = request.DoRequest();//发起请求 data可以指示值
-            //RequestObj requestObj;//用于存储icmp请求结果的对象              
-            //requestObj = DataHelper.GetProperty(request);
-            //_preCheckSite.Last_request_result = int.Parse(requestObj.Color);//更新color
-            //_preCheckSite.Request_count = _preCheckSite.Request_count + 1;//更新请求次数
-            //_preCheckSite.Request_interval = requestObj.TimeCost;
-            //if (data == false)
-            //{
-            //    toast.ShowToast(_preCheckSite);
-            //    _preCheckSite.Last_request_result = int.Parse("0");//更新color 
-            //}
-            //int up = -1;
-            //while (up == -1)
-            //{
-            //    up = DBHelper.UpdateSite(_preCheckSite);//更新站点
-            //}
-            string baiduDomain = "www.baidu.com";//设定一个网站供dns服务器进行解析
-            DNSRequest pre = new DNSRequest(IPAddress.Parse(_preCheckSite.Site_address), baiduDomain);
-            bool dnsFlag = await pre.MakeRequest();
-            //请求完毕
-            if ("1000".Equals(pre.Status))
-            {
-                //dns正常
-                _preCheckSite.Is_success = 1;
-            }
-            else if ("1001".Equals(pre.Status))
-            {
-                //unknown
-                _preCheckSite.Is_success = 2;
-            }
-            else if ("1002".Equals(pre.Status))
-            {
-                //timeout
-                _preCheckSite.Is_success = -1;
-            }
-            _preCheckSite.Request_TimeCost = pre.TimeCost;
-            _preCheckSite.Request_count += 1;
-            if (dnsFlag == false)
+            // 使用Socket协议请求PreCheck站点  --xb
+            SocketRequest _socketRequest = new SocketRequest();
+            LogModel log = await util.ConnectToServerWithSocket(_preCheckSite, _socketRequest);
+            // 请求失败则提醒用户，并更新所有其他站点的状态为UnKnown  --xb
+            if (log.Is_error == true)
             {
                 SiteDaoImpl impl = new SiteDaoImpl();
-                impl.SetAllSiteStatus(2);///所有站点置为unknown
-                //消息提醒
+                impl.SetAllSiteStatus(2);// 并更新所有其他站点的状态为UnKnown 
+                // 消息提醒
                 _preCheckSite.Is_success = 0;
-                toast.ShowToast(_preCheckSite);                          
+                toast.ShowToast(_preCheckSite);
             }
-            DBHelper.UpdateSite(_preCheckSite);
             GetListSite();//更新ui
-            return dnsFlag;
+            // 插入此次对Pre Chech站点请求的记录  --xb
+            InsertLog(log);
+            return !(log.Is_error);
         }
         /// <summary>
         /// 请求所有服务的按钮事件
@@ -248,12 +217,12 @@ namespace ServerMonitor.ViewModels
             (sender as AppBarButton).IsEnabled = false;
             RequestAsyncStat = true;
             MessageRemind toast = new MessageRemind();
+            // 引入封装的工具类  --xb
+            SiteDetailUtilImpl util = new SiteDetailUtilImpl();
             //首先进行precheck 
-            bool pre =  await Pre_Check();
+            bool pre = await Pre_Check(util);
             if (pre)
             {
-                // 引入封装的工具类  --xb
-                SiteDetailUtilImpl util = new SiteDetailUtilImpl();
                 // 引入封装的SiteDAO
                 SiteDaoImpl siteDao = new SiteDaoImpl();
                 var sitelist = SiteItems;//获取sitelist
@@ -311,9 +280,9 @@ namespace ServerMonitor.ViewModels
                             break;
                         // 补充之前欠缺的Socket服务器请求   --xb
                         case "SOCKET":
-                            // 初始化Socket请求对象
+                            // 初始化Socket请求对象  --xb
                             SocketRequest _socketRequest = new SocketRequest();
-                            // 请求指定终端，并生成对应的请求记录，最后更新站点信息
+                            // 请求指定终端，并生成对应的请求记录，最后更新站点信息  --xb
                             log = await util.ConnectToServerWithSocket(siteElement, _socketRequest);
                             break;
                         // 补充之前欠缺的SSH服务器请求   --xb
@@ -346,6 +315,28 @@ namespace ServerMonitor.ViewModels
             // V操作 启用刷新按钮
             (sender as AppBarButton).IsEnabled = true;
             RequestAsyncStat = false;
+        }
+
+        /// <summary>
+        /// 插入一条请求记录  --xb
+        /// </summary>
+        /// <param name="log"></param>
+        /// <returns></returns>
+        public bool InsertLog(LogModel log)
+        {
+            if (null != log)
+            {
+                // 将请求的记录插入数据库  --xb
+                LogDaoImpl logDao = new LogDaoImpl();
+                logDao.InsertOneLog(log);
+            }
+            // 说明此次请求处于异常状态，记录进数据库中
+            else
+            {
+                DBHelper.InsertErrorLog(new Exception("Insert Log failed!Beacuse log to insert is null"));
+                Debug.WriteLine("Insert Log failed!Beacuse log to insert is null");
+            }
+            return false;
         }
 
         /// <summary>
@@ -485,7 +476,7 @@ namespace ServerMonitor.ViewModels
                 GetListSite();
             }
         }
-        
+
         /// <summary>
         /// 弹出对话框，设置应用响应时间的最优门槛T 
         /// </summary>
@@ -674,9 +665,9 @@ namespace ServerMonitor.ViewModels
 
             //排除不监听和precheck，再只留错误和超时的
             List<SiteModel> q = (from t in list
-                            where t.Is_Monitor == true && t.Is_pre_check == false && (t.Is_success == 0 || t.Is_success == -1)
-                            orderby t.Update_time descending
-                            select t).ToList();
+                                 where t.Is_Monitor == true && t.Is_pre_check == false && (t.Is_success == 0 || t.Is_success == -1)
+                                 orderby t.Update_time descending
+                                 select t).ToList();
             // 循环判断站点超时还是错误
             for (int i = 0; i < q.Count && i < 7; i++)
             {
@@ -713,8 +704,8 @@ namespace ServerMonitor.ViewModels
 
             //得到监听的站点信息（除pre_check）
             List<SiteModel> q = (from t in list
-                            where t.Is_Monitor == true && t.Is_pre_check == false
-                            select t).ToList();
+                                 where t.Is_Monitor == true && t.Is_pre_check == false
+                                 select t).ToList();
             List<SitePerformance> container = new List<SitePerformance>();
             //循环计算并记录站点性能信息
             for (int i = 0; i < q.Count; i++)
@@ -767,7 +758,7 @@ namespace ServerMonitor.ViewModels
                 SitePerformanceList.Add(container[i]);
             }
         }
-        
+
         /// <summary>
         /// 深度克隆站点 （大部分克隆）
         /// </summary>
