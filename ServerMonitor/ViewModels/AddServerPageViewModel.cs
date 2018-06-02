@@ -389,7 +389,7 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         public async Task SaveAsync()
         {
-            if (!(await CheckSite()))
+            if (!(await CheckSite(SiteAddress)))
             {
                 IsEnabled = false;
                 return;
@@ -543,20 +543,31 @@ namespace ServerMonitor.ViewModels
 
         #region 异步辅助函数
         /// <summary>
-        /// 最后判断，判断SiteAddress是否可以解析
+        /// 最后判断，判断网站地址是否可以解析
         /// </summary>
         /// <returns>是否可以解析</returns>
-        public async Task<bool> CheckSite()
+        public async Task<bool> CheckSite(string domain)
         {
             try
             {
-                if (!IPAddress.TryParse(SiteAddress, out IPAddress reIP))
+                if (!IPAddress.TryParse(domain, out IPAddress reIP))
                 {
-                    IPAddress[] hostEntry = await Dns.GetHostAddressesAsync(SiteAddress);
+                    var http = domain.StartsWith("http://");
+                    var https = domain.StartsWith("https://");
+                    if (http)
+                    {
+                        domain = domain.Substring(7);//去除http://
+                    }
+                    else if (https)
+                    {
+                        domain = domain.Substring(8);//去除https://
+                    }
+
+                    IPAddress[] hostEntry = await Dns.GetHostAddressesAsync(domain);
                 }
                 else
                 {
-                    IPAddress.Parse(SiteAddress);
+                    IPAddress.Parse(domain);
                 }
             }
             catch (Exception)
