@@ -61,11 +61,11 @@ namespace ServerMonitor.Views
             bool test = result.Result;
             if (request.Status != null)//如果返回不为空说明请求过程没有问题，显示返回码和耗时
             {
-                await new MessageDialog(request.Status + "\t耗时" + request.TimeCost).ShowAsync();
+                await new MessageDialog(request.Status + "\tCostTime" + request.TimeCost).ShowAsync();
             }
             else
             {
-                await new MessageDialog("域名错误或不存在").ShowAsync();
+                await new MessageDialog("The hostname is wrong or not exist!").ShowAsync();
             }
         }
     }
