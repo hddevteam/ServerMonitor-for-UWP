@@ -156,9 +156,9 @@ namespace ServerMonitor.ViewModels
             if (l.Count == 0)
             {
                 Infos.LastRequest = new LogModel();
-                Infos.LastRequestWords = "None Data !";
+                Infos.LastRequestWords = "No Datas !";
                 Infos.PreviousRequestLog = new LogModel();
-                Infos.PreviousRequestLogWords = "None Data!";
+                Infos.PreviousRequestLogWords = "No Datas!";
             }
             else
             {
@@ -170,6 +170,7 @@ namespace ServerMonitor.ViewModels
                     Infos.Logs.Add(log);
                     if (!log.Is_error)
                     {
+                        //请求成功的集合添加 新的 Log
                         Infos.SuccessLogs.Add(log);
                         object o = log.Create_Time.Subtract(pioneerDate).TotalMinutes;
                         // 大于两倍的请求周期
@@ -183,6 +184,8 @@ namespace ServerMonitor.ViewModels
                 }
                 Infos.LastRequest = l.Last<LogModel>();
                 infos.LastRequestWords = string.Format("{0} in {1} ms", Infos.LastRequest.Status_code, infos.LastRequest.TimeCost);
+                // 初始化的时候让左下角的图表显示一天内的数据
+                Infos.DateLogs = GetLogsByDateLimit(1, Infos.Logs);
                 if (l.Count > 1)
                 {
                     infos.PreviousRequestLog = l[l.Count - 1];
@@ -194,6 +197,21 @@ namespace ServerMonitor.ViewModels
                     Infos.PreviousRequestLogWords = "No Data!";
                 }
             }
+        }
+        /// <summary>
+        /// 获取指定天数内的数据  --xb
+        /// </summary>
+        /// <param name="days">指定的天数</param>
+        /// <param name="logs">总的数据</param>
+        /// <returns>指定天数内的数据集</returns>
+        public ObservableCollection<LogModel> GetLogsByDateLimit(int days, ObservableCollection<LogModel> logs)
+        {
+            if (logs.Count == 0) return new ObservableCollection<LogModel>();
+            var q = from log in logs
+                    where log.Create_Time < DateTime.Now && log.Create_Time > DateTime.Now.AddDays(-days)
+                    select log;
+            ObservableCollection<LogModel> result = new ObservableCollection<LogModel>(q);
+            return result;
         }
         /// <summary>
         /// 初始化载入联系人数据
@@ -260,7 +278,7 @@ namespace ServerMonitor.ViewModels
                     item.Count = 0;
                 }
                 #endregion
-                foreach (var i in Infos.Logs)
+                foreach (var i in Infos.DateLogs)
                 {
                     #region 更新数据
                     UpdateChart(i);
@@ -277,7 +295,7 @@ namespace ServerMonitor.ViewModels
                 else
                 {
                     Infos.PreviousRequestLog = new LogModel();
-                    Infos.PreviousRequestLogWords = "None Data!";
+                    Infos.PreviousRequestLogWords = "No Datas!";
                 }
             }
         }
@@ -599,14 +617,20 @@ namespace ServerMonitor.ViewModels
                 case 0:
                     Infos.MaxmumDatetime = DateTime.Now;
                     Infos.MinmumDatetime = DateTime.Now.AddDays(-1);
+                    Infos.DateLogs = GetLogsByDateLimit(1, Infos.Logs);
+                    InitChartData();
                     break;
                 case 1:
                     Infos.MaxmumDatetime = DateTime.Now;
                     Infos.MinmumDatetime = DateTime.Now.AddDays(-3);
+                    Infos.DateLogs = GetLogsByDateLimit(3, Infos.Logs);
+                    InitChartData();
                     break;
                 case 2:
                     Infos.MaxmumDatetime = DateTime.Now;
                     Infos.MinmumDatetime = DateTime.Now.AddDays(-7);
+                    Infos.DateLogs = GetLogsByDateLimit(7, Infos.Logs);
+                    InitChartData();
                     break;
                 default:
                     break;
@@ -628,6 +652,7 @@ namespace ServerMonitor.ViewModels
             // 重新获取界面信息
             Infos.Logs.Clear();
             Infos.SuccessLogs.Clear();
+            Infos.FirstLineChartData.Clear();            
             //Infos.RequestTimeList.Clear();
             #region 清空Re和PieInfo集合每一项的值
             foreach (var item in Infos.Re)
@@ -641,6 +666,8 @@ namespace ServerMonitor.ViewModels
             #endregion
             Infos.MedianValue = 0;
             Infos.AverageValue = 0;
+            Infos.PreviousRequestLogWords = "No Datas!";
+            Infos.LastRequestWords = "No Datas!";
             InitChartData();
         }
         /// <summary>
@@ -674,7 +701,7 @@ namespace ServerMonitor.ViewModels
                 else
                 {
                     Infos.PreviousRequestLog = new LogModel();
-                    Infos.PreviousRequestLogWords = "None Data!";
+                    Infos.PreviousRequestLogWords = "No Datas!";
                 }
             }
             else
@@ -684,7 +711,7 @@ namespace ServerMonitor.ViewModels
                 Infos.LastRequest = new LogModel();
                 Infos.LastRequestWords = "No Data!";
                 Infos.PreviousRequestLog = new LogModel();
-                Infos.PreviousRequestLogWords = "None Data!";
+                Infos.PreviousRequestLogWords = "No Datas!";
             }
             // V操作 启用刷新按钮
             Infos.RequestAsyncStat = true;
@@ -1066,6 +1093,7 @@ namespace ServerMonitor.ViewModels
         private LogModel previousRequestLog;
         private string previousRequestLogWords;
         private ObservableCollection<LineChartData> firstLineChartData;
+        private ObservableCollection<LogModel> dateLogs;
 
         // 对应界面上的toggledSwitch 按钮的值，表示此站点是否正在监测
         public bool IsMonitor
@@ -1305,6 +1333,16 @@ namespace ServerMonitor.ViewModels
             {
                 firstLineChartData = value;
                 RaisePropertyChanged(() => FirstLineChartData);
+            }
+        }
+
+        public ObservableCollection<LogModel> DateLogs
+        {
+            get => dateLogs;
+            set
+            {
+                dateLogs = value;
+                RaisePropertyChanged(() => DateLogs);
             }
         }
     }

@@ -260,10 +260,6 @@ namespace ServerMonitor.ViewModels.BLL
                 CreateLogWithRequestServerResult(log, requestObj);
                 // 更新站点信息
                 UpdateSiteStatus(site, log);
-                if (icmpFlag == false)
-                {
-                    site.Is_success = 0;
-                }
                 #endregion
             }
 
@@ -528,6 +524,79 @@ namespace ServerMonitor.ViewModels.BLL
                 return log;
             }
             return null;
+        }
+
+        /// <summary>
+        /// 发起请求主体
+        /// </summary>
+        /// <returns>请求结果Log</returns>
+        public async Task<LogModel> MakeRequest(SiteModel siteElement)
+        {
+            LogModel log = null;
+            if (!siteElement.Is_server)
+            {
+                try
+                {
+                    log = await utilObject.RequestHTTPSite(siteElement, HTTPRequest.Instance);
+                }
+                catch (Exception ex)
+                {
+                    DBHelper.InsertErrorLog(ex);
+                    log = null;
+                }
+            }
+            else
+            {
+                try
+                {
+                    switch (siteElement.Protocol_type)
+                    {
+                        // DNS协议请求   --xb
+                        case "DNS":
+                            // 发起DNS请求，生成请求记录并更新站点信息  --xb
+                            log = await utilObject.AccessDNSServer(siteElement, DNSRequest.Instance);
+                            break;
+                        // ICMP协议请求   --xb
+                        case "ICMP":
+                            IPAddress _siteAddress_redress =await utilObject.GetIPAddressAsync(siteElement.Site_address);
+                            ICMPRequest icmp = new ICMPRequest(_siteAddress_redress);
+                            // 发起ICMP请求，生成请求记录并更新站点信息  --xb
+                            log = await utilObject.ConnectToServerWithICMP(siteElement, icmp);
+                            break;
+                        // FTP协议请求   --xb
+                        case "FTP":
+                            // 发起FTP请求，生成请求记录并更新站点信息  --xb
+                            log = await utilObject.AccessFTPServer(siteElement, FTPRequest.Instance);
+                            break;
+                        // SMTP协议请求   --xb
+                        case "SMTP":
+                            // 发起SMTP请求，生成请求记录并更新站点信息  --xb
+                            SMTPRequest _smtpRequest = new SMTPRequest(siteElement.Site_address, siteElement.Server_port);
+                            log = await utilObject.AccessSMTPServer(siteElement, _smtpRequest);
+                            break;
+                        // 补充之前欠缺的Socket服务器请求   --xb
+                        case "SOCKET":
+                            // 初始化Socket请求对象  --xb
+                            SocketRequest _socketRequest = new SocketRequest();
+                            // 请求指定终端，并生成对应的请求记录，最后更新站点信息  --xb
+                            log = await utilObject.ConnectToServerWithSocket(siteElement, _socketRequest);
+                            break;
+                        // 补充之前欠缺的SSH服务器请求   --xb
+                        case "SSH":
+                            log = await utilObject.AccessSSHServer(siteElement, new SSHRequest(siteElement.Site_address, SshLoginType.Anonymous));
+                            break;
+                        default:
+                            log = null;
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    DBHelper.InsertErrorLog(ex);
+                    log = null;
+                }
+            }
+            return log;
         }
     }
 }

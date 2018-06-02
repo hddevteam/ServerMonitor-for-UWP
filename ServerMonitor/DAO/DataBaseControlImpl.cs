@@ -33,8 +33,10 @@ namespace ServerMonitor.SiteDb
         /// <summary>
         /// 延迟加载对象
         /// </summary>
-        public static DataBaseControlImpl Instance {
-            get {
+        public static DataBaseControlImpl Instance
+        {
+            get
+            {
                 return Nested.instance;
             }
         }
@@ -44,9 +46,10 @@ namespace ServerMonitor.SiteDb
         /// </summary>
         public static string DBPath { get => dBPath; }
 
-        static DataBaseControlImpl(){}
+        static DataBaseControlImpl() { }
 
-        private DataBaseControlImpl() {
+        private DataBaseControlImpl()
+        {
 
         }
 
@@ -74,8 +77,8 @@ namespace ServerMonitor.SiteDb
                         // 插入默认的五条数据
                         new SiteModel()
                         {
-                            Site_name = "Google",
-                            Site_address = "https://www.google.com",
+                            Site_name = "Baidu",
+                            Site_address = "https://www.baidu.com",
                             Is_server = false,
                             Protocol_type = "HTTPS",
                             Server_port = 1,
@@ -125,11 +128,11 @@ namespace ServerMonitor.SiteDb
                         },
                         new SiteModel()
                         {
-                            Site_name = "Google",
-                            Site_address = "8.8.8.8",
+                            Site_name = "Bing",
+                            Site_address = "https://cn.bing.com",
                             Is_server = true,
-                            Protocol_type = "DNS",
-                            Server_port = 53,
+                            Protocol_type = "SOCKET",
+                            Server_port = 80,
                             Monitor_interval = 5,
                             Is_Monitor = true,
                             Status_code = "1000/0",
@@ -139,24 +142,7 @@ namespace ServerMonitor.SiteDb
                             Is_pre_check = true,
                             Request_succeed_code = "1000",
                             Is_success = 2,
-                            Protocol_content =JObject.Parse("{'recordType':'A','lookup':'localhost','expectedResults':'127.0.0.1'}").ToString()
-                        },
-                        new SiteModel()
-                        {
-                            Site_name = "Google",
-                            Site_address = "8.8.8.8",
-                            Is_server = true,
-                            Protocol_type = "ICMP",
-                            Server_port = 53,
-                            Monitor_interval = 5,
-                            Is_Monitor = false,
-                            Status_code = "1000/0",
-                            Request_TimeCost = 25383,
-                            Create_time = DateTime.Now,
-                            Update_time = DateTime.Now,
-                            Is_pre_check = false,
-                            Request_succeed_code = "1000",
-                            Is_success = 2                           
+                            Protocol_content =""
                         }
                     };
                     siteDao.InsertListSite(l_site);
@@ -186,9 +172,10 @@ namespace ServerMonitor.SiteDb
             }
         }
 
-        class Nested {
-            static Nested(){}
-            internal static readonly DataBaseControlImpl instance = new DataBaseControlImpl();           
+        class Nested
+        {
+            static Nested() { }
+            internal static readonly DataBaseControlImpl instance = new DataBaseControlImpl();
         }
     }
 }
