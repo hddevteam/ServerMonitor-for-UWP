@@ -64,8 +64,15 @@ namespace ServerMonitor.ViewModels
                 }
                 if (siteId != -1)
                 {
+                    MyTitle = "Edit Server";
+                    CanDelete = true;
                     GetEditSite();  //需要id 放这里
                     SetVS();
+                }
+                else
+                {
+                    MyTitle = "Add Server";
+                    CanDelete = false;
                 }
             });
 
@@ -98,8 +105,19 @@ namespace ServerMonitor.ViewModels
         #region 绑定数据
 
         #region UI控件的显示与其他
-        private Boolean noAnonymous = false;  //true 用户登陆  false：匿名
-        public Boolean NoAnonymous
+        private bool canDelete;
+        public bool CanDelete
+        {
+            get => canDelete;
+            set
+            {
+                canDelete = value;
+                RaisePropertyChanged(() => CanDelete);
+            }
+        }
+
+        private bool noAnonymous = false;  //true 用户登陆  false：匿名
+        public bool NoAnonymous
         {
             get => noAnonymous;
             set
@@ -108,8 +126,8 @@ namespace ServerMonitor.ViewModels
                 RaisePropertyChanged(() => NoAnonymous);
             }
         }
-        private Boolean anonymous = true;  //true 匿名  false：用户登陆
-        public Boolean Anonymous
+        private bool anonymous = true;  //true 匿名  false：用户登陆
+        public bool Anonymous
         {
             get => anonymous;
             set
@@ -118,8 +136,8 @@ namespace ServerMonitor.ViewModels
                 RaisePropertyChanged(() => Anonymous);
             }
         }
-        private Boolean livePort;  //Port是否可人为输入 true 可输入
-        public Boolean LivePort
+        private bool livePort;  //Port是否可人为输入 true 可输入
+        public bool LivePort
         {
             get => livePort;
             set
@@ -128,8 +146,8 @@ namespace ServerMonitor.ViewModels
                 RaisePropertyChanged(() => LivePort);
             }
         }
-        private Boolean diePort;  // = ! livePort
-        public Boolean DiePort
+        private bool diePort;  // = ! livePort
+        public bool DiePort
         {
             get => diePort;
             set
@@ -139,8 +157,8 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        private Boolean needUser;  //是否需要用户名和密码
-        public Boolean NeedUser
+        private bool needUser;  //是否需要用户名和密码
+        public bool NeedUser
         {
             get => needUser;
             set
@@ -150,8 +168,8 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        private Boolean needRecord;   //是否需要Record
-        public Boolean NeedRecord
+        private bool needRecord;   //是否需要Record
+        public bool NeedRecord
         {
             get => needRecord;
             set
@@ -161,8 +179,8 @@ namespace ServerMonitor.ViewModels
             }
         }
 
-        private Boolean isEnabled;   //save按钮是否可用
-        public Boolean IsEnabled
+        private bool isEnabled;   //save按钮是否可用
+        public bool IsEnabled
         {
             get => isEnabled;
             set
@@ -172,6 +190,16 @@ namespace ServerMonitor.ViewModels
             }
         }
         #endregion
+        private string myTitle;
+        public string MyTitle
+        {
+            get => myTitle;
+            set
+            {
+                myTitle = value;
+                RaisePropertyChanged(() => MyTitle);
+            }
+        }
 
         private ObservableCollection<ContactModel> contacts = new ObservableCollection<ContactModel>(); //所有联系人，在本界面只添加一次数据
         public ObservableCollection<ContactModel> Contacts { get => contacts; set => contacts = value; }
@@ -387,7 +415,7 @@ namespace ServerMonitor.ViewModels
         /// <summary>
         /// 上传提交，保存到数据库。改用异步方法 -xn
         /// </summary>
-        public async Task SaveAsync()
+        public async void SaveAsync()
         {
             if (!(await CheckSite(SiteAddress)))
             {
@@ -519,6 +547,39 @@ namespace ServerMonitor.ViewModels
                 site.Protocol_content = GetJson(RecordType, Lookup, ExpectedResults);
             }
         }
+
+        /// <summary>
+        /// 删除站点，只在编辑站点时用到
+        /// </summary>
+        public async void DeleteSiteAsync()
+        {
+            string str = SiteName + " will be deleted.";
+            var messageBox = new Windows.UI.Popups.MessageDialog(str) { Title = "Delete this server?" };
+            messageBox.Commands.Add(new Windows.UI.Popups.UICommand("OK", uicommand =>
+            {
+                if (DBHelper.DeleteOneSite(siteId) == 1)
+                {
+                    if (page == 1)
+                    {
+                        NavigationService.Navigate(typeof(Views.MainPage));
+                    }
+                    else if (page == 2)
+                    {
+                        NavigationService.Navigate(typeof(Views.AllServerPage));
+                    }
+                    else if (page == 3)
+                    {
+                        NavigationService.Navigate(typeof(Views.MainPage));
+                    }
+                }
+            }));
+            messageBox.Commands.Add(new Windows.UI.Popups.UICommand("Cancel", uicommand =>
+            {
+
+            }));
+            await messageBox.ShowAsync();
+        }
+
         /// <summary>
         /// 取消修改/添加 返回原界面
         /// </summary>
@@ -538,6 +599,10 @@ namespace ServerMonitor.ViewModels
             {
                 NoAnonymous = true;
             }
+        }
+        public void GetExpected_Click()
+        {
+
         }
         #endregion
 
@@ -678,7 +743,7 @@ namespace ServerMonitor.ViewModels
             SiteAddress = site.Site_address;
             SiteName = site.Site_name;
             Port = site.Server_port+"";
-            
+
             if (ProtocolType == 2 || ProtocolType == 3)
             {
                 JObject js = (JObject)JsonConvert.DeserializeObject(site.ProtocolIdentification);
@@ -722,7 +787,7 @@ namespace ServerMonitor.ViewModels
                 {
                     //ip的正则表达式
                     Regex regIP = new Regex(@"^((25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))$");
-                    Boolean _ipcheck = regIP.IsMatch(domain);
+                    bool _ipcheck = regIP.IsMatch(domain);
 
                     //域名的正则表达式
                     var http = domain.StartsWith("http://");
@@ -737,7 +802,7 @@ namespace ServerMonitor.ViewModels
                     }
 
                     Regex reg = new Regex(@"^[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+\.?$");
-                    Boolean _domaincheck = reg.IsMatch(domain);
+                    bool _domaincheck = reg.IsMatch(domain);
                     if (_ipcheck || _domaincheck)
                     {
                         return true;
@@ -766,7 +831,7 @@ namespace ServerMonitor.ViewModels
                 return false;
             }
             Regex regPort = new Regex(@"^[1-9][0-9]{0,5}$");
-            Boolean check = regPort.IsMatch(port);
+            bool check = regPort.IsMatch(port);
             if (check)
             {
                 return true;

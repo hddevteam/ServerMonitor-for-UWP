@@ -33,46 +33,48 @@
         <controls:PageHeader x:Name="pageHeader" RelativePanel.AlignLeftWithPanel="True"
                              RelativePanel.AlignRightWithPanel="True"
                              RelativePanel.AlignTopWithPanel="True"
-                             Text="Add Website" >
+                             Text="{Binding MyTitle}" >
         </controls:PageHeader>
-        <Grid Background="#F3F3F3" Grid.Row="1" Margin="24,16,24,20">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <StackPanel Background="#F3F3F3" Grid.Row="1" Margin="24,16,24,20" Orientation="Horizontal">
             <Button Background="{x:Null}" IsEnabled="{Binding IsEnabled}" Click="{x:Bind ViewModel.SaveAsync}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Images/commit.png" Width="16" Height="16"/>
                     <TextBlock Text="Save" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
                 </StackPanel>
             </Button>
-            <Button Grid.Column="1" Background="{x:Null}" Click="{x:Bind ViewModel.CancelBack}">
+            
+            <Grid Width="1" Background="DarkGray" Visibility="{Binding CanDelete}"/>
+            <Button Background="{x:Null}" Click="{x:Bind ViewModel.DeleteSiteAsync}" Visibility="{Binding CanDelete}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Images/delete.png" Width="16" Height="16"/>
+                    <TextBlock Text="Delete" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
+                </StackPanel>
+            </Button>
+
+            <Grid Width="1" Background="DarkGray"/>
+            <Button Background="{x:Null}" Click="{x:Bind ViewModel.CancelBack}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Images/cancel.png" Width="12" Height="12"/>
                     <TextBlock Text="Cancel" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
                 </StackPanel>
             </Button>
 
-            <Grid Grid.Column="2" Width="1" Background="DarkGray"/>
-            <Button Grid.Column="3" Background="{x:Null}" Click="TestSiteConnection">
+            <Grid Width="1" Background="DarkGray"/>
+            <Button Background="{x:Null}" Click="TestSiteConnection">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Images/test.png" Width="16" Height="16"/>
                     <TextBlock Text="Test" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
                 </StackPanel>
             </Button>
 
-            <Grid Grid.Column="4" Width="1" Background="DarkGray"/>
-            <Button Grid.Column="5" Background="{x:Null}" Click="{x:Bind ViewModel.BindContact_Click}">
+            <Grid Width="1" Background="DarkGray"/>
+            <Button Background="{x:Null}" Click="{x:Bind ViewModel.BindContact_Click}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Images/addcontact.png" Width="16" Height="16" HorizontalAlignment="Right"/>
                     <TextBlock Text="Edit Contact" Foreground="Black" VerticalAlignment="Center" Margin="8" FontSize="12"/>
                 </StackPanel>
             </Button>
-        </Grid>
+        </StackPanel>
         
         <Grid HorizontalAlignment="Stretch" Grid.Row="2" Margin="24,0,24,0">
             <Grid.ColumnDefinitions>
