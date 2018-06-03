@@ -158,7 +158,7 @@ namespace ServerMonitor.ViewModels
                 Infos.LastRequest = new LogModel();
                 Infos.LastRequestWords = "No Datas !";
                 Infos.PreviousRequestLog = new LogModel();
-                Infos.PreviousRequestLogWords = "No Datas!";
+                Infos.PreviousRequestLogWords = "No Datas !";
             }
             else
             {
@@ -295,7 +295,7 @@ namespace ServerMonitor.ViewModels
                 else
                 {
                     Infos.PreviousRequestLog = new LogModel();
-                    Infos.PreviousRequestLogWords = "No Datas!";
+                    Infos.PreviousRequestLogWords = "No Datas !";
                 }
             }
         }
@@ -666,8 +666,8 @@ namespace ServerMonitor.ViewModels
             #endregion
             Infos.MedianValue = 0;
             Infos.AverageValue = 0;
-            Infos.PreviousRequestLogWords = "No Datas!";
-            Infos.LastRequestWords = "No Datas!";
+            Infos.PreviousRequestLogWords = "No Datas !";
+            Infos.LastRequestWords = "No Datas !";
             InitChartData();
         }
         /// <summary>
@@ -701,7 +701,7 @@ namespace ServerMonitor.ViewModels
                 else
                 {
                     Infos.PreviousRequestLog = new LogModel();
-                    Infos.PreviousRequestLogWords = "No Datas!";
+                    Infos.PreviousRequestLogWords = "No Datas !";
                 }
             }
             else
@@ -709,9 +709,9 @@ namespace ServerMonitor.ViewModels
                 Infos.MedianValue = 0;
                 Infos.AverageValue = 0;
                 Infos.LastRequest = new LogModel();
-                Infos.LastRequestWords = "No Data!";
+                Infos.LastRequestWords = "No Datas !";
                 Infos.PreviousRequestLog = new LogModel();
-                Infos.PreviousRequestLogWords = "No Datas!";
+                Infos.PreviousRequestLogWords = "No Datas !";
             }
             // V操作 启用刷新按钮
             Infos.RequestAsyncStat = true;
