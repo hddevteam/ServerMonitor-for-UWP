@@ -60,7 +60,8 @@ namespace ServerMonitor.Services.RequestServices
         /// <param name="uri">请求的URI</param>
         private async Task<bool> HttpRequest(string uri)
         {
-            CreateTime = DateTime.Now;
+            // 记录请求耗时
+            Stopwatch stopwatch = new Stopwatch();
             try
             {
                 // 生成默认请求的处理帮助器
@@ -72,24 +73,67 @@ namespace ServerMonitor.Services.RequestServices
                 // 自动释放链接资源
                 using (HttpClient client = new HttpClient(handler))
                 {
+                    
                     //设置标头
                     client.DefaultRequestHeaders.Referrer = new Uri(uri);
                     // 设置请求预期超时时间 
                     client.Timeout = TimeSpan.FromSeconds(OverTime);
                     // 加入请求任务超时控制
-                    CancellationTokenSource ctx = new CancellationTokenSource();
-                    ctx.CancelAfter(TimeSpan.FromSeconds(OverTime));//5s放弃请求
-                    DateTime start_time = DateTime.Now;
-                    HttpResponseMessage message = await client.GetAsync(uri, ctx.Token);
-
-                    //请求失败计算时间
-                    DateTime end_time = DateTime.Now;
-                    TimeSpan timeSpan = end_time - start_time;
-                    TimeCost = (int)timeSpan.TotalMilliseconds;
-                    //请求失败状态码
-                    Status = ((int)Enum.Parse(typeof(System.Net.HttpStatusCode), message.StatusCode.ToString())).ToString();//状态码strign to num                    
-                }
-                return true;
+                    CancellationTokenSource cts = new CancellationTokenSource();
+                    cts.CancelAfter(TimeSpan.FromSeconds(OverTime));//5s放弃请求
+                    // 创建用于接受响应的Message对象
+                    HttpResponseMessage message = null; 
+                    // 秒表开启
+                    stopwatch.Start();
+                    Task queryTask = Task.Run(async() =>
+                    {
+                        try
+                        {
+                            message = await client.GetAsync(uri, cts.Token);
+                            // 停表获取时间
+                            stopwatch.Stop();
+                        }
+                        catch (HttpRequestException e)
+                        {
+                            message = null;
+                            ErrorException = e;
+                            requestInfo = e.Message;
+                        }
+                    });   
+                    // 等待请求任务完成
+                    var ranTask = Task.WaitAny(queryTask, Task.Delay(OverTime));                    
+                    if (0 != ranTask)
+                    {
+                        // 停表获取时间
+                        stopwatch.Stop();
+                        // 取消任务，并返回超时异常
+                        if (!cts.IsCancellationRequested) {
+                            cts.Cancel();
+                        }                       
+                        TimeCost = OverTime;
+                        Status = "1002";
+                        Exception e = new TaskCanceledException("Overtime");
+                        requestInfo = e.ToString();
+                        ErrorException = e;
+                        return false;
+                    }
+                    await Task.CompletedTask;
+                    if (null == message)
+                    {
+                        Status = "500";
+                        TimeCost = (int)(OverTime * 1.5);
+                        return false;
+                    }
+                    else {
+                        //请求计算时间
+                        TimeCost = (int)stopwatch.ElapsedMilliseconds;
+                        //请求失败状态码
+                        Status = ((int)Enum.Parse(typeof(System.Net.HttpStatusCode), message.StatusCode.ToString())).ToString();//状态码string to num
+                        requestInfo = string.Format("{0} in {1}ms",message.StatusCode, stopwatch.ElapsedMilliseconds);
+                        Debug.WriteLine(requestInfo);
+                        return true;
+                    }                    
+                }               
             }
             catch (TaskCanceledException e)
             {
@@ -105,7 +149,7 @@ namespace ServerMonitor.Services.RequestServices
             {
                 Debug.WriteLine("请求失败" + e.Message);
                 DBHelper.InsertErrorLog(e);
-                TimeCost = OverTime;
+                TimeCost = (int)(OverTime*1.5);
                 ErrorException = e;
                 Status = "1002";
                 requestInfo = e.Message;
