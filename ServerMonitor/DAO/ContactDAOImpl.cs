@@ -124,7 +124,7 @@ namespace ServerMonitor.DAO
         public List<ContactModel> GetContactModelsBySiteId(int siteid)
         {
             List<ContactModel> contactModels = new List<ContactModel>();   //新建一个ContactModel表格用于储存获取到的信息
-            IContactSiteDao ISCD = ContactSiteDAOImpl.Instance;    //调用IContactSiteDao里面的接口
+            ISiteContactDao ISCD = SiteContactDAOImpl.Instance;    //调用IContactSiteDao里面的接口
             List<SiteContactModel> contactSiteModels = ISCD.GetConnectsBySiteId(siteid);
             //调用了ContactDAOImpl里面的GetConnectsBySiteId类，该类是通过输入的siteId从ContactSite表里的相对应的ContactId
             foreach (SiteContactModel m in contactSiteModels)//遍历所获得的contactSiteModels表里的信息，如果contactSiteModels里的ContactId与Contact表里的Id相对应，则输出Contact的信息，并加入 List<ContactModel> contactModels
