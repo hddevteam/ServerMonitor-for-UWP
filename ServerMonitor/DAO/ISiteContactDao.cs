@@ -17,7 +17,7 @@ namespace ServerMonitor.DAO
         /// </summary>
         /// <param name="contact"></param>
         /// <returns></returns>
-        int InsertConnect(ContactModel contact);    
+        int InsertConnect(SiteContactModel connect);    
         /// <summary>
         /// 根据站点的id获取绑定记录
         /// </summary>

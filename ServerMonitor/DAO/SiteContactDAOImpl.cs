@@ -83,12 +83,12 @@ namespace ServerMonitor.DAOImpl
         /// </summary>
         /// <param name="contact">待插入的绑定记录</param>
         /// <returns>此次操作影响的数据行数</returns>
-        public int InsertConnect(ContactModel contact)
+        public int InsertConnect(SiteContactModel connect)
         {
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
-                result = conn.Insert(contact);
+                result = conn.Insert(connect);
             }
             return result;
         }
