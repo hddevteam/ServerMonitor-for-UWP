@@ -91,11 +91,17 @@ namespace ServerMonitor.ViewModels.BLL
         /// </summary>
         /// <param name="site"></param>
         /// <returns></returns>
-        string[] getSuccStatusCode(SiteModel site);
+        string[] GetSuccStatusCode(SiteModel site);
         /// <summary>
         /// 发起请求主体
         /// </summary>
         /// <returns>请求结果Log</returns>
         Task<LogModel> MakeRequest(SiteModel site);
+        /// <summary>
+        /// 根据给定的DNS期待返回值字符串返回期待值集合
+        /// </summary>
+        /// <param name="expectString"></param>
+        /// <returns></returns>
+        HashSet<string> GetDNSExpectResult(string expectString);
     }
 }

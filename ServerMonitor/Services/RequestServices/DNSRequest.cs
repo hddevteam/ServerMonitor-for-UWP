@@ -239,7 +239,7 @@ namespace ServerMonitor.Services.RequestServices
         public static QType GetQTypeWithStringTypeName(string typeName) {
             return (QType)Enum.Parse(typeof(QType), typeName);
         }
-
+        
         /// <summary>
         /// 用于控制线程安全的内部类
         /// </summary>

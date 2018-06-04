@@ -89,11 +89,9 @@ namespace ServerMonitor.ViewModels.BLL
                 CreateLogWithRequestServerResult(log, request);
                 // 补充额外添加的判断
                 log.Log_Record = request.RequestInfos;
-                log.Is_error = !request.IsMatchResult(request.ActualResult.First(),
-                    new HashSet<string>() {
-                        // 赋值保存的期待返回值
-                        js["expectedResults"].ToString()
-                    });
+                // 判断此次DNS解析请求的返回值是否为期待的返回值
+                log.Is_error = !request.IsMatchResult(request.ActualResult.First(), 
+                    GetDNSExpectResult(js["expectedResults"].ToString()));
                 if (log.Is_error)
                 {
                     log.Status_code = "1001";
@@ -468,7 +466,7 @@ namespace ServerMonitor.ViewModels.BLL
         /// <returns></returns>
         public bool SuccessCodeMatch(SiteModel site, string statusCode)
         {
-            string[] successCodes = getSuccStatusCode(site);
+            string[] successCodes = GetSuccStatusCode(site);
             foreach (var i in successCodes)
             {
                 if (i.Equals(statusCode))
@@ -484,7 +482,7 @@ namespace ServerMonitor.ViewModels.BLL
         /// </summary>
         /// <param name="site"></param>
         /// <returns></returns>
-        public string[] getSuccStatusCode(SiteModel site)
+        public string[] GetSuccStatusCode(SiteModel site)
         {
             if (site.Request_succeed_code.Contains(','))
             {
@@ -597,6 +595,15 @@ namespace ServerMonitor.ViewModels.BLL
                 }
             }
             return log;
+        }
+        /// <summary>
+        /// 根据给定的DNS期待返回值字符串返回期待值集合
+        /// </summary>
+        /// <param name="expectString"></param>
+        /// <returns></returns>
+        public HashSet<string> GetDNSExpectResult(string expectString)
+        {
+            return string.IsNullOrEmpty(expectString)?null: new HashSet<string>(expectString.Split(','));            
         }
     }
 }
