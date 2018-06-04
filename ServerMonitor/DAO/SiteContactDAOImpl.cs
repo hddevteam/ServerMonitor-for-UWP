@@ -81,7 +81,7 @@ namespace ServerMonitor.DAOImpl
         /// <summary>
         /// 插入一条绑定记录
         /// </summary>
-        /// <param name="contact">待插入的绑定记录</param>
+        /// <param name="connect">待插入的绑定记录</param>
         /// <returns>此次操作影响的数据行数</returns>
         public int InsertConnect(SiteContactModel connect)
         {
