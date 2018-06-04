@@ -10,7 +10,7 @@ namespace ServerMonitor.DAO
     /// <summary>
     /// Author:xb
     /// </summary>
-    public interface IContactSiteDao
+    public interface ISiteContactDao
     {        
         /// <summary>
         /// 插入一条绑定记录

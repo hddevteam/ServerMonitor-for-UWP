@@ -98,13 +98,13 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="DAO\ContactDAOImpl.cs" />
-    <Compile Include="DAO\ContactSiteDAOImpl.cs" />
+    <Compile Include="DAO\SiteContactDAOImpl.cs" />
     <Compile Include="DAO\DataBaseControlImpl.cs" />
     <Compile Include="DAO\IContactDAO.cs" />
     <Compile Include="DAO\ILogDAO.cs" />
     <Compile Include="DAO\LogDAOImpl.cs" />
     <Compile Include="DAO\SiteDAOImpl.cs" />
-    <Compile Include="DAO\IContactSiteDao.cs" />
+    <Compile Include="DAO\ISiteContactDao.cs" />
     <Compile Include="DAO\IDatbaBaseControl.cs" />
     <Compile Include="DAO\ISiteDAO.cs" />
     <Compile Include="Models\SiteContactModel.cs" />

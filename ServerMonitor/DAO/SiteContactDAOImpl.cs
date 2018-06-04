@@ -14,12 +14,12 @@ namespace ServerMonitor.DAOImpl
     /// <summary>
     /// Author:xb
     /// </summary>
-    public class ContactSiteDAOImpl : IContactSiteDao
+    public class SiteContactDAOImpl : ISiteContactDao
     {
         /// <summary>
         /// 延迟加载实例
         /// </summary>
-        public static ContactSiteDAOImpl Instance
+        public static SiteContactDAOImpl Instance
         {
             get {
                 return Nested.instance;
@@ -29,7 +29,7 @@ namespace ServerMonitor.DAOImpl
         /// <summary>
         /// 禁止直接生成实例
         /// </summary>
-        private ContactSiteDAOImpl() { }
+        private SiteContactDAOImpl() { }
 
         /// <summary>
         /// 根据单个站点ID删除此站点与指定ID联系人的记录
@@ -42,7 +42,7 @@ namespace ServerMonitor.DAOImpl
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
-                result = conn.Execute("delete from Site_Contact where SiteId = ? and contact_id = ?", SiteId, ContactId);
+                result = conn.Execute("delete from Site_Contact where site_id = ? and contact_id = ?", SiteId, ContactId);
             }
             return result;
         }
@@ -138,7 +138,7 @@ namespace ServerMonitor.DAOImpl
             {
 
             }
-            internal static readonly ContactSiteDAOImpl instance = new ContactSiteDAOImpl();
+            internal static readonly SiteContactDAOImpl instance = new SiteContactDAOImpl();
         }
     }
 }

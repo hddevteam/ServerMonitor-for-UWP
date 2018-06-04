@@ -44,7 +44,7 @@ namespace ServerMonitor.LogDb
             {
                 using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
                 {
-                    result = conn.Execute("delete from Log where Site_id = ?", siteId);
+                    result = conn.Execute("delete from Log where site_id = ?", siteId);
                 }
                 Debug.WriteLine(string.Format("站点：{0} 成功删除 {1} 条记录！", siteId, result));
             }
@@ -68,7 +68,7 @@ namespace ServerMonitor.LogDb
 
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
-                result = conn.Execute("delete from Log where Id = ?", LogId);
+                result = conn.Execute("delete from Log where id = ?", LogId);
             }
             return result;
         }
