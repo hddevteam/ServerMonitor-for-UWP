@@ -23,6 +23,8 @@ using ServerMonitor.ViewModels.BLL;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ServerMonitor.LogDb;
+using System.Diagnostics;
+using Windows.ApplicationModel;
 
 namespace ServerMonitor
 {
@@ -62,6 +64,7 @@ namespace ServerMonitor
 
         public override async Task OnStartAsync(StartKind startKind, IActivatedEventArgs args)
         {
+            Debug.WriteLine("OnInitializeAsync execute!");
             // TODO: add your long-running task here
             // 翻译下：把你需要长时间加载的代码放在这里
             #region 数据库Init
@@ -78,8 +81,21 @@ namespace ServerMonitor
             await NavigationService.NavigateAsync(typeof(Views.MainPage));
         }
 
+        public override void OnResuming(object s, object e, AppExecutionState previousExecutionState)
+        {
+            Debug.WriteLine("OnResuming execute!");
+            base.OnResuming(s, e, previousExecutionState);
+        }
+
+        public override Task OnSuspendingAsync(object s, SuspendingEventArgs e, bool prelaunchActivated)
+        {
+            Debug.WriteLine("OnSuspendingAsync execute!");
+            return base.OnSuspendingAsync(s, e, prelaunchActivated);
+        }
+
         public override Task OnInitializeAsync(IActivatedEventArgs args)
-        {            
+        {
+            Debug.WriteLine("OnInitializeAsync execute!");
             return base.OnInitializeAsync(args);
         }
 
@@ -188,6 +204,6 @@ namespace ServerMonitor
                 }
             }
 			
-		}
+		}        
 	}
 }

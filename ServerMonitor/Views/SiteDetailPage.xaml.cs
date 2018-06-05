@@ -17,8 +17,6 @@ namespace ServerMonitor.Views
             InitializeComponent();
             // 确认界面是否采用缓存
             NavigationCacheMode = NavigationCacheMode.Disabled;            
-        }
-
-        
+        }                
     }
 }

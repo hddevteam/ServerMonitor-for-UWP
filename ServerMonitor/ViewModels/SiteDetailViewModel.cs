@@ -454,12 +454,12 @@ namespace ServerMonitor.ViewModels
                 Debug.WriteLine("成功插入一条日志数据! 日志内容为：" + log.ToString());
                 Infos.Logs.Add(log);
                 if (!log.Is_error)
-                {
-                    Infos.SuccessLogs.Add(log);
+                {                    
                     if (log.Create_Time.Subtract(Infos.SuccessLogs.Last().Create_Time).TotalMinutes >= 30)
                     {
                         Infos.FirstLineChartData.Add(new LineChartData() { RequestTime = log.Create_Time, ResponseTime = null });
                     }
+                    Infos.SuccessLogs.Add(log);
                     Infos.FirstLineChartData.Add(new LineChartData() { RequestTime = log.Create_Time, ResponseTime = log.TimeCost });
                 }
             }
@@ -587,7 +587,7 @@ namespace ServerMonitor.ViewModels
         public void Load_Loading(FrameworkElement sender, object args)
         {
             ChangeStepUnitStep(0);
-            Debug.WriteLine("load_Loading() Excute!");
+            Debug.WriteLine("load_Loading() Excute!"+DateTime.Now.ToLocalTime().ToString());
         }
         /// <summary>
         /// 绑定界面的ToggleSwitch
