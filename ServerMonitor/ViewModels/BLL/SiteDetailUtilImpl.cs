@@ -87,17 +87,21 @@ namespace ServerMonitor.ViewModels.BLL
 
                 // 处理请求记录
                 CreateLogWithRequestServerResult(log, request);
-                // 补充额外添加的判断
-                log.Log_Record = request.RequestInfos;
-                log.Is_error = !request.IsMatchResult(request.ActualResult.First(),
+                // 补充额外添加的判断  --xb
+                if (! log.Is_error) {
+                    log.Is_error = !request.IsMatchResult(request.ActualResult.First(),
                     new HashSet<string>() {
-                        // 赋值保存的期待返回值
+                        // 赋值保存的期待返回值  --xb
                         js["expectedResults"].ToString()
                     });
-                if (log.Is_error)
-                {
-                    log.Status_code = "1001";
+                    if (log.Is_error)
+                    {
+                        log.Status_code = "1001";
+                    }
                 }
+                // 补充此次请求的其他内容（协议的返回信息）  --xb
+                log.Log_Record = request.RequestInfos;
+                
                 // 更新站点信息
                 UpdateSiteStatus(site, log);
             }

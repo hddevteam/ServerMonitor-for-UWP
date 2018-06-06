@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Heijden.DNS;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ServerMonitor.Controls;
 using ServerMonitor.DAOImpl;
@@ -15,6 +16,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Template10.Mvvm;
 using Template10.Services.NavigationService;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -544,7 +546,7 @@ namespace ServerMonitor.ViewModels
             }
             else if (site.Protocol_type.Equals("DNS"))
             {
-                site.Protocol_content = GetJson(RecordType, Lookup, ExpectedResults);
+                site.Protocol_content = GetJson(RecordType, Lookup, GetExpectedResults(ExpectedResults));
             }
         }
 
@@ -600,9 +602,51 @@ namespace ServerMonitor.ViewModels
                 NoAnonymous = true;
             }
         }
-        public void GetExpected_Click()
+        public async void GetExpected_Click()
         {
+            DNSRequest request = DNSRequest.Instance;
+            IPAddress server;
+            try//检测IP是否合法
+            {
+                server = IPAddress.Parse(SiteAddress);
+            }
+            catch
+            {
+                await new MessageDialog("ServerAddress is wrong").ShowAsync();
+                return;
+            }
+            QType type = QType.A;//默认值为A
+            switch (RecordType)
+            {//获取QType
+                case 0:
+                    type = QType.A;
+                    break;
+                case 1:
+                    type = QType.CNAME;
+                    break;
+                case 2:
+                    type = QType.NS;
+                    break;
+                case 3:
+                    type = QType.MX;
+                    break;
+                default:
+                    break;
+            }
+            request.DomainName = Lookup;
+            request.RecordType = type;
+            request.DnsServer = server;
+            await request.MakeRequest();
 
+            if (request.ActualResult!=null)
+            {
+                string str = "";
+                foreach (var item in request.ActualResult)
+                {
+                    str += item + ",";
+                }
+                ExpectedResults = GetExpectedResults(ExpectedResults +","+ str);
+            }
         }
         #endregion
 
@@ -1028,6 +1072,35 @@ namespace ServerMonitor.ViewModels
                     vs[contactS[i].ContactId] = true;
                 }
             }
+        }
+
+        
+        private string GetExpectedResults(string results)
+        {
+            string str = "";
+            string[] arr = results.Split(',');
+            List<string> vs = new List<string>();
+            for (int i = 0; i < arr.Count(); i++)
+            {
+                try
+                {
+                    var x = IPAddress.Parse(arr[i]);
+                    var q1 = (from t in vs
+                              where t.Equals(arr[i])
+                              select t).Count();
+                    if (q1 == 0)
+                    {
+                        vs.Add(arr[i]);
+                        str += arr[i] + ",";
+                    }
+                }
+                catch (Exception)
+                {
+                    
+                }
+                
+            }
+            return str.TrimEnd(',');
         }
         #endregion
     }
