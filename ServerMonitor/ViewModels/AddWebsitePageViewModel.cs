@@ -65,8 +65,15 @@ namespace ServerMonitor.ViewModels
                 }
                 if (siteId != -1)
                 {
+                    MyTitle = "Edit Website";
+                    CanDelete = true;
                     GetEditSite();  //需要id 放这里
                     SetVS();
+                }
+                else
+                {
+                    MyTitle = "Add Website";
+                    CanDelete = false;
                 }
             });
 
@@ -97,11 +104,22 @@ namespace ServerMonitor.ViewModels
         #endregion 系统函数
 
         #region 绑定数据
-        private Boolean isEnabled;
+        private bool canDelete;
+        public bool CanDelete
+        {
+            get => canDelete;
+            set
+            {
+                canDelete = value;
+                RaisePropertyChanged(() => CanDelete);
+            }
+        }
+
+        private bool isEnabled;
         /// <summary>
         /// save按钮是否可用
         /// </summary>
-        public Boolean IsEnabled
+        public bool IsEnabled
         {
             get => isEnabled;
             set
@@ -110,7 +128,16 @@ namespace ServerMonitor.ViewModels
                 RaisePropertyChanged(() => IsEnabled);
             }
         }
-
+        private string myTitle;
+        public string MyTitle
+        {
+            get => myTitle;
+            set
+            {
+                myTitle = value;
+                RaisePropertyChanged(() => MyTitle);
+            }
+        }
         private ObservableCollection<ContactModel> contacts = new ObservableCollection<ContactModel>(); //所有联系人，在本界面只添加一次数据
         public ObservableCollection<ContactModel> Contacts { get => contacts; set => contacts = value; }
 
@@ -269,7 +296,7 @@ namespace ServerMonitor.ViewModels
         /// <summary>
         /// 上传提交，保存到数据库
         /// </summary>
-        public async Task SaveAsync()
+        public async void SaveAsync()
         {
             //save前检查下站点地址是否可解析
             if (!(await CheckSite()))
@@ -378,6 +405,39 @@ namespace ServerMonitor.ViewModels
                 Jump();
             }
         }
+
+        /// <summary>
+        /// 删除站点，只在编辑站点时用到
+        /// </summary>
+        public async void DeleteSiteAsync()
+        {
+            string str = SiteName + " will be deleted.";
+            var messageBox = new Windows.UI.Popups.MessageDialog(str) { Title = "Delete this website?" };
+            messageBox.Commands.Add(new Windows.UI.Popups.UICommand("OK", uicommand =>
+            {
+                if (DBHelper.DeleteOneSite(siteId) == 1)
+                {
+                    if (page == 1)
+                    {
+                        NavigationService.Navigate(typeof(Views.MainPage));
+                    }
+                    else if (page == 2)
+                    {
+                        NavigationService.Navigate(typeof(Views.AllServerPage));
+                    }
+                    else if (page == 3)
+                    {
+                        NavigationService.Navigate(typeof(Views.MainPage));
+                    }
+                }
+            }));
+            messageBox.Commands.Add(new Windows.UI.Popups.UICommand("Cancel", uicommand =>
+            {
+
+            }));
+            await messageBox.ShowAsync();
+        }
+
         /// <summary>
         /// 取消修改/添加 返回原界面
         /// </summary>
@@ -523,7 +583,7 @@ namespace ServerMonitor.ViewModels
                 {
                     //域名的正则表达式
                     Regex reg = new Regex(@"^[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+\.?$");
-                    Boolean _domaincheck = reg.IsMatch(domain);
+                    bool _domaincheck = reg.IsMatch(domain);
                     if (_domaincheck)
                     {
                         return true;
