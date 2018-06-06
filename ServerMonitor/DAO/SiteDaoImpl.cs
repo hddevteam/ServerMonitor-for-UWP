@@ -67,7 +67,7 @@ namespace ServerMonitor.SiteDb
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
-                result = conn.Execute("delete from Site where Id = ?", siteId);
+                result = conn.Execute("delete from Site where id = ?", siteId);
             }
             return result;
         }
@@ -157,7 +157,7 @@ namespace ServerMonitor.SiteDb
             int result = -1;
             using (SQLiteConnection conn = new SQLiteConnection(new SQLitePlatformWinRT(), DataBaseControlImpl.DBPath))
             {
-                SQLiteCommand cmd = conn.CreateCommand("update Site set Is_success = ?;", statusCode);
+                SQLiteCommand cmd = conn.CreateCommand("update Site set is_success = ?;", statusCode);
                 result = cmd.ExecuteNonQuery();
             }
             return result;

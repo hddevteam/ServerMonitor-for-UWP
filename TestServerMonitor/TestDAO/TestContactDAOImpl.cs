@@ -46,7 +46,7 @@ namespace TestServerMonitor.TestDAO
             };
             ICD.InsertOneContact(l_CL);
             //为了防止数据库起初没数据，为表插入一条Contact信息，使测试通过
-            IContactSiteDao contactSiteDao = ContactSiteDAOImpl.Instance;
+            ISiteContactDao contactSiteDao = SiteContactDAOImpl.Instance;
             contactSiteDao.InsertListConnects(new List<SiteContactModel>()
             {
                 new SiteContactModel()

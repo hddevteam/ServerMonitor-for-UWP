@@ -468,7 +468,7 @@ namespace ServerMonitor.ViewModels
             //数据库操作
             if (DBHelper.InsertOneSite(site) == 1)
             {
-                var contactS = ContactSiteDAOImpl.Instance.InsertListConnects(contactSiteModels);
+                var contactS = SiteContactDAOImpl.Instance.InsertListConnects(contactSiteModels);
                 Jump(); //返回原界面
             }
         }
@@ -502,8 +502,8 @@ namespace ServerMonitor.ViewModels
             {
                 if (contactChange)
                 {
-                    var in1 = ContactSiteDAOImpl.Instance.DeletSiteAllConnect(siteId);
-                    var contactS = ContactSiteDAOImpl.Instance.InsertListConnects(contactSiteModels);
+                    var in1 = SiteContactDAOImpl.Instance.DeletSiteAllConnect(siteId);
+                    var contactS = SiteContactDAOImpl.Instance.InsertListConnects(contactSiteModels);
                 }
                 Jump();
             }
@@ -1061,7 +1061,7 @@ namespace ServerMonitor.ViewModels
         /// </summary>
         private void SetVS()
         {
-            var contactS = ContactSiteDAOImpl.Instance.GetConnectsBySiteId(siteId);
+            var contactS = SiteContactDAOImpl.Instance.GetConnectsBySiteId(siteId);
             for (int i = 0; i < contactS.Count; i++)  //vs填充数据
             {
                 var q = (from t in Contacts

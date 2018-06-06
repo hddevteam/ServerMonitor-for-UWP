@@ -10,14 +10,14 @@ namespace ServerMonitor.DAO
     /// <summary>
     /// Author:xb
     /// </summary>
-    public interface IContactSiteDao
+    public interface ISiteContactDao
     {        
         /// <summary>
         /// 插入一条绑定记录
         /// </summary>
         /// <param name="contact"></param>
         /// <returns></returns>
-        int InsertConnect(ContactModel contact);    
+        int InsertConnect(SiteContactModel connect);    
         /// <summary>
         /// 根据站点的id获取绑定记录
         /// </summary>
